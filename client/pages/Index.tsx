@@ -222,7 +222,7 @@ export default function Index() {
             {services.map((service, index) => (
               <Card
                 key={index}
-                className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-primary/20"
+                className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-2 hover:border-primary/20 flex flex-col h-full"
               >
                 <CardHeader className="text-center pb-4">
                   <div
@@ -233,19 +233,21 @@ export default function Index() {
                   <CardTitle className="text-xl">{service.title}</CardTitle>
                   <CardDescription>{service.description}</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  {service.subcategories.map((sub, subIndex) => (
-                    <div
-                      key={subIndex}
-                      className="flex items-center gap-3 text-sm"
-                    >
-                      <sub.icon className="h-4 w-4 text-muted-foreground" />
-                      <span>{sub.name}</span>
-                    </div>
-                  ))}
+                <CardContent className="flex flex-col h-full">
+                  <div className="space-y-3 flex-1">
+                    {service.subcategories.map((sub, subIndex) => (
+                      <div
+                        key={subIndex}
+                        className="flex items-center gap-3 text-sm"
+                      >
+                        <sub.icon className="h-4 w-4 text-muted-foreground" />
+                        <span>{sub.name}</span>
+                      </div>
+                    ))}
+                  </div>
                   <Button
                     variant="outline"
-                    className="w-full mt-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                    className="w-full mt-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                   >
                     Voir les professionnels
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -269,22 +271,26 @@ export default function Index() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-12">
             {steps.map((step, index) => (
-              <div key={index} className="text-center space-y-4">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+              <div key={index} className="text-center space-y-6">
+                <div className="relative mx-auto w-fit">
+                  <div className="w-20 h-20 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-2xl font-bold shadow-lg">
                     {step.number}
                   </div>
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                    <div className="w-12 h-12 bg-white border-4 border-primary/20 rounded-full flex items-center justify-center">
+                  <div className="absolute -bottom-3 -right-3">
+                    <div className="w-12 h-12 bg-white border-4 border-primary rounded-full flex items-center justify-center shadow-md">
                       <step.icon className="h-5 w-5 text-primary" />
                     </div>
                   </div>
                 </div>
-                <div className="pt-4">
-                  <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                  <p className="text-muted-foreground">{step.description}</p>
+                <div className="bg-white/50 rounded-xl p-6 border border-primary/10">
+                  <h3 className="text-xl font-semibold mb-3 text-foreground">
+                    {step.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {step.description}
+                  </p>
                 </div>
               </div>
             ))}
