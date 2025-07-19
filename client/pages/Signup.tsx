@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -30,19 +30,21 @@ import {
   UserCheck,
 } from "lucide-react";
 
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../firebase";
+import { doc, setDoc } from "firebase/firestore";
+
 type AccountType = "client" | "professionnel" | "";
 
 export default function Signup() {
+  const navigate = useNavigate();
   const [accountType, setAccountType] = useState<AccountType>("");
   const [formData, setFormData] = useState({
-    // Client fields
     firstName: "",
     lastName: "",
-    // Professional fields
     companyName: "",
     profession: "",
     siret: "",
-    // Common fields
     email: "",
     password: "",
     confirmPassword: "",
@@ -52,76 +54,55 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const validateSiret = (siret: string) => {
-    return /^\d{14}$/.test(siret);
-  };
-
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validateSiret = (siret: string) => /^\d{14}$/.test(siret);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    // Validation du type de compte
-    if (!accountType) {
-      setError("Veuillez sélectionner un type de compte");
-      return;
-    }
+    if (!accountType) return setError("Veuillez sélectionner un type de compte");
+    if (!formData.email || !formData.password || !formData.confirmPassword) return setError("Veuillez remplir tous les champs");
+    if (!validateEmail(formData.email)) return setError("Adresse email invalide");
+    if (formData.password.length < 6) return setError("Mot de passe trop court");
+    if (formData.password !== formData.confirmPassword) return setError("Les mots de passe ne correspondent pas");
 
-    // Validation des champs communs
-    if (!formData.email || !formData.password || !formData.confirmPassword) {
-      setError("Veuillez remplir tous les champs obligatoires");
-      return;
-    }
-
-    if (!validateEmail(formData.email)) {
-      setError("Veuillez entrer une adresse email valide");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Les mots de passe ne correspondent pas");
-      return;
-    }
-
-    // Validation spécifique selon le type de compte
     if (accountType === "client") {
-      if (!formData.firstName || !formData.lastName) {
-        setError("Veuillez remplir votre prénom et nom");
-        return;
-      }
+      if (!formData.firstName || !formData.lastName) return setError("Prénom et nom requis");
     } else if (accountType === "professionnel") {
-      if (!formData.companyName || !formData.profession || !formData.siret) {
-        setError("Veuillez remplir tous les champs professionnels");
-        return;
-      }
-      if (!validateSiret(formData.siret)) {
-        setError("Le SIRET doit contenir exactement 14 chiffres");
-        return;
-      }
+      if (!formData.companyName || !formData.profession || !formData.siret) return setError("Champs pro requis");
+      if (!validateSiret(formData.siret)) return setError("SIRET invalide");
     }
 
     setIsLoading(true);
-
-    // Simulation d'une inscription (à remplacer par votre API)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const user = userCredential.user;
 
-      console.log("Inscription réussie:", { accountType, ...formData });
-      // window.location.href = accountType === "client" ? "/espace-client" : "/professionnels";
-    } catch (err) {
-      setError("Une erreur est survenue. Veuillez réessayer.");
+      const userData = {
+        role: accountType,
+        email: formData.email,
+        ...(accountType === "client"
+          ? {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+            }
+          : {
+              companyName: formData.companyName,
+              profession: formData.profession,
+              siret: formData.siret,
+            }),
+      };
+
+      await setDoc(doc(db, "users", user.uid), userData);
+      navigate(accountType === "client" ? "/espace-client" : "/professionnels");
+    } catch (err: any) {
+      console.error(err);
+      setError(err.code === "auth/email-already-in-use" ? "Cet email est déjà utilisé." : "Erreur : " + err.message);
     } finally {
       setIsLoading(false);
     }

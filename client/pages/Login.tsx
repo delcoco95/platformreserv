@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -13,12 +17,16 @@ import {
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 
+const db = getFirestore(); // 🔥 Firestore instance
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -28,7 +36,6 @@ export default function Login() {
     e.preventDefault();
     setError("");
 
-    // Validation
     if (!email || !password) {
       setError("Veuillez remplir tous les champs");
       return;
@@ -46,27 +53,44 @@ export default function Login() {
 
     setIsLoading(true);
 
-    // Simulation d'une connexion (à remplacer par votre API)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-      // Simulation d'une erreur de connexion
-      if (email === "test@error.com") {
-        setError("Email ou mot de passe incorrect");
-        return;
+      console.log("✅ Connexion réussie :", user);
+
+      // 🔍 Récupération du rôle dans Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const role = userData.role || userData.type; // selon nom du champ
+
+        if (role === "client") {
+          navigate("/espace-client");
+        } else if (role === "professionnel") {
+          navigate("/professionnels");
+        } else {
+          setError("Type de compte inconnu.");
+        }
+      } else {
+        setError("Profil utilisateur introuvable.");
       }
 
-      // Redirection après connexion réussie
-      console.log("Connexion réussie:", { email });
-      // window.location.href = "/espace-client";
-    } catch (err) {
-      setError("Une erreur est survenue. Veuillez réessayer.");
+    } catch (err: any) {
+      console.error(err);
+      if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+        setError("Email ou mot de passe incorrect.");
+      } else {
+        setError("Erreur lors de la connexion : " + err.message);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  return (
+   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-muted/20">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
@@ -162,17 +186,8 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Demo info */}
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground">
-            Demo : utilisez n'importe quel email valide et mot de passe (6+
-            caractères)
-            <br />
-            Testez une erreur avec : test@error.com
-          </p>
-        </div>
       </div>
     </div>
   );
+
 }
