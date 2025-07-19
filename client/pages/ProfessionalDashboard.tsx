@@ -39,8 +39,6 @@ const Map = lazy(() =>
   import("../components/Map").then((module) => ({ default: module.Map })),
 );
 
-import { lazy } from "react";
-
 export default function ProfessionalDashboard() {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
 
