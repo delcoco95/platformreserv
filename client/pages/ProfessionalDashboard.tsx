@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
@@ -34,38 +34,15 @@ import {
 // Import Leaflet CSS
 import "leaflet/dist/leaflet.css";
 
-// Dynamic imports for Leaflet components
-const MapContainer = lazy(() =>
-  import("react-leaflet").then((module) => ({ default: module.MapContainer })),
-);
-const TileLayer = lazy(() =>
-  import("react-leaflet").then((module) => ({ default: module.TileLayer })),
-);
-const Marker = lazy(() =>
-  import("react-leaflet").then((module) => ({ default: module.Marker })),
-);
-const Popup = lazy(() =>
-  import("react-leaflet").then((module) => ({ default: module.Popup })),
+// Lazy load the map component
+const Map = lazy(() =>
+  import("../components/Map").then((module) => ({ default: module.Map })),
 );
 
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 
 export default function ProfessionalDashboard() {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
-
-  // Fix Leaflet default markers
-  useEffect(() => {
-    // This fixes the default markers in Leaflet
-    delete (L.Icon.Default.prototype as any)._getIconUrl;
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl:
-        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-      iconUrl:
-        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-      shadowUrl:
-        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-    });
-  }, []);
 
   // Mock data - remplacer par des vraies données API
   const professionalInfo = {
@@ -304,11 +281,21 @@ export default function ProfessionalDashboard() {
                                 <div className="flex items-center gap-4 text-sm">
                                   <div className="flex items-center gap-1">
                                     <Phone className="h-4 w-4 text-muted-foreground" />
-                                    {appointment.clientPhone}
+                                    <a
+                                      href={`tel:${appointment.clientPhone}`}
+                                      className="hover:text-primary"
+                                    >
+                                      {appointment.clientPhone}
+                                    </a>
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <Mail className="h-4 w-4 text-muted-foreground" />
-                                    {appointment.clientEmail}
+                                    <a
+                                      href={`mailto:${appointment.clientEmail}`}
+                                      className="hover:text-primary"
+                                    >
+                                      {appointment.clientEmail}
+                                    </a>
                                   </div>
                                 </div>
                                 <div className="text-lg font-semibold text-primary">
@@ -317,6 +304,7 @@ export default function ProfessionalDashboard() {
                               </div>
                             </div>
                             <Button variant="outline" size="sm">
+                              <Phone className="h-4 w-4 mr-2" />
                               Contacter
                             </Button>
                           </div>
@@ -330,72 +318,27 @@ export default function ProfessionalDashboard() {
                       <Suspense
                         fallback={
                           <div className="h-full bg-muted flex items-center justify-center">
-                            <p className="text-muted-foreground">
-                              Chargement de la carte...
-                            </p>
+                            <div className="text-center space-y-2">
+                              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+                              <p className="text-muted-foreground">
+                                Chargement de la carte...
+                              </p>
+                            </div>
                           </div>
                         }
                       >
-                        <MapContainer
+                        <Map
+                          appointments={upcomingAppointments}
                           center={mapCenter}
                           zoom={12}
-                          className="h-full w-full"
-                        >
-                          <TileLayer
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                          />
-                          {upcomingAppointments.map((appointment) => (
-                            <Marker
-                              key={appointment.id}
-                              position={[appointment.lat, appointment.lng]}
-                              eventHandlers={{
-                                click: () => {
-                                  setSelectedAppointment(appointment);
-                                },
-                              }}
-                            >
-                              <Popup>
-                                <div className="space-y-2 min-w-48">
-                                  <h4 className="font-semibold">
-                                    {appointment.service}
-                                  </h4>
-                                  <div className="space-y-1 text-sm">
-                                    <div>
-                                      <strong>Client:</strong>{" "}
-                                      {appointment.clientName}
-                                    </div>
-                                    <div>
-                                      <strong>Date:</strong>{" "}
-                                      {formatDate(appointment.date)} à{" "}
-                                      {appointment.time}
-                                    </div>
-                                    <div>
-                                      <strong>Téléphone:</strong>{" "}
-                                      {appointment.clientPhone}
-                                    </div>
-                                    <div>
-                                      <strong>Email:</strong>{" "}
-                                      {appointment.clientEmail}
-                                    </div>
-                                    <div>
-                                      <strong>Adresse:</strong>{" "}
-                                      {appointment.address}
-                                    </div>
-                                    <div className="text-lg font-semibold text-primary pt-2">
-                                      {appointment.price}
-                                    </div>
-                                  </div>
-                                </div>
-                              </Popup>
-                            </Marker>
-                          ))}
-                        </MapContainer>
+                          onMarkerClick={setSelectedAppointment}
+                        />
                       </Suspense>
                     </div>
                     <p className="text-sm text-muted-foreground mt-4">
                       Cliquez sur les marqueurs pour voir les détails des
-                      rendez-vous
+                      rendez-vous. Les informations des clients s'affichent dans
+                      les bulles d'information.
                     </p>
                   </TabsContent>
                 </Tabs>
@@ -414,7 +357,7 @@ export default function ProfessionalDashboard() {
                 <div className="flex items-center gap-4">
                   <Avatar className="h-16 w-16">
                     <AvatarImage src={professionalInfo.avatar} />
-                    <AvatarFallback className="text-lg">
+                    <AvatarFallback className="text-lg bg-primary text-primary-foreground">
                       {professionalInfo.companyName
                         .split(" ")
                         .map((word) => word[0])
@@ -509,6 +452,10 @@ export default function ProfessionalDashboard() {
                 <div className="flex items-center gap-3 text-sm">
                   <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                   <span>Profil mis à jour</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <span>Paiement reçu: 180€</span>
                 </div>
               </CardContent>
             </Card>
