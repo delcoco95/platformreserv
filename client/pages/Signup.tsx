@@ -59,9 +59,10 @@ export default function Signup() {
   // Rediriger si déjà connecté
   useEffect(() => {
     if (currentUser && userProfile) {
-      const redirectPath = userProfile.userType === 'client' 
-        ? '/espace-client' 
-        : '/espace-professionnel';
+      const redirectPath =
+        userProfile.userType === "client"
+          ? "/espace-client"
+          : "/espace-professionnel";
       navigate(redirectPath, { replace: true });
     }
   }, [currentUser, userProfile, navigate]);
@@ -123,8 +124,8 @@ export default function Signup() {
         preferences: {
           notifications: true,
           smsAlerts: false,
-          emailAlerts: true
-        }
+          emailAlerts: true,
+        },
       };
     } else if (accountType === "professionnel") {
       if (!formData.companyName || !formData.profession || !formData.siret) {
@@ -150,31 +151,36 @@ export default function Signup() {
           thursday: true,
           friday: true,
           saturday: false,
-          sunday: false
-        }
+          sunday: false,
+        },
       };
     }
 
     setIsLoading(true);
 
     try {
-      await register(formData.email, formData.password, accountType, additionalData);
+      await register(
+        formData.email,
+        formData.password,
+        accountType,
+        additionalData,
+      );
       // La redirection se fera via useEffect quand currentUser sera mis à jour
     } catch (error: any) {
-      console.error('Erreur d\'inscription:', error);
-      
+      console.error("Erreur d'inscription:", error);
+
       // Messages d'erreur Firebase traduits
       switch (error.code) {
-        case 'auth/email-already-in-use':
+        case "auth/email-already-in-use":
           setError("Cette adresse email est déjà utilisée");
           break;
-        case 'auth/invalid-email':
+        case "auth/invalid-email":
           setError("Adresse email invalide");
           break;
-        case 'auth/weak-password':
+        case "auth/weak-password":
           setError("Le mot de passe est trop faible");
           break;
-        case 'auth/operation-not-allowed':
+        case "auth/operation-not-allowed":
           setError("L'inscription n'est pas autorisée");
           break;
         default:

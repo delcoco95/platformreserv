@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { 
-  Calendar, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Car, 
-  Wrench, 
-  Key, 
+import {
+  Calendar,
+  Mail,
+  Phone,
+  MapPin,
+  Car,
+  Wrench,
+  Key,
   Clock,
   Shield,
   Award,
@@ -16,33 +16,33 @@ import {
   Facebook,
   Twitter,
   Instagram,
-  Linkedin
+  Linkedin,
 } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   const services = [
-    { 
-      id: 'automobile', 
-      label: 'Automobile', 
-      icon: Car, 
-      description: 'Entretien et réparation',
-      link: '/professionnels?categorie=automobile'
+    {
+      id: "automobile",
+      label: "Automobile",
+      icon: Car,
+      description: "Entretien et réparation",
+      link: "/professionnels?categorie=automobile",
     },
-    { 
-      id: 'plomberie', 
-      label: 'Plomberie', 
-      icon: Wrench, 
-      description: 'Installation et dépannage',
-      link: '/professionnels?categorie=plomberie'
+    {
+      id: "plomberie",
+      label: "Plomberie",
+      icon: Wrench,
+      description: "Installation et dépannage",
+      link: "/professionnels?categorie=plomberie",
     },
-    { 
-      id: 'serrurerie', 
-      label: 'Serrurerie', 
-      icon: Key, 
-      description: 'Sécurité et urgences',
-      link: '/professionnels?categorie=serrurerie'
+    {
+      id: "serrurerie",
+      label: "Serrurerie",
+      icon: Key,
+      description: "Sécurité et urgences",
+      link: "/professionnels?categorie=serrurerie",
     },
   ];
 
@@ -80,12 +80,14 @@ export function Footer() {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Calendar className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold text-white">RendezVousPro</span>
+              <span className="text-xl font-bold text-white">
+                RendezVousPro
+              </span>
             </div>
             <p className="text-sm leading-relaxed mb-6">
-              La plateforme de référence pour réserver vos services à domicile. 
-              Automobile, plomberie, serrurerie : trouvez le professionnel qu'il vous faut 
-              en quelques clics.
+              La plateforme de référence pour réserver vos services à domicile.
+              Automobile, plomberie, serrurerie : trouvez le professionnel qu'il
+              vous faut en quelques clics.
             </p>
             <div className="space-y-3 text-sm">
               <div className="flex items-center space-x-2">
@@ -94,13 +96,19 @@ export function Footer() {
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-primary" />
-                <a href="tel:+33123456789" className="hover:text-white transition-colors">
+                <a
+                  href="tel:+33123456789"
+                  className="hover:text-white transition-colors"
+                >
                   01 23 45 67 89
                 </a>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-primary" />
-                <a href="mailto:contact@rendezvoupro.fr" className="hover:text-white transition-colors">
+                <a
+                  href="mailto:contact@rendezvoupro.fr"
+                  className="hover:text-white transition-colors"
+                >
                   contact@rendezvoupro.fr
                 </a>
               </div>
@@ -120,7 +128,9 @@ export function Footer() {
                     <service.icon className="h-5 w-5 mt-0.5 text-primary group-hover:text-white transition-colors" />
                     <div>
                       <div className="font-medium">{service.label}</div>
-                      <div className="text-xs text-gray-400">{service.description}</div>
+                      <div className="text-xs text-gray-400">
+                        {service.description}
+                      </div>
                     </div>
                   </Link>
                 </li>
@@ -142,8 +152,8 @@ export function Footer() {
             <ul className="space-y-3">
               {quickLinks.map((link, index) => (
                 <li key={index}>
-                  <Link 
-                    to={link.href} 
+                  <Link
+                    to={link.href}
                     className="text-sm hover:text-white transition-colors hover:translate-x-1 transform duration-200 inline-block"
                   >
                     {link.label}
@@ -173,29 +183,29 @@ export function Footer() {
               <div className="pt-4">
                 <h4 className="text-white font-medium mb-3">Suivez-nous</h4>
                 <div className="flex space-x-3">
-                  <a 
-                    href="#" 
+                  <a
+                    href="#"
                     className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-colors"
                     aria-label="Facebook"
                   >
                     <Facebook className="h-4 w-4" />
                   </a>
-                  <a 
-                    href="#" 
+                  <a
+                    href="#"
                     className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-colors"
                     aria-label="Twitter"
                   >
                     <Twitter className="h-4 w-4" />
                   </a>
-                  <a 
-                    href="#" 
+                  <a
+                    href="#"
                     className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-colors"
                     aria-label="Instagram"
                   >
                     <Instagram className="h-4 w-4" />
                   </a>
-                  <a 
-                    href="#" 
+                  <a
+                    href="#"
                     className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-colors"
                     aria-label="LinkedIn"
                   >
@@ -215,7 +225,9 @@ export function Footer() {
                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                   <feature.icon className="h-5 w-5 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-white">{feature.text}</span>
+                <span className="text-sm font-medium text-white">
+                  {feature.text}
+                </span>
               </div>
             ))}
           </div>
@@ -232,9 +244,9 @@ export function Footer() {
             </div>
             <div className="flex flex-wrap justify-center md:justify-end gap-4">
               {legalLinks.map((link, index) => (
-                <Link 
+                <Link
                   key={index}
-                  to={link.href} 
+                  to={link.href}
                   className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   {link.label}

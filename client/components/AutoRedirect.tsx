@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 export function AutoRedirect() {
   const { currentUser, userProfile, loading } = useAuth();
@@ -14,16 +14,19 @@ export function AutoRedirect() {
     // Si utilisateur connecté et on a son profil
     if (currentUser && userProfile) {
       const currentPath = location.pathname;
-      
+
       // Déterminer le dashboard approprié
-      const targetDashboard = userProfile.userType === 'client' 
-        ? '/espace-client' 
-        : '/espace-professionnel';
+      const targetDashboard =
+        userProfile.userType === "client"
+          ? "/espace-client"
+          : "/espace-professionnel";
 
       // Rediriger depuis les pages d'auth ou la page d'accueil après connexion
-      if (currentPath === '/connexion' || 
-          currentPath === '/inscription' ||
-          (currentPath === '/' && location.search.includes('redirect=dashboard'))) {
+      if (
+        currentPath === "/connexion" ||
+        currentPath === "/inscription" ||
+        (currentPath === "/" && location.search.includes("redirect=dashboard"))
+      ) {
         navigate(targetDashboard, { replace: true });
       }
     }

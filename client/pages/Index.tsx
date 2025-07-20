@@ -136,15 +136,15 @@ export default function Index() {
     },
   ];
 
-    const handleSearch = () => {
+  const handleSearch = () => {
     // Navigate to search results with parameters
     if (postalCode || selectedCategory) {
       const params = new URLSearchParams();
-      if (postalCode) params.set('code', postalCode);
-      if (selectedCategory) params.set('categorie', selectedCategory);
+      if (postalCode) params.set("code", postalCode);
+      if (selectedCategory) params.set("categorie", selectedCategory);
       window.location.href = `/professionnels?${params.toString()}`;
     } else {
-      window.location.href = '/professionnels';
+      window.location.href = "/professionnels";
     }
   };
 
@@ -250,7 +250,7 @@ export default function Index() {
                       </div>
                     ))}
                   </div>
-                                    <Button
+                  <Button
                     variant="outline"
                     className="w-full mt-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                     asChild

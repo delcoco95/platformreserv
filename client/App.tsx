@@ -18,7 +18,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <AuthProvider>
-            <BrowserRouter>
+      <BrowserRouter>
         <div className="min-h-screen bg-background flex flex-col">
           <AutoRedirect />
           <Header />
@@ -47,7 +47,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-                            <Route path="/connexion" element={<Login />} />
+              <Route path="/connexion" element={<Login />} />
               <Route path="/inscription" element={<Signup />} />
               <Route path="/test-data" element={<TestData />} />
               <Route path="*" element={<NotFound />} />

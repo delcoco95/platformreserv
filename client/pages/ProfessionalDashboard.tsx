@@ -16,10 +16,7 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import {
-  Alert,
-  AlertDescription,
-} from "../components/ui/alert";
+import { Alert, AlertDescription } from "../components/ui/alert";
 import { Switch } from "../components/ui/switch";
 import { Label } from "../components/ui/label";
 import {
@@ -78,7 +75,7 @@ export default function ProfessionalDashboard() {
 
   useEffect(() => {
     if (authLoading) return;
-    
+
     if (!currentUser) {
       setLoading(false);
       return;
@@ -90,7 +87,7 @@ export default function ProfessionalDashboard() {
       (appointmentsData) => {
         setAppointments(appointmentsData);
         setLoading(false);
-      }
+      },
     );
 
     return () => unsubscribe();
@@ -98,8 +95,8 @@ export default function ProfessionalDashboard() {
 
   // Fix Leaflet default markers
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      import('leaflet').then((L) => {
+    if (typeof window !== "undefined") {
+      import("leaflet").then((L) => {
         delete (L.Icon.Default.prototype as any)._getIconUrl;
         L.Icon.Default.mergeOptions({
           iconRetinaUrl:
@@ -115,18 +112,18 @@ export default function ProfessionalDashboard() {
 
   const handleValidateAppointment = async (appointmentId: string) => {
     try {
-      await appointmentService.updateAppointment(appointmentId, { 
-        status: 'completed' 
+      await appointmentService.updateAppointment(appointmentId, {
+        status: "completed",
       });
     } catch (error) {
-      console.error('Erreur lors de la validation:', error);
-      setError('Impossible de valider le rendez-vous');
+      console.error("Erreur lors de la validation:", error);
+      setError("Impossible de valider le rendez-vous");
     }
   };
 
   const formatDate = (timestamp: any) => {
-    if (!timestamp) return 'Date non définie';
-    
+    if (!timestamp) return "Date non définie";
+
     let date: Date;
     if (timestamp.toDate) {
       date = timestamp.toDate();
@@ -134,17 +131,17 @@ export default function ProfessionalDashboard() {
       date = new Date(timestamp);
     }
 
-    return date.toLocaleDateString('fr-FR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return date.toLocaleDateString("fr-FR", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const formatTime = (timestamp: any) => {
-    if (!timestamp) return 'Heure non définie';
-    
+    if (!timestamp) return "Heure non définie";
+
     let date: Date;
     if (timestamp.toDate) {
       date = timestamp.toDate();
@@ -152,21 +149,23 @@ export default function ProfessionalDashboard() {
       date = new Date(timestamp);
     }
 
-    return date.toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'confirmed':
+      case "confirmed":
         return <Badge className="bg-green-100 text-green-800">Confirmé</Badge>;
-      case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800">En attente</Badge>;
-      case 'completed':
+      case "pending":
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800">En attente</Badge>
+        );
+      case "completed":
         return <Badge className="bg-blue-100 text-blue-800">Terminé</Badge>;
-      case 'cancelled':
+      case "cancelled":
         return <Badge className="bg-red-100 text-red-800">Annulé</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
@@ -175,11 +174,11 @@ export default function ProfessionalDashboard() {
 
   const getCategoryIcon = (profession: string) => {
     switch (profession) {
-      case 'automobile':
+      case "automobile":
         return Car;
-      case 'plomberie':
+      case "plomberie":
         return Settings;
-      case 'serrurerie':
+      case "serrurerie":
         return Settings;
       default:
         return Building;
@@ -191,36 +190,41 @@ export default function ProfessionalDashboard() {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const todayAppointments = appointments.filter(apt => {
+  const todayAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
-    return date >= today && date < tomorrow && apt.status !== 'cancelled';
+    return date >= today && date < tomorrow && apt.status !== "cancelled";
   });
 
-  const upcomingAppointments = appointments.filter(apt => {
+  const upcomingAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
-    return date >= tomorrow && apt.status !== 'cancelled';
+    return date >= tomorrow && apt.status !== "cancelled";
   });
 
-  const completedAppointments = appointments.filter(apt => apt.status === 'completed');
-  const totalEarnings = completedAppointments.reduce((sum, apt) => sum + (apt.price || 0), 0);
+  const completedAppointments = appointments.filter(
+    (apt) => apt.status === "completed",
+  );
+  const totalEarnings = completedAppointments.reduce(
+    (sum, apt) => sum + (apt.price || 0),
+    0,
+  );
 
   // Données pour le graphique
   const statsData = {
-    confirmed: appointments.filter(apt => apt.status === 'confirmed').length,
-    completed: appointments.filter(apt => apt.status === 'completed').length,
-    cancelled: appointments.filter(apt => apt.status === 'cancelled').length,
-    pending: appointments.filter(apt => apt.status === 'pending').length,
+    confirmed: appointments.filter((apt) => apt.status === "confirmed").length,
+    completed: appointments.filter((apt) => apt.status === "completed").length,
+    cancelled: appointments.filter((apt) => apt.status === "cancelled").length,
+    pending: appointments.filter((apt) => apt.status === "pending").length,
   };
 
   // Rendez-vous avec coordonnées pour la carte
-  const appointmentsWithCoords = appointments.filter(apt => 
-    apt.coordinates && apt.coordinates.lat && apt.coordinates.lng
+  const appointmentsWithCoords = appointments.filter(
+    (apt) => apt.coordinates && apt.coordinates.lat && apt.coordinates.lng,
   );
 
   const professionalProfile = userProfile as ProfessionalProfile;
-  const IconComponent = getCategoryIcon(professionalProfile?.profession || '');
+  const IconComponent = getCategoryIcon(professionalProfile?.profession || "");
 
   // Centre de la carte (Paris par défaut)
   const mapCenter: [number, number] = [48.8566, 2.3522];
@@ -243,7 +247,9 @@ export default function ProfessionalDashboard() {
           <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto" />
           <div>
             <h3 className="text-lg font-semibold">Accès non autorisé</h3>
-            <p className="text-muted-foreground">Veuillez vous connecter pour accéder à votre espace professionnel.</p>
+            <p className="text-muted-foreground">
+              Veuillez vous connecter pour accéder à votre espace professionnel.
+            </p>
           </div>
           <Button asChild>
             <Link to="/connexion">Se connecter</Link>
@@ -261,19 +267,19 @@ export default function ProfessionalDashboard() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16">
-                <AvatarImage src={currentUser?.photoURL || ''} />
+                <AvatarImage src={currentUser?.photoURL || ""} />
                 <AvatarFallback className="bg-primary text-primary-foreground text-lg">
-                  {professionalProfile?.companyName?.[0] || 'P'}
+                  {professionalProfile?.companyName?.[0] || "P"}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <h1 className="text-3xl font-bold text-foreground">
-                  {professionalProfile?.companyName || 'Espace Professionnel'}
+                  {professionalProfile?.companyName || "Espace Professionnel"}
                 </h1>
                 <div className="flex items-center gap-2 mt-1">
                   <IconComponent className="h-4 w-4 text-muted-foreground" />
                   <p className="text-muted-foreground">
-                    {professionalProfile?.profession || 'Professionnel'}
+                    {professionalProfile?.profession || "Professionnel"}
                   </p>
                   {professionalProfile?.isVerified && (
                     <Badge variant="secondary">
@@ -285,7 +291,10 @@ export default function ProfessionalDashboard() {
               </div>
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setShowEditProfile(true)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowEditProfile(true)}
+              >
                 <Settings className="h-4 w-4 mr-2" />
                 Modifier mes informations
               </Button>
@@ -351,7 +360,7 @@ export default function ProfessionalDashboard() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold">
-                        {professionalProfile?.rating?.toFixed(1) || '0.0'}
+                        {professionalProfile?.rating?.toFixed(1) || "0.0"}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         Note moyenne
@@ -367,9 +376,7 @@ export default function ProfessionalDashboard() {
                       <Euro className="h-6 w-6 text-purple-600" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">
-                        {totalEarnings}€
-                      </p>
+                      <p className="text-2xl font-bold">{totalEarnings}€</p>
                       <p className="text-sm text-muted-foreground">
                         Revenus totaux
                       </p>
@@ -388,9 +395,7 @@ export default function ProfessionalDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle>Carte des rendez-vous</CardTitle>
-                  <CardDescription>
-                    Localisation de vos clients
-                  </CardDescription>
+                  <CardDescription>Localisation de vos clients</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {appointmentsWithCoords.length === 0 ? (
@@ -428,7 +433,10 @@ export default function ProfessionalDashboard() {
                           {appointmentsWithCoords.map((appointment) => (
                             <Marker
                               key={appointment.id}
-                              position={[appointment.coordinates!.lat, appointment.coordinates!.lng]}
+                              position={[
+                                appointment.coordinates!.lat,
+                                appointment.coordinates!.lng,
+                              ]}
                             >
                               <Popup>
                                 <div className="space-y-2 min-w-48">
@@ -471,9 +479,7 @@ export default function ProfessionalDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Mes rendez-vous</CardTitle>
-                <CardDescription>
-                  Gérez vos rendez-vous clients
-                </CardDescription>
+                <CardDescription>Gérez vos rendez-vous clients</CardDescription>
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="today" className="w-full">
@@ -486,7 +492,9 @@ export default function ProfessionalDashboard() {
                     {todayAppointments.length === 0 ? (
                       <div className="text-center py-8">
                         <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Aucun rendez-vous aujourd'hui</h3>
+                        <h3 className="text-lg font-semibold mb-2">
+                          Aucun rendez-vous aujourd'hui
+                        </h3>
                         <p className="text-muted-foreground">
                           Profitez de cette journée plus calme !
                         </p>
@@ -506,7 +514,7 @@ export default function ProfessionalDashboard() {
                                   </h3>
                                   {getStatusBadge(appointment.status)}
                                 </div>
-                                
+
                                 <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
                                   <div className="flex items-center gap-2">
                                     <Clock className="h-4 w-4" />
@@ -538,15 +546,17 @@ export default function ProfessionalDashboard() {
                                   </div>
                                 )}
                               </div>
-                              
+
                               <div className="flex gap-2 ml-4">
                                 <Button variant="outline" size="sm">
                                   <MessageCircle className="h-4 w-4" />
                                 </Button>
-                                {appointment.status === 'confirmed' && (
+                                {appointment.status === "confirmed" && (
                                   <Button
                                     size="sm"
-                                    onClick={() => handleValidateAppointment(appointment.id)}
+                                    onClick={() =>
+                                      handleValidateAppointment(appointment.id)
+                                    }
                                   >
                                     <CheckCircle className="h-4 w-4 mr-2" />
                                     Valider
@@ -564,7 +574,9 @@ export default function ProfessionalDashboard() {
                     {upcomingAppointments.length === 0 ? (
                       <div className="text-center py-8">
                         <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Aucun rendez-vous à venir</h3>
+                        <h3 className="text-lg font-semibold mb-2">
+                          Aucun rendez-vous à venir
+                        </h3>
                         <p className="text-muted-foreground">
                           Les nouveaux rendez-vous apparaîtront ici
                         </p>
@@ -581,7 +593,7 @@ export default function ProfessionalDashboard() {
                                   </h3>
                                   {getStatusBadge(appointment.status)}
                                 </div>
-                                
+
                                 <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
                                   <div className="flex items-center gap-2">
                                     <Calendar className="h-4 w-4" />
@@ -599,7 +611,7 @@ export default function ProfessionalDashboard() {
                                   </div>
                                 )}
                               </div>
-                              
+
                               <Button variant="outline" size="sm">
                                 Détails
                               </Button>
@@ -625,7 +637,9 @@ export default function ProfessionalDashboard() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Building className="h-4 w-4 text-muted-foreground" />
-                    <span>{professionalProfile?.companyName || 'Non renseigné'}</span>
+                    <span>
+                      {professionalProfile?.companyName || "Non renseigné"}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="h-4 w-4 text-muted-foreground" />
@@ -650,7 +664,7 @@ export default function ProfessionalDashboard() {
                     </div>
                   )}
                 </div>
-                
+
                 {professionalProfile?.rating && (
                   <div className="flex items-center gap-2 pt-2 border-t">
                     <Star className="h-4 w-4 text-yellow-500 fill-current" />
@@ -662,9 +676,9 @@ export default function ProfessionalDashboard() {
                     </span>
                   </div>
                 )}
-                
-                <Button 
-                  variant="outline" 
+
+                <Button
+                  variant="outline"
                   className="w-full mt-4"
                   onClick={() => setShowEditProfile(true)}
                 >
@@ -675,29 +689,34 @@ export default function ProfessionalDashboard() {
             </Card>
 
             {/* Services */}
-            {professionalProfile?.services && professionalProfile.services.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Mes services</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {professionalProfile.services.map((service, index) => (
-                    <Badge key={index} variant="outline" className="mr-2 mb-2">
-                      {service}
-                    </Badge>
-                  ))}
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full mt-3"
-                    onClick={() => setShowEditProfile(true)}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Modifier mes services
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+            {professionalProfile?.services &&
+              professionalProfile.services.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Mes services</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {professionalProfile.services.map((service, index) => (
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="mr-2 mb-2"
+                      >
+                        {service}
+                      </Badge>
+                    ))}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-3"
+                      onClick={() => setShowEditProfile(true)}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Modifier mes services
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
 
             {/* Availability */}
             {professionalProfile?.availability && (
@@ -706,29 +725,30 @@ export default function ProfessionalDashboard() {
                   <CardTitle>Mes disponibilités</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {Object.entries(professionalProfile.availability).map(([day, isAvailable]) => {
-                    const dayLabels: { [key: string]: string } = {
-                      monday: 'Lundi',
-                      tuesday: 'Mardi',
-                      wednesday: 'Mercredi',
-                      thursday: 'Jeudi',
-                      friday: 'Vendredi',
-                      saturday: 'Samedi',
-                      sunday: 'Dimanche'
-                    };
-                    
-                    return (
-                      <div key={day} className="flex items-center justify-between">
-                        <Label className="text-sm">{dayLabels[day]}</Label>
-                        <Switch checked={isAvailable as boolean} disabled />
-                      </div>
-                    );
-                  })}
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full mt-3"
-                  >
+                  {Object.entries(professionalProfile.availability).map(
+                    ([day, isAvailable]) => {
+                      const dayLabels: { [key: string]: string } = {
+                        monday: "Lundi",
+                        tuesday: "Mardi",
+                        wednesday: "Mercredi",
+                        thursday: "Jeudi",
+                        friday: "Vendredi",
+                        saturday: "Samedi",
+                        sunday: "Dimanche",
+                      };
+
+                      return (
+                        <div
+                          key={day}
+                          className="flex items-center justify-between"
+                        >
+                          <Label className="text-sm">{dayLabels[day]}</Label>
+                          <Switch checked={isAvailable as boolean} disabled />
+                        </div>
+                      );
+                    },
+                  )}
+                  <Button variant="outline" size="sm" className="w-full mt-3">
                     <Settings className="h-4 w-4 mr-2" />
                     Modifier les créneaux
                   </Button>
@@ -760,9 +780,9 @@ export default function ProfessionalDashboard() {
         </div>
 
         {/* Edit Profile Dialog */}
-        <EditProfileDialog 
-          open={showEditProfile} 
-          onOpenChange={setShowEditProfile} 
+        <EditProfileDialog
+          open={showEditProfile}
+          onOpenChange={setShowEditProfile}
         />
       </div>
     </div>

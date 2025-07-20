@@ -16,10 +16,7 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import {
-  Alert,
-  AlertDescription,
-} from "../components/ui/alert";
+import { Alert, AlertDescription } from "../components/ui/alert";
 import {
   Calendar,
   Clock,
@@ -47,14 +44,15 @@ import { Appointment, ClientProfile, ProfessionalProfile } from "../types";
 export default function ClientDashboard() {
   const { currentUser, userProfile, loading: authLoading } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [lastProfessional, setLastProfessional] = useState<ProfessionalProfile | null>(null);
+  const [lastProfessional, setLastProfessional] =
+    useState<ProfessionalProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showEditProfile, setShowEditProfile] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
-    
+
     if (!currentUser) {
       setLoading(false);
       return;
@@ -65,7 +63,7 @@ export default function ClientDashboard() {
       currentUser.uid,
       async (appointmentsData) => {
         setAppointments(appointmentsData);
-        
+
         // Récupérer les infos du dernier professionnel utilisé
         if (appointmentsData.length > 0) {
           const lastAppointment = appointmentsData.sort((a, b) => {
@@ -73,22 +71,28 @@ export default function ClientDashboard() {
             const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
             return dateB.getTime() - dateA.getTime();
           })[0];
-          
+
           if (lastAppointment.professionalId) {
             try {
-              const professionals = await professionalService.getAllProfessionals();
-              const professional = professionals.find(p => p.uid === lastAppointment.professionalId);
+              const professionals =
+                await professionalService.getAllProfessionals();
+              const professional = professionals.find(
+                (p) => p.uid === lastAppointment.professionalId,
+              );
               if (professional) {
                 setLastProfessional(professional);
               }
             } catch (error) {
-              console.error('Erreur lors de la récupération du professionnel:', error);
+              console.error(
+                "Erreur lors de la récupération du professionnel:",
+                error,
+              );
             }
           }
         }
-        
+
         setLoading(false);
-      }
+      },
     );
 
     return () => unsubscribe();
@@ -98,14 +102,14 @@ export default function ClientDashboard() {
     try {
       await appointmentService.cancelAppointment(appointmentId);
     } catch (error) {
-      console.error('Erreur lors de l\'annulation:', error);
-      setError('Impossible d\'annuler le rendez-vous');
+      console.error("Erreur lors de l'annulation:", error);
+      setError("Impossible d'annuler le rendez-vous");
     }
   };
 
   const formatDate = (timestamp: any) => {
-    if (!timestamp) return 'Date non définie';
-    
+    if (!timestamp) return "Date non définie";
+
     let date: Date;
     if (timestamp.toDate) {
       date = timestamp.toDate();
@@ -113,17 +117,17 @@ export default function ClientDashboard() {
       date = new Date(timestamp);
     }
 
-    return date.toLocaleDateString('fr-FR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return date.toLocaleDateString("fr-FR", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const formatTime = (timestamp: any) => {
-    if (!timestamp) return 'Heure non définie';
-    
+    if (!timestamp) return "Heure non définie";
+
     let date: Date;
     if (timestamp.toDate) {
       date = timestamp.toDate();
@@ -131,37 +135,39 @@ export default function ClientDashboard() {
       date = new Date(timestamp);
     }
 
-    return date.toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'confirmed':
+      case "confirmed":
         return <Badge className="bg-green-100 text-green-800">Confirmé</Badge>;
-      case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800">En attente</Badge>;
-      case 'completed':
+      case "pending":
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800">En attente</Badge>
+        );
+      case "completed":
         return <Badge className="bg-blue-100 text-blue-800">Terminé</Badge>;
-      case 'cancelled':
+      case "cancelled":
         return <Badge className="bg-red-100 text-red-800">Annulé</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
-  const upcomingAppointments = appointments.filter(apt => {
+  const upcomingAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
-    return date > new Date() && apt.status !== 'cancelled';
+    return date > new Date() && apt.status !== "cancelled";
   });
 
-  const pastAppointments = appointments.filter(apt => {
+  const pastAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
-    return date <= new Date() || apt.status === 'completed';
+    return date <= new Date() || apt.status === "completed";
   });
 
   const clientProfile = userProfile as ClientProfile;
@@ -184,7 +190,9 @@ export default function ClientDashboard() {
           <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto" />
           <div>
             <h3 className="text-lg font-semibold">Accès non autorisé</h3>
-            <p className="text-muted-foreground">Veuillez vous connecter pour accéder à votre espace client.</p>
+            <p className="text-muted-foreground">
+              Veuillez vous connecter pour accéder à votre espace client.
+            </p>
           </div>
           <Button asChild>
             <Link to="/connexion">Se connecter</Link>
@@ -202,15 +210,15 @@ export default function ClientDashboard() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16">
-                <AvatarImage src={currentUser?.photoURL || ''} />
+                <AvatarImage src={currentUser?.photoURL || ""} />
                 <AvatarFallback className="bg-primary text-primary-foreground text-lg">
-                  {clientProfile?.firstName?.[0] || ''}
-                  {clientProfile?.lastName?.[0] || 'C'}
+                  {clientProfile?.firstName?.[0] || ""}
+                  {clientProfile?.lastName?.[0] || "C"}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <h1 className="text-3xl font-bold text-foreground">
-                  Bonjour {clientProfile?.firstName || 'Client'} 👋
+                  Bonjour {clientProfile?.firstName || "Client"} 👋
                 </h1>
                 <p className="text-muted-foreground mt-1">
                   Bienvenue dans votre espace personnel
@@ -218,7 +226,10 @@ export default function ClientDashboard() {
               </div>
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setShowEditProfile(true)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowEditProfile(true)}
+              >
                 <Settings className="h-4 w-4 mr-2" />
                 Modifier mon profil
               </Button>
@@ -269,7 +280,11 @@ export default function ClientDashboard() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold">
-                        {pastAppointments.filter(apt => apt.status === 'completed').length}
+                        {
+                          pastAppointments.filter(
+                            (apt) => apt.status === "completed",
+                          ).length
+                        }
                       </p>
                       <p className="text-sm text-muted-foreground">
                         Services reçus
@@ -314,7 +329,9 @@ export default function ClientDashboard() {
                     {upcomingAppointments.length === 0 ? (
                       <div className="text-center py-8">
                         <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Aucun rendez-vous programmé</h3>
+                        <h3 className="text-lg font-semibold mb-2">
+                          Aucun rendez-vous programmé
+                        </h3>
                         <p className="text-muted-foreground mb-4">
                           Réservez votre premier service dès maintenant
                         </p>
@@ -340,7 +357,7 @@ export default function ClientDashboard() {
                                   </h3>
                                   {getStatusBadge(appointment.status)}
                                 </div>
-                                
+
                                 <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
                                   <div className="flex items-center gap-2">
                                     <Calendar className="h-4 w-4" />
@@ -370,16 +387,18 @@ export default function ClientDashboard() {
                                   </div>
                                 )}
                               </div>
-                              
+
                               <div className="flex gap-2 ml-4">
                                 <Button variant="outline" size="sm">
                                   <MessageCircle className="h-4 w-4" />
                                 </Button>
-                                {appointment.status === 'confirmed' && (
+                                {appointment.status === "confirmed" && (
                                   <Button
                                     variant="destructive"
                                     size="sm"
-                                    onClick={() => handleCancelAppointment(appointment.id)}
+                                    onClick={() =>
+                                      handleCancelAppointment(appointment.id)
+                                    }
                                   >
                                     <X className="h-4 w-4" />
                                   </Button>
@@ -396,7 +415,9 @@ export default function ClientDashboard() {
                     {pastAppointments.length === 0 ? (
                       <div className="text-center py-8">
                         <CalendarCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Aucun historique</h3>
+                        <h3 className="text-lg font-semibold mb-2">
+                          Aucun historique
+                        </h3>
                         <p className="text-muted-foreground">
                           Vos services passés apparaîtront ici
                         </p>
@@ -413,7 +434,7 @@ export default function ClientDashboard() {
                                   </h3>
                                   {getStatusBadge(appointment.status)}
                                 </div>
-                                
+
                                 <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
                                   <div className="flex items-center gap-2">
                                     <Calendar className="h-4 w-4" />
@@ -431,8 +452,8 @@ export default function ClientDashboard() {
                                   </div>
                                 )}
                               </div>
-                              
-                              {appointment.status === 'completed' && (
+
+                              {appointment.status === "completed" && (
                                 <Button variant="outline" size="sm">
                                   <Star className="h-4 w-4 mr-2" />
                                   Noter
@@ -461,7 +482,8 @@ export default function ClientDashboard() {
                   <div className="flex items-center gap-2 text-sm">
                     <User className="h-4 w-4 text-muted-foreground" />
                     <span>
-                      {clientProfile?.firstName || ''} {clientProfile?.lastName || ''}
+                      {clientProfile?.firstName || ""}{" "}
+                      {clientProfile?.lastName || ""}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
@@ -481,9 +503,9 @@ export default function ClientDashboard() {
                     </div>
                   )}
                 </div>
-                
-                <Button 
-                  variant="outline" 
+
+                <Button
+                  variant="outline"
                   className="w-full mt-4"
                   onClick={() => setShowEditProfile(true)}
                 >
@@ -503,19 +525,26 @@ export default function ClientDashboard() {
                   <div className="flex items-center gap-3">
                     <Avatar className="h-12 w-12">
                       <AvatarFallback className="bg-secondary">
-                        {lastProfessional.companyName?.[0] || 'P'}
+                        {lastProfessional.companyName?.[0] || "P"}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h4 className="font-semibold">{lastProfessional.companyName}</h4>
-                      <p className="text-sm text-muted-foreground">{lastProfessional.profession}</p>
+                      <h4 className="font-semibold">
+                        {lastProfessional.companyName}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        {lastProfessional.profession}
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-2">
                     {lastProfessional.phone && (
                       <div className="flex items-center gap-2 text-sm">
                         <Phone className="h-4 w-4 text-muted-foreground" />
-                        <a href={`tel:${lastProfessional.phone}`} className="hover:text-primary">
+                        <a
+                          href={`tel:${lastProfessional.phone}`}
+                          className="hover:text-primary"
+                        >
                           {lastProfessional.phone}
                         </a>
                       </div>
@@ -527,7 +556,9 @@ export default function ClientDashboard() {
                     {lastProfessional.address && (
                       <div className="flex items-center gap-2 text-sm">
                         <Building className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-xs">{lastProfessional.address}</span>
+                        <span className="text-xs">
+                          {lastProfessional.address}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -547,7 +578,9 @@ export default function ClientDashboard() {
               <CardContent>
                 <div className="text-center py-6">
                   <MessageCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Aucun nouveau message</p>
+                  <p className="text-sm text-muted-foreground">
+                    Aucun nouveau message
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -564,8 +597,16 @@ export default function ClientDashboard() {
                       <Bell className="h-4 w-4 text-muted-foreground" />
                       <span>Notifications générales</span>
                     </div>
-                    <Badge variant={clientProfile.preferences.notifications ? "default" : "secondary"}>
-                      {clientProfile.preferences.notifications ? "Activées" : "Désactivées"}
+                    <Badge
+                      variant={
+                        clientProfile.preferences.notifications
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {clientProfile.preferences.notifications
+                        ? "Activées"
+                        : "Désactivées"}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between text-sm">
@@ -573,8 +614,16 @@ export default function ClientDashboard() {
                       <Mail className="h-4 w-4 text-muted-foreground" />
                       <span>Alertes email</span>
                     </div>
-                    <Badge variant={clientProfile.preferences.emailAlerts ? "default" : "secondary"}>
-                      {clientProfile.preferences.emailAlerts ? "Activées" : "Désactivées"}
+                    <Badge
+                      variant={
+                        clientProfile.preferences.emailAlerts
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {clientProfile.preferences.emailAlerts
+                        ? "Activées"
+                        : "Désactivées"}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between text-sm">
@@ -582,13 +631,21 @@ export default function ClientDashboard() {
                       <MessageCircle className="h-4 w-4 text-muted-foreground" />
                       <span>Alertes SMS</span>
                     </div>
-                    <Badge variant={clientProfile.preferences.smsAlerts ? "default" : "secondary"}>
-                      {clientProfile.preferences.smsAlerts ? "Activées" : "Désactivées"}
+                    <Badge
+                      variant={
+                        clientProfile.preferences.smsAlerts
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {clientProfile.preferences.smsAlerts
+                        ? "Activées"
+                        : "Désactivées"}
                     </Badge>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="w-full mt-3"
                     onClick={() => setShowEditProfile(true)}
                   >
@@ -602,9 +659,9 @@ export default function ClientDashboard() {
         </div>
 
         {/* Edit Profile Dialog */}
-        <EditProfileDialog 
-          open={showEditProfile} 
-          onOpenChange={setShowEditProfile} 
+        <EditProfileDialog
+          open={showEditProfile}
+          onOpenChange={setShowEditProfile}
         />
       </div>
     </div>

@@ -13,9 +13,12 @@ interface StatsChartProps {
   title?: string;
 }
 
-export function StatsChart({ data, title = "Répartition des rendez-vous" }: StatsChartProps) {
+export function StatsChart({
+  data,
+  title = "Répartition des rendez-vous",
+}: StatsChartProps) {
   const total = data.confirmed + data.completed + data.cancelled + data.pending;
-  
+
   if (total === 0) {
     return (
       <Card>
@@ -73,17 +76,18 @@ export function StatsChart({ data, title = "Répartition des rendez-vous" }: Sta
         {/* Barre de progression visuelle */}
         <div className="relative">
           <div className="h-8 bg-gray-100 rounded-lg overflow-hidden flex">
-            {stats.map((stat, index) => (
-              stat.percentage > 0 && (
-                <div
-                  key={index}
-                  className={`${stat.color} flex items-center justify-center text-white text-xs font-medium`}
-                  style={{ width: `${stat.percentage}%` }}
-                >
-                  {stat.percentage > 8 && `${stat.percentage}%`}
-                </div>
-              )
-            ))}
+            {stats.map(
+              (stat, index) =>
+                stat.percentage > 0 && (
+                  <div
+                    key={index}
+                    className={`${stat.color} flex items-center justify-center text-white text-xs font-medium`}
+                    style={{ width: `${stat.percentage}%` }}
+                  >
+                    {stat.percentage > 8 && `${stat.percentage}%`}
+                  </div>
+                ),
+            )}
           </div>
         </div>
 

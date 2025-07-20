@@ -22,20 +22,23 @@ interface EditProfileDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps) {
+export function EditProfileDialog({
+  open,
+  onOpenChange,
+}: EditProfileDialogProps) {
   const { userProfile, updateUserProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState(() => {
     if (!userProfile) return {};
-    
-    if (userProfile.userType === 'client') {
+
+    if (userProfile.userType === "client") {
       const client = userProfile as ClientProfile;
       return {
-        firstName: client.firstName || '',
-        lastName: client.lastName || '',
-        phone: client.phone || '',
-        address: client.address || '',
+        firstName: client.firstName || "",
+        lastName: client.lastName || "",
+        phone: client.phone || "",
+        address: client.address || "",
         notifications: client.preferences?.notifications ?? true,
         smsAlerts: client.preferences?.smsAlerts ?? false,
         emailAlerts: client.preferences?.emailAlerts ?? true,
@@ -43,17 +46,17 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
     } else {
       const professional = userProfile as ProfessionalProfile;
       return {
-        companyName: professional.companyName || '',
-        phone: professional.phone || '',
-        address: professional.address || '',
-        description: professional.description || '',
-        services: professional.services?.join(', ') || '',
+        companyName: professional.companyName || "",
+        phone: professional.phone || "",
+        address: professional.address || "",
+        description: professional.description || "",
+        services: professional.services?.join(", ") || "",
       };
     }
   });
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,7 +69,7 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
     try {
       let updateData: Partial<ClientProfile | ProfessionalProfile> = {};
 
-      if (userProfile.userType === 'client') {
+      if (userProfile.userType === "client") {
         updateData = {
           firstName: formData.firstName as string,
           lastName: formData.lastName as string,
@@ -76,13 +79,13 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
             notifications: formData.notifications as boolean,
             smsAlerts: formData.smsAlerts as boolean,
             emailAlerts: formData.emailAlerts as boolean,
-          }
+          },
         };
       } else {
         const servicesArray = (formData.services as string)
-          .split(',')
-          .map(s => s.trim())
-          .filter(s => s.length > 0);
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0);
 
         updateData = {
           companyName: formData.companyName as string,
@@ -96,8 +99,8 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
       await updateUserProfile(updateData);
       onOpenChange(false);
     } catch (err: any) {
-      console.error('Erreur lors de la mise à jour:', err);
-      setError('Une erreur est survenue lors de la mise à jour');
+      console.error("Erreur lors de la mise à jour:", err);
+      setError("Une erreur est survenue lors de la mise à jour");
     } finally {
       setLoading(false);
     }
@@ -105,7 +108,7 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
 
   if (!userProfile) return null;
 
-  const isClient = userProfile.userType === 'client';
+  const isClient = userProfile.userType === "client";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -133,8 +136,10 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                   <Label htmlFor="firstName">Prénom</Label>
                   <Input
                     id="firstName"
-                    value={formData.firstName as string || ''}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    value={(formData.firstName as string) || ""}
+                    onChange={(e) =>
+                      handleInputChange("firstName", e.target.value)
+                    }
                     disabled={loading}
                   />
                 </div>
@@ -142,8 +147,10 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                   <Label htmlFor="lastName">Nom</Label>
                   <Input
                     id="lastName"
-                    value={formData.lastName as string || ''}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    value={(formData.lastName as string) || ""}
+                    onChange={(e) =>
+                      handleInputChange("lastName", e.target.value)
+                    }
                     disabled={loading}
                   />
                 </div>
@@ -154,8 +161,8 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                 <Input
                   id="phone"
                   type="tel"
-                  value={formData.phone as string || ''}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  value={(formData.phone as string) || ""}
+                  onChange={(e) => handleInputChange("phone", e.target.value)}
                   disabled={loading}
                 />
               </div>
@@ -164,8 +171,8 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                 <Label htmlFor="address">Adresse</Label>
                 <Input
                   id="address"
-                  value={formData.address as string || ''}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  value={(formData.address as string) || ""}
+                  onChange={(e) => handleInputChange("address", e.target.value)}
                   disabled={loading}
                 />
               </div>
@@ -173,7 +180,7 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
               {/* Préférences */}
               <div className="space-y-4 pt-4 border-t">
                 <h4 className="font-medium">Préférences de notification</h4>
-                
+
                 <div className="flex items-center justify-between">
                   <Label htmlFor="notifications" className="flex-1">
                     Notifications générales
@@ -181,7 +188,9 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                   <Switch
                     id="notifications"
                     checked={formData.notifications as boolean}
-                    onCheckedChange={(checked) => handleInputChange('notifications', checked)}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("notifications", checked)
+                    }
                     disabled={loading}
                   />
                 </div>
@@ -193,7 +202,9 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                   <Switch
                     id="emailAlerts"
                     checked={formData.emailAlerts as boolean}
-                    onCheckedChange={(checked) => handleInputChange('emailAlerts', checked)}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("emailAlerts", checked)
+                    }
                     disabled={loading}
                   />
                 </div>
@@ -205,7 +216,9 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                   <Switch
                     id="smsAlerts"
                     checked={formData.smsAlerts as boolean}
-                    onCheckedChange={(checked) => handleInputChange('smsAlerts', checked)}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("smsAlerts", checked)
+                    }
                     disabled={loading}
                   />
                 </div>
@@ -218,8 +231,10 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                 <Label htmlFor="companyName">Nom de l'entreprise</Label>
                 <Input
                   id="companyName"
-                  value={formData.companyName as string || ''}
-                  onChange={(e) => handleInputChange('companyName', e.target.value)}
+                  value={(formData.companyName as string) || ""}
+                  onChange={(e) =>
+                    handleInputChange("companyName", e.target.value)
+                  }
                   disabled={loading}
                 />
               </div>
@@ -229,8 +244,8 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                 <Input
                   id="phone"
                   type="tel"
-                  value={formData.phone as string || ''}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  value={(formData.phone as string) || ""}
+                  onChange={(e) => handleInputChange("phone", e.target.value)}
                   disabled={loading}
                 />
               </div>
@@ -239,8 +254,8 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                 <Label htmlFor="address">Adresse</Label>
                 <Input
                   id="address"
-                  value={formData.address as string || ''}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  value={(formData.address as string) || ""}
+                  onChange={(e) => handleInputChange("address", e.target.value)}
                   disabled={loading}
                 />
               </div>
@@ -249,8 +264,10 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
-                  value={formData.description as string || ''}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  value={(formData.description as string) || ""}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                   placeholder="Décrivez votre entreprise et vos services..."
                   rows={3}
                   disabled={loading}
@@ -258,11 +275,15 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="services">Services (séparés par des virgules)</Label>
+                <Label htmlFor="services">
+                  Services (séparés par des virgules)
+                </Label>
                 <Textarea
                   id="services"
-                  value={formData.services as string || ''}
-                  onChange={(e) => handleInputChange('services', e.target.value)}
+                  value={(formData.services as string) || ""}
+                  onChange={(e) =>
+                    handleInputChange("services", e.target.value)
+                  }
                   placeholder="Vidange, freinage, lavage auto..."
                   rows={2}
                   disabled={loading}
@@ -272,9 +293,9 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
           )}
 
           <DialogFooter className="flex gap-3">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={loading}
             >
@@ -287,7 +308,7 @@ export function EditProfileDialog({ open, onOpenChange }: EditProfileDialogProps
                   Enregistrement...
                 </>
               ) : (
-                'Enregistrer'
+                "Enregistrer"
               )}
             </Button>
           </DialogFooter>

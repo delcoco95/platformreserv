@@ -20,16 +20,17 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { login, currentUser, userProfile } = useAuth();
   const navigate = useNavigate();
 
   // Rediriger si déjà connecté
   useEffect(() => {
     if (currentUser && userProfile) {
-      const redirectPath = userProfile.userType === 'client' 
-        ? '/espace-client' 
-        : '/espace-professionnel';
+      const redirectPath =
+        userProfile.userType === "client"
+          ? "/espace-client"
+          : "/espace-professionnel";
       navigate(redirectPath, { replace: true });
     }
   }, [currentUser, userProfile, navigate]);
@@ -59,23 +60,23 @@ export default function Login() {
       await login(email, password);
       // La redirection se fera via useEffect quand currentUser sera mis à jour
     } catch (error: any) {
-      console.error('Erreur de connexion:', error);
-      
+      console.error("Erreur de connexion:", error);
+
       // Messages d'erreur Firebase traduits
       switch (error.code) {
-        case 'auth/user-not-found':
+        case "auth/user-not-found":
           setError("Aucun compte trouvé avec cette adresse email");
           break;
-        case 'auth/wrong-password':
+        case "auth/wrong-password":
           setError("Mot de passe incorrect");
           break;
-        case 'auth/invalid-email':
+        case "auth/invalid-email":
           setError("Adresse email invalide");
           break;
-        case 'auth/user-disabled':
+        case "auth/user-disabled":
           setError("Ce compte a été désactivé");
           break;
-        case 'auth/too-many-requests':
+        case "auth/too-many-requests":
           setError("Trop de tentatives. Veuillez réessayer plus tard");
           break;
         default:
