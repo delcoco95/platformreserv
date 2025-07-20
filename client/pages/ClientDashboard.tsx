@@ -41,6 +41,7 @@ import { appointmentService } from "../services/appointmentService";
 import { professionalService } from "../services/professionalService";
 import { EditProfileDialog } from "../components/EditProfileDialog";
 import { Appointment, ClientProfile, ProfessionalProfile } from "../types";
+import { parseDate, formatDate, formatTime } from "../lib/dateUtils";
 
 export default function ClientDashboard() {
   const { currentUser, userProfile, loading: authLoading } = useAuth();
@@ -59,13 +60,7 @@ export default function ClientDashboard() {
       return;
     }
 
-    const parseDate = (rawDate: any): Date => {
-      if (!rawDate) return new Date(0);
-      if (rawDate instanceof Timestamp) return rawDate.toDate();
-      if (rawDate.toDate) return rawDate.toDate();
-      const parsed = new Date(rawDate);
-      return isNaN(parsed.getTime()) ? new Date(0) : parsed;
-    };
+    
 
     const unsubscribe = appointmentService.onClientAppointmentsChange(
       currentUser.uid,
@@ -114,43 +109,9 @@ export default function ClientDashboard() {
     }
   };
 
-  const formatDate = (timestamp: any) => {
-    if (!timestamp) return "Date non définie";
+  
 
-    let date: Date;
-    if (timestamp instanceof Timestamp) {
-      date = timestamp.toDate();
-    } else if (timestamp.toDate) {
-      date = timestamp.toDate();
-    } else {
-      date = new Date(timestamp);
-    }
-
-    return date.toLocaleDateString("fr-FR", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const formatTime = (timestamp: any) => {
-    if (!timestamp) return "Heure non définie";
-
-    let date: Date;
-    if (timestamp instanceof Timestamp) {
-      date = timestamp.toDate();
-    } else if (timestamp.toDate) {
-      date = timestamp.toDate();
-    } else {
-      date = new Date(timestamp);
-    }
-
-    return date.toLocaleTimeString("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -169,29 +130,15 @@ export default function ClientDashboard() {
     }
   };
 
-      const upcomingAppointments = appointments.filter((apt) => {
+        const upcomingAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
-    let date: Date;
-    if (apt.date instanceof Timestamp) {
-      date = apt.date.toDate();
-    } else if (typeof apt.date === 'object' && apt.date !== null && 'toDate' in apt.date) {
-      date = (apt.date as any).toDate();
-    } else {
-      date = new Date(apt.date as any);
-    }
+    const date = parseDate(apt.date);
     return date > new Date() && apt.status !== "cancelled";
   });
 
-      const pastAppointments = appointments.filter((apt) => {
+        const pastAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
-    let date: Date;
-    if (apt.date instanceof Timestamp) {
-      date = apt.date.toDate();
-    } else if (typeof apt.date === 'object' && apt.date !== null && 'toDate' in apt.date) {
-      date = (apt.date as any).toDate();
-    } else {
-      date = new Date(apt.date as any);
-    }
+    const date = parseDate(apt.date);
     return date <= new Date() || apt.status === "completed";
   });
 
