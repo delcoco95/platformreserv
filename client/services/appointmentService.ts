@@ -112,50 +112,94 @@ export const appointmentService = {
     }
   },
 
-  // Écouter les changements en temps réel pour un client
+    // Écouter les changements en temps réel pour un client
   onClientAppointmentsChange(
     clientId: string,
     callback: (appointments: Appointment[]) => void,
   ) {
-    const q = query(
-      collection(db, "appointments"),
-      where("clientId", "==", clientId),
-      orderBy("date", "desc"),
-    );
+    try {
+      if (!auth.currentUser) {
+        const filtered = demoAppointments.filter((apt) => apt.clientId === clientId);
+        setTimeout(() => callback(filtered), 100);
+        return () => {};
+      }
 
-    return onSnapshot(q, (snapshot) => {
-      const appointments = snapshot.docs.map(
-        (doc) =>
-          ({
-            id: doc.id,
-            ...doc.data(),
-          }) as Appointment,
+      const q = query(
+        collection(db, "appointments"),
+        where("clientId", "==", clientId),
+        orderBy("date", "desc"),
       );
-      callback(appointments);
-    });
+
+      return onSnapshot(
+        q,
+        (snapshot) => {
+          const appointments = snapshot.docs.map(
+            (doc) =>
+              ({
+                id: doc.id,
+                ...doc.data(),
+              }) as Appointment,
+          );
+          const filtered = demoAppointments.filter((apt) => apt.clientId === clientId);
+          callback(appointments.length > 0 ? appointments : filtered);
+        },
+        (error) => {
+          console.warn("Erreur dans l'écoute Firebase des rendez-vous client:", error);
+          const filtered = demoAppointments.filter((apt) => apt.clientId === clientId);
+          callback(filtered);
+        }
+      );
+    } catch (error) {
+      console.warn("Erreur Firebase, utilisation des données démo:", error);
+      const filtered = demoAppointments.filter((apt) => apt.clientId === clientId);
+      setTimeout(() => callback(filtered), 100);
+      return () => {};
+    }
   },
 
-  // Écouter les changements en temps réel pour un professionnel
+    // Écouter les changements en temps réel pour un professionnel
   onProfessionalAppointmentsChange(
     professionalId: string,
     callback: (appointments: Appointment[]) => void,
   ) {
-    const q = query(
-      collection(db, "appointments"),
-      where("professionalId", "==", professionalId),
-      orderBy("date", "desc"),
-    );
+    try {
+      if (!auth.currentUser) {
+        const filtered = demoAppointments.filter((apt) => apt.professionalId === professionalId);
+        setTimeout(() => callback(filtered), 100);
+        return () => {};
+      }
 
-    return onSnapshot(q, (snapshot) => {
-      const appointments = snapshot.docs.map(
-        (doc) =>
-          ({
-            id: doc.id,
-            ...doc.data(),
-          }) as Appointment,
+      const q = query(
+        collection(db, "appointments"),
+        where("professionalId", "==", professionalId),
+        orderBy("date", "desc"),
       );
-      callback(appointments);
-    });
+
+      return onSnapshot(
+        q,
+        (snapshot) => {
+          const appointments = snapshot.docs.map(
+            (doc) =>
+              ({
+                id: doc.id,
+                ...doc.data(),
+              }) as Appointment,
+          );
+          const filtered = demoAppointments.filter((apt) => apt.professionalId === professionalId);
+          callback(appointments.length > 0 ? appointments : filtered);
+        },
+        (error) => {
+          console.warn("Erreur dans l'écoute Firebase des rendez-vous professionnel:", error);
+          const filtered = demoAppointments.filter((apt) => apt.professionalId === professionalId);
+          callback(filtered);
+        }
+      );
+    } catch (error) {
+      console.warn("Erreur Firebase, utilisation des données démo:", error);
+      const filtered = demoAppointments.filter((apt) => apt.professionalId === professionalId);
+      setTimeout(() => callback(filtered), 100);
+      return () => {};
+    }
   },
 
   // Mettre à jour un rendez-vous
