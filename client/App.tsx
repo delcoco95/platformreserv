@@ -10,6 +10,7 @@ import ProfessionalDashboard from "./pages/ProfessionalDashboard";
 import ProfessionalsList from "./pages/ProfessionalsList";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import TestData from "./pages/TestData";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
