@@ -36,6 +36,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { DemoModeAlert } from "../components/DemoModeAlert";
 
 export default function ProfessionalsList() {
+  const { currentUser } = useAuth();
   const [searchParams] = useSearchParams();
   const [professionals, setProfessionals] = useState<ProfessionalProfile[]>([]);
   const [filteredProfessionals, setFilteredProfessionals] = useState<
