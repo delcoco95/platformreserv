@@ -818,9 +818,9 @@ export default function ProfessionalDashboard() {
                   Support pro
                 </Button>
               </CardContent>
-            </Card>
+                        </Card>
           </div>
-                )}
+        }
 
         {/* Availability Tab */}
         {activeTab === "availability" && (
