@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Timestamp } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
@@ -50,7 +51,7 @@ export default function ClientDashboard() {
   const [error, setError] = useState("");
   const [showEditProfile, setShowEditProfile] = useState(false);
 
-  useEffect(() => {
+    useEffect(() => {
     if (authLoading) return;
 
     if (!currentUser) {
@@ -58,17 +59,23 @@ export default function ClientDashboard() {
       return;
     }
 
-    // Écouter les changements de rendez-vous en temps réel
+    const parseDate = (rawDate: any): Date => {
+      if (!rawDate) return new Date(0);
+      if (rawDate instanceof Timestamp) return rawDate.toDate();
+      if (rawDate.toDate) return rawDate.toDate();
+      const parsed = new Date(rawDate);
+      return isNaN(parsed.getTime()) ? new Date(0) : parsed;
+    };
+
     const unsubscribe = appointmentService.onClientAppointmentsChange(
       currentUser.uid,
       async (appointmentsData) => {
         setAppointments(appointmentsData);
 
-        // Récupérer les infos du dernier professionnel utilisé
         if (appointmentsData.length > 0) {
           const lastAppointment = appointmentsData.sort((a, b) => {
-            const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
-            const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+            const dateA = parseDate(a.date);
+            const dateB = parseDate(b.date);
             return dateB.getTime() - dateA.getTime();
           })[0];
 
@@ -107,11 +114,13 @@ export default function ClientDashboard() {
     }
   };
 
-  const formatDate = (timestamp: any) => {
+    const formatDate = (timestamp: any) => {
     if (!timestamp) return "Date non définie";
 
     let date: Date;
-    if (timestamp.toDate) {
+    if (timestamp instanceof Timestamp) {
+      date = timestamp.toDate();
+    } else if (timestamp.toDate) {
       date = timestamp.toDate();
     } else {
       date = new Date(timestamp);
@@ -125,11 +134,13 @@ export default function ClientDashboard() {
     });
   };
 
-  const formatTime = (timestamp: any) => {
+    const formatTime = (timestamp: any) => {
     if (!timestamp) return "Heure non définie";
 
     let date: Date;
-    if (timestamp.toDate) {
+    if (timestamp instanceof Timestamp) {
+      date = timestamp.toDate();
+    } else if (timestamp.toDate) {
       date = timestamp.toDate();
     } else {
       date = new Date(timestamp);
@@ -158,15 +169,29 @@ export default function ClientDashboard() {
     }
   };
 
-  const upcomingAppointments = appointments.filter((apt) => {
+    const upcomingAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
-    const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
+    let date: Date;
+    if (apt.date instanceof Timestamp) {
+      date = apt.date.toDate();
+    } else if (apt.date.toDate) {
+      date = apt.date.toDate();
+    } else {
+      date = new Date(apt.date);
+    }
     return date > new Date() && apt.status !== "cancelled";
   });
 
-  const pastAppointments = appointments.filter((apt) => {
+    const pastAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
-    const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
+    let date: Date;
+    if (apt.date instanceof Timestamp) {
+      date = apt.date.toDate();
+    } else if (apt.date.toDate) {
+      date = apt.date.toDate();
+    } else {
+      date = new Date(apt.date);
+    }
     return date <= new Date() || apt.status === "completed";
   });
 
