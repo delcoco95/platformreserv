@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -29,15 +29,14 @@ import {
   AlertCircle,
   UserCheck,
 } from "lucide-react";
-
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { useAuth } from "../contexts/AuthContext";
 
 type AccountType = "client" | "professionnel" | "";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const { register, currentUser, userProfile } = useAuth();
+
   const [accountType, setAccountType] = useState<AccountType>("");
   const [formData, setFormData] = useState({
     firstName: "",
@@ -49,67 +48,143 @@ export default function Signup() {
     password: "",
     confirmPassword: "",
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Redirection si déjà connecté
+  useEffect(() => {
+    if (currentUser && userProfile) {
+      const redirectPath =
+        userProfile.userType === "client"
+          ? "/espace-client"
+          : "/espace-professionnel";
+      navigate(redirectPath, { replace: true });
+    }
+  }, [currentUser, userProfile, navigate]);
+
+  // ------------------ VALIDATIONS ------------------
+  const validateEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const validateSiret = (siret: string) => /^\d{14}$/.test(siret);
+
+  // Si tu veux une validation SIRET plus poussée, remplace par cette fonction :
+  /*
+  const validateSiretLuhn = (siret: string) => {
+    if (!/^\d{14}$/.test(siret)) return false;
+    let sum = 0;
+    for (let i = 0; i < 14; i++) {
+      let digit = parseInt(siret.charAt(i), 10);
+      if (i % 2 === 0) digit *= 2;
+      if (digit > 9) digit -= 9;
+      sum += digit;
+    }
+    return sum % 10 === 0;
+  };
+  */
+
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
-
-  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validateSiret = (siret: string) => /^\d{14}$/.test(siret);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     if (!accountType) return setError("Veuillez sélectionner un type de compte");
-    if (!formData.email || !formData.password || !formData.confirmPassword) return setError("Veuillez remplir tous les champs");
-    if (!validateEmail(formData.email)) return setError("Adresse email invalide");
-    if (formData.password.length < 6) return setError("Mot de passe trop court");
-    if (formData.password !== formData.confirmPassword) return setError("Les mots de passe ne correspondent pas");
+
+    // Champs communs
+    const { email, password, confirmPassword } = formData;
+    if (!email || !password || !confirmPassword) {
+      return setError("Veuillez remplir tous les champs obligatoires");
+    }
+    if (!validateEmail(email)) return setError("Adresse email invalide");
+    if (password.length < 6) return setError("Mot de passe trop court");
+    if (password !== confirmPassword) return setError("Les mots de passe ne correspondent pas");
+
+    // Champs spécifiques
+    let additionalData = {};
 
     if (accountType === "client") {
-      if (!formData.firstName || !formData.lastName) return setError("Prénom et nom requis");
-    } else if (accountType === "professionnel") {
-      if (!formData.companyName || !formData.profession || !formData.siret) return setError("Champs pro requis");
-      if (!validateSiret(formData.siret)) return setError("SIRET invalide");
+      const { firstName, lastName } = formData;
+      if (!firstName || !lastName) {
+        return setError("Veuillez remplir votre prénom et nom");
+      }
+      additionalData = {
+        firstName,
+        lastName,
+        preferences: {
+          notifications: true,
+          smsAlerts: false,
+          emailAlerts: true,
+        },
+      };
+    }
+
+    if (accountType === "professionnel") {
+      const { companyName, profession, siret } = formData;
+      if (!companyName || !profession || !siret) {
+        return setError("Veuillez remplir tous les champs professionnels");
+      }
+      if (!validateSiret(siret)) {
+        return setError("Le numéro SIRET doit contenir 14 chiffres valides");
+      }
+      additionalData = {
+        companyName,
+        profession,
+        siret,
+        rating: 0,
+        totalReviews: 0,
+        isVerified: false,
+        services: [],
+        availability: {
+          monday: true,
+          tuesday: true,
+          wednesday: true,
+          thursday: true,
+          friday: true,
+          saturday: false,
+          sunday: false,
+        },
+      };
     }
 
     setIsLoading(true);
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      const user = userCredential.user;
+      await register(email, password, accountType, additionalData);
+    } catch (error: any) {
+      console.error("Erreur d'inscription:", error);
 
-      const userData = {
-        role: accountType,
-        email: formData.email,
-        ...(accountType === "client"
-          ? {
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-            }
-          : {
-              companyName: formData.companyName,
-              profession: formData.profession,
-              siret: formData.siret,
-            }),
-      };
-
-      await setDoc(doc(db, "users", user.uid), userData);
-      navigate(accountType === "client" ? "/espace-client" : "/professionnels");
-    } catch (err: any) {
-      console.error(err);
-      setError(err.code === "auth/email-already-in-use" ? "Cet email est déjà utilisé." : "Erreur : " + err.message);
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          setError("Cette adresse email est déjà utilisée");
+          break;
+        case "auth/invalid-email":
+          setError("Adresse email invalide");
+          break;
+        case "auth/weak-password":
+          setError("Le mot de passe est trop faible");
+          break;
+        case "auth/operation-not-allowed":
+          setError("L'inscription n'est pas autorisée");
+          break;
+        case "auth/too-many-requests":
+          setError("Trop de tentatives. Réessayez plus tard.");
+          break;
+        default:
+          setError("Une erreur est survenue lors de l'inscription");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-muted/20">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="max-w-lg w-full space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-foreground">Inscription</h1>
@@ -118,7 +193,7 @@ export default function Signup() {
           </p>
         </div>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-lg bg-white">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">
               Créer un compte
@@ -147,6 +222,7 @@ export default function Signup() {
                     setAccountType(value as AccountType)
                   }
                   className="grid grid-cols-2 gap-4"
+                  disabled={isLoading}
                 >
                   <div>
                     <RadioGroupItem
@@ -156,7 +232,7 @@ export default function Signup() {
                     />
                     <Label
                       htmlFor="client"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors"
                     >
                       <User className="mb-3 h-6 w-6" />
                       <div className="text-center">
@@ -175,7 +251,7 @@ export default function Signup() {
                     />
                     <Label
                       htmlFor="professionnel"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors"
                     >
                       <Building className="mb-3 h-6 w-6" />
                       <div className="text-center">
@@ -206,6 +282,7 @@ export default function Signup() {
                               handleInputChange("firstName", e.target.value)
                             }
                             required
+                            disabled={isLoading}
                           />
                         </div>
                         <div className="space-y-2">
@@ -219,6 +296,7 @@ export default function Signup() {
                               handleInputChange("lastName", e.target.value)
                             }
                             required
+                            disabled={isLoading}
                           />
                         </div>
                       </div>
@@ -240,6 +318,7 @@ export default function Signup() {
                             handleInputChange("companyName", e.target.value)
                           }
                           required
+                          disabled={isLoading}
                         />
                       </div>
                       <div className="space-y-2">
@@ -249,6 +328,7 @@ export default function Signup() {
                           onValueChange={(value) =>
                             handleInputChange("profession", value)
                           }
+                          disabled={isLoading}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Choisir votre métier" />
@@ -276,6 +356,7 @@ export default function Signup() {
                           }
                           maxLength={14}
                           required
+                          disabled={isLoading}
                         />
                         <p className="text-xs text-muted-foreground">
                           14 chiffres de votre numéro SIRET
@@ -299,6 +380,7 @@ export default function Signup() {
                         }
                         className="pl-10"
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -317,11 +399,13 @@ export default function Signup() {
                         }
                         className="pl-10 pr-10"
                         required
+                        disabled={isLoading}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                        className="absolute right-3 top-3 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                        disabled={isLoading}
                       >
                         {showPassword ? (
                           <EyeOff className="h-4 w-4" />
@@ -348,13 +432,15 @@ export default function Signup() {
                         }
                         className="pl-10 pr-10"
                         required
+                        disabled={isLoading}
                       />
                       <button
                         type="button"
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
-                        className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                        className="absolute right-3 top-3 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                        disabled={isLoading}
                       >
                         {showConfirmPassword ? (
                           <EyeOff className="h-4 w-4" />
@@ -392,15 +478,6 @@ export default function Signup() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Demo info */}
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground">
-            Demo : remplissez le formulaire avec des données valides
-            <br />
-            SIRET de test : 12345678901234
-          </p>
-        </div>
       </div>
     </div>
   );
