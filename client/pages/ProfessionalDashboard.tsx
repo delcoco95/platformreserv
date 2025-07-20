@@ -188,15 +188,29 @@ export default function ProfessionalDashboard() {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const todayAppointments = appointments.filter((apt) => {
+    const todayAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
-    const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
+    let date: Date;
+    if (apt.date instanceof Timestamp) {
+      date = apt.date.toDate();
+    } else if (typeof apt.date === 'object' && apt.date !== null && 'toDate' in apt.date && typeof apt.date.toDate === 'function') {
+      date = apt.date.toDate();
+    } else {
+      date = new Date(apt.date as any);
+    }
     return date >= today && date < tomorrow && apt.status !== "cancelled";
   });
 
-  const upcomingAppointments = appointments.filter((apt) => {
+    const upcomingAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
-    const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
+    let date: Date;
+    if (apt.date instanceof Timestamp) {
+      date = apt.date.toDate();
+    } else if (typeof apt.date === 'object' && apt.date !== null && 'toDate' in apt.date && typeof apt.date.toDate === 'function') {
+      date = apt.date.toDate();
+    } else {
+      date = new Date(apt.date as any);
+    }
     return date >= tomorrow && apt.status !== "cancelled";
   });
 
