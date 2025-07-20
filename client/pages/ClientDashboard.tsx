@@ -35,15 +35,19 @@ import {
   MessageCircle,
   Plus,
   AlertCircle,
+  Bell,
+  Building,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { appointmentService } from "../services/appointmentService";
+import { professionalService } from "../services/professionalService";
 import { EditProfileDialog } from "../components/EditProfileDialog";
-import { Appointment, ClientProfile } from "../types";
+import { Appointment, ClientProfile, ProfessionalProfile } from "../types";
 
 export default function ClientDashboard() {
   const { currentUser, userProfile, loading: authLoading } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [lastProfessional, setLastProfessional] = useState<ProfessionalProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showEditProfile, setShowEditProfile] = useState(false);
@@ -59,8 +63,30 @@ export default function ClientDashboard() {
     // Écouter les changements de rendez-vous en temps réel
     const unsubscribe = appointmentService.onClientAppointmentsChange(
       currentUser.uid,
-      (appointmentsData) => {
+      async (appointmentsData) => {
         setAppointments(appointmentsData);
+        
+        // Récupérer les infos du dernier professionnel utilisé
+        if (appointmentsData.length > 0) {
+          const lastAppointment = appointmentsData.sort((a, b) => {
+            const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+            const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+            return dateB.getTime() - dateA.getTime();
+          })[0];
+          
+          if (lastAppointment.professionalId) {
+            try {
+              const professionals = await professionalService.getAllProfessionals();
+              const professional = professionals.find(p => p.uid === lastAppointment.professionalId);
+              if (professional) {
+                setLastProfessional(professional);
+              }
+            } catch (error) {
+              console.error('Erreur lors de la récupération du professionnel:', error);
+            }
+          }
+        }
+        
         setLoading(false);
       }
     );
@@ -197,7 +223,7 @@ export default function ClientDashboard() {
                 Modifier mon profil
               </Button>
               <Button asChild>
-                <Link to="/recherche">
+                <Link to="/professionnels">
                   <Plus className="h-4 w-4 mr-2" />
                   Nouveau rendez-vous
                 </Link>
@@ -293,7 +319,7 @@ export default function ClientDashboard() {
                           Réservez votre premier service dès maintenant
                         </p>
                         <Button asChild>
-                          <Link to="/recherche">
+                          <Link to="/professionnels">
                             <Plus className="h-4 w-4 mr-2" />
                             Réserver un service
                           </Link>
@@ -467,26 +493,62 @@ export default function ClientDashboard() {
               </CardContent>
             </Card>
 
-            {/* Quick Actions */}
+            {/* Last Professional Used */}
+            {lastProfessional && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Dernier professionnel</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-12 w-12">
+                      <AvatarFallback className="bg-secondary">
+                        {lastProfessional.companyName?.[0] || 'P'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h4 className="font-semibold">{lastProfessional.companyName}</h4>
+                      <p className="text-sm text-muted-foreground">{lastProfessional.profession}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {lastProfessional.phone && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <a href={`tel:${lastProfessional.phone}`} className="hover:text-primary">
+                          {lastProfessional.phone}
+                        </a>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-sm">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <span>{lastProfessional.email}</span>
+                    </div>
+                    {lastProfessional.address && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Building className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-xs">{lastProfessional.address}</span>
+                      </div>
+                    )}
+                  </div>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Reprendre RDV
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Messages/Notifications */}
             <Card>
               <CardHeader>
-                <CardTitle>Actions rapides</CardTitle>
+                <CardTitle>Messages</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <Button className="w-full" asChild>
-                  <Link to="/recherche">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Nouveau rendez-vous
-                  </Link>
-                </Button>
-                <Button variant="outline" className="w-full">
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Support client
-                </Button>
-                <Button variant="outline" className="w-full">
-                  <Star className="h-4 w-4 mr-2" />
-                  Mes avis
-                </Button>
+              <CardContent>
+                <div className="text-center py-6">
+                  <MessageCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">Aucun nouveau message</p>
+                </div>
               </CardContent>
             </Card>
 
@@ -498,23 +560,41 @@ export default function ClientDashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span>Notifications générales</span>
+                    <div className="flex items-center gap-2">
+                      <Bell className="h-4 w-4 text-muted-foreground" />
+                      <span>Notifications générales</span>
+                    </div>
                     <Badge variant={clientProfile.preferences.notifications ? "default" : "secondary"}>
                       {clientProfile.preferences.notifications ? "Activées" : "Désactivées"}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span>Alertes email</span>
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <span>Alertes email</span>
+                    </div>
                     <Badge variant={clientProfile.preferences.emailAlerts ? "default" : "secondary"}>
                       {clientProfile.preferences.emailAlerts ? "Activées" : "Désactivées"}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span>Alertes SMS</span>
+                    <div className="flex items-center gap-2">
+                      <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                      <span>Alertes SMS</span>
+                    </div>
                     <Badge variant={clientProfile.preferences.smsAlerts ? "default" : "secondary"}>
                       {clientProfile.preferences.smsAlerts ? "Activées" : "Désactivées"}
                     </Badge>
                   </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full mt-3"
+                    onClick={() => setShowEditProfile(true)}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Modifier les préférences
+                  </Button>
                 </CardContent>
               </Card>
             )}
