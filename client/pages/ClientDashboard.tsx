@@ -1,194 +1,532 @@
-// ClientDashboard.tsx
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { auth, db } from "../firebase";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-  updateDoc,
-} from "firebase/firestore";
-
 import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Badge } from "../components/ui/badge";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
+import {
+  Alert,
+  AlertDescription,
+} from "../components/ui/alert";
 import {
   Calendar,
   Clock,
   MapPin,
+  User,
+  Settings,
   Phone,
   Mail,
-  Settings,
-  Pencil,
+  Star,
+  TrendingUp,
+  CalendarCheck,
+  X,
+  MessageCircle,
+  Plus,
+  AlertCircle,
 } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { appointmentService } from "../services/appointmentService";
+import { EditProfileDialog } from "../components/EditProfileDialog";
+import { Appointment, ClientProfile } from "../types";
 
 export default function ClientDashboard() {
-  const [userInfo, setUserInfo] = useState<any>(null);
-  const [form, setForm] = useState({ firstName: "", lastName: "", phone: "" });
+  const { currentUser, userProfile, loading: authLoading } = useAuth();
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [upcomingAppointments, setUpcomingAppointments] = useState<any[]>([]);
-  const [pastAppointments, setPastAppointments] = useState<any[]>([]);
+  const [error, setError] = useState("");
+  const [showEditProfile, setShowEditProfile] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      console.log("🔁 AuthStateChanged appelé", user);
+    if (authLoading) return;
+    
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
 
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          setUserInfo(data);
-          setForm({
-            firstName: data.firstName || "",
-            lastName: data.lastName || "",
-            phone: data.phone || "",
-          });
-        } else {
-          console.warn("👤 Profil non trouvé dans Firestore.");
-        }
-
-        const q = query(collection(db, "appointments"), where("userId", "==", user.uid));
-        const snapshot = await getDocs(q);
-        const now = new Date();
-
-        const upcoming: any[] = [];
-        const past: any[] = [];
-
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          const date = new Date(data.date);
-          if (date >= now) upcoming.push({ id: docSnap.id, ...data });
-          else past.push({ id: docSnap.id, ...data });
-        });
-
-        setUpcomingAppointments(upcoming);
-        setPastAppointments(past);
-      } catch (err) {
-        console.error("🔥 Erreur dans le dashboard client:", err);
-      } finally {
+    // Écouter les changements de rendez-vous en temps réel
+    const unsubscribe = appointmentService.onClientAppointmentsChange(
+      currentUser.uid,
+      (appointmentsData) => {
+        setAppointments(appointmentsData);
         setLoading(false);
       }
-    });
+    );
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser, authLoading]);
 
-  const handleUpdate = async () => {
-    if (!auth.currentUser) return;
-    const ref = doc(db, "users", auth.currentUser.uid);
-    await updateDoc(ref, {
-      firstName: form.firstName,
-      lastName: form.lastName,
-      phone: form.phone,
-    });
-    setUserInfo({ ...userInfo, ...form });
+  const handleCancelAppointment = async (appointmentId: string) => {
+    try {
+      await appointmentService.cancelAppointment(appointmentId);
+    } catch (error) {
+      console.error('Erreur lors de l\'annulation:', error);
+      setError('Impossible d\'annuler le rendez-vous');
+    }
   };
 
-  if (loading) return <p className="text-center mt-10 text-muted-foreground">Chargement...</p>;
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return 'Date non définie';
+    
+    let date: Date;
+    if (timestamp.toDate) {
+      date = timestamp.toDate();
+    } else {
+      date = new Date(timestamp);
+    }
 
-  if (!userInfo) return <p className="text-center text-red-500">Impossible de charger le profil utilisateur.</p>;
+    return date.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  const formatTime = (timestamp: any) => {
+    if (!timestamp) return 'Heure non définie';
+    
+    let date: Date;
+    if (timestamp.toDate) {
+      date = timestamp.toDate();
+    } else {
+      date = new Date(timestamp);
+    }
+
+    return date.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'confirmed':
+        return <Badge className="bg-green-100 text-green-800">Confirmé</Badge>;
+      case 'pending':
+        return <Badge className="bg-yellow-100 text-yellow-800">En attente</Badge>;
+      case 'completed':
+        return <Badge className="bg-blue-100 text-blue-800">Terminé</Badge>;
+      case 'cancelled':
+        return <Badge className="bg-red-100 text-red-800">Annulé</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
+
+  const upcomingAppointments = appointments.filter(apt => {
+    if (!apt.date) return false;
+    const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
+    return date > new Date() && apt.status !== 'cancelled';
+  });
+
+  const pastAppointments = appointments.filter(apt => {
+    if (!apt.date) return false;
+    const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
+    return date <= new Date() || apt.status === 'completed';
+  });
+
+  const clientProfile = userProfile as ClientProfile;
+
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-muted-foreground">Chargement de votre espace...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser || !userProfile) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto" />
+          <div>
+            <h3 className="text-lg font-semibold">Accès non autorisé</h3>
+            <p className="text-muted-foreground">Veuillez vous connecter pour accéder à votre espace client.</p>
+          </div>
+          <Button asChild>
+            <Link to="/connexion">Se connecter</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container max-w-4xl py-8">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Avatar>
-            <AvatarImage src={userInfo.avatar || ""} />
-            <AvatarFallback>
-              {userInfo.firstName?.[0]}{userInfo.lastName?.[0]}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h2 className="text-2xl font-bold">Bonjour {userInfo.firstName} 👋</h2>
-            <p className="text-muted-foreground text-sm">Bienvenue sur votre espace client</p>
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-8">
+      <div className="container max-w-7xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={currentUser?.photoURL || ''} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-lg">
+                  {clientProfile?.firstName?.[0] || ''}
+                  {clientProfile?.lastName?.[0] || 'C'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">
+                  Bonjour {clientProfile?.firstName || 'Client'} 👋
+                </h1>
+                <p className="text-muted-foreground mt-1">
+                  Bienvenue dans votre espace personnel
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => setShowEditProfile(true)}>
+                <Settings className="h-4 w-4 mr-2" />
+                Modifier mon profil
+              </Button>
+              <Button asChild>
+                <Link to="/recherche">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nouveau rendez-vous
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline"><Pencil className="w-4 h-4 mr-2" /> Modifier</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Modifier mon profil</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label>Prénom</Label>
-                <Input value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} />
-              </div>
-              <div>
-                <Label>Nom</Label>
-                <Input value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
-              </div>
-              <div>
-                <Label>Téléphone</Label>
-                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-              </div>
-              <Button onClick={handleUpdate}>Enregistrer</Button>
+
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Quick Stats */}
+            <div className="grid md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Calendar className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">
+                        {upcomingAppointments.length}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        RDV à venir
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                      <CalendarCheck className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">
+                        {pastAppointments.filter(apt => apt.status === 'completed').length}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Services reçus
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                      <Star className="h-6 w-6 text-orange-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">4.8</p>
+                      <p className="text-sm text-muted-foreground">
+                        Note moyenne
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </DialogContent>
-        </Dialog>
+
+            {/* Appointments Tabs */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Mes rendez-vous</CardTitle>
+                <CardDescription>
+                  Consultez et gérez vos rendez-vous
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="upcoming" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="upcoming">À venir</TabsTrigger>
+                    <TabsTrigger value="history">Historique</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="upcoming" className="space-y-4 mt-6">
+                    {upcomingAppointments.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">Aucun rendez-vous programmé</h3>
+                        <p className="text-muted-foreground mb-4">
+                          Réservez votre premier service dès maintenant
+                        </p>
+                        <Button asChild>
+                          <Link to="/recherche">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Réserver un service
+                          </Link>
+                        </Button>
+                      </div>
+                    ) : (
+                      upcomingAppointments.map((appointment) => (
+                        <Card
+                          key={appointment.id}
+                          className="border-l-4 border-l-primary"
+                        >
+                          <CardContent className="p-6">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1 space-y-3">
+                                <div className="flex items-center gap-3">
+                                  <h3 className="font-semibold text-lg">
+                                    {appointment.service}
+                                  </h3>
+                                  {getStatusBadge(appointment.status)}
+                                </div>
+                                
+                                <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4" />
+                                    <span>{formatDate(appointment.date)}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="h-4 w-4" />
+                                    <span>{formatTime(appointment.date)}</span>
+                                  </div>
+                                  {appointment.address && (
+                                    <div className="flex items-center gap-2 md:col-span-2">
+                                      <MapPin className="h-4 w-4" />
+                                      <span>{appointment.address}</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {appointment.price && (
+                                  <div className="text-lg font-semibold text-primary">
+                                    {appointment.price}€
+                                  </div>
+                                )}
+
+                                {appointment.notes && (
+                                  <div className="text-sm text-muted-foreground">
+                                    <strong>Notes :</strong> {appointment.notes}
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <div className="flex gap-2 ml-4">
+                                <Button variant="outline" size="sm">
+                                  <MessageCircle className="h-4 w-4" />
+                                </Button>
+                                {appointment.status === 'confirmed' && (
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => handleCancelAppointment(appointment.id)}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="history" className="space-y-4 mt-6">
+                    {pastAppointments.length === 0 ? (
+                      <div className="text-center py-8">
+                        <CalendarCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">Aucun historique</h3>
+                        <p className="text-muted-foreground">
+                          Vos services passés apparaîtront ici
+                        </p>
+                      </div>
+                    ) : (
+                      pastAppointments.map((appointment) => (
+                        <Card key={appointment.id} className="opacity-75">
+                          <CardContent className="p-6">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1 space-y-3">
+                                <div className="flex items-center gap-3">
+                                  <h3 className="font-semibold">
+                                    {appointment.service}
+                                  </h3>
+                                  {getStatusBadge(appointment.status)}
+                                </div>
+                                
+                                <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4" />
+                                    <span>{formatDate(appointment.date)}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="h-4 w-4" />
+                                    <span>{formatTime(appointment.date)}</span>
+                                  </div>
+                                </div>
+
+                                {appointment.price && (
+                                  <div className="text-lg font-semibold">
+                                    {appointment.price}€
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {appointment.status === 'completed' && (
+                                <Button variant="outline" size="sm">
+                                  <Star className="h-4 w-4 mr-2" />
+                                  Noter
+                                </Button>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Profile Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Mon profil</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span>
+                      {clientProfile?.firstName || ''} {clientProfile?.lastName || ''}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <span>{currentUser.email}</span>
+                  </div>
+                  {clientProfile?.phone && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span>{clientProfile.phone}</span>
+                    </div>
+                  )}
+                  {clientProfile?.address && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span>{clientProfile.address}</span>
+                    </div>
+                  )}
+                </div>
+                
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4"
+                  onClick={() => setShowEditProfile(true)}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Modifier
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Actions rapides</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button className="w-full" asChild>
+                  <Link to="/recherche">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Nouveau rendez-vous
+                  </Link>
+                </Button>
+                <Button variant="outline" className="w-full">
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Support client
+                </Button>
+                <Button variant="outline" className="w-full">
+                  <Star className="h-4 w-4 mr-2" />
+                  Mes avis
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Preferences Card */}
+            {clientProfile?.preferences && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Mes préférences</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Notifications générales</span>
+                    <Badge variant={clientProfile.preferences.notifications ? "default" : "secondary"}>
+                      {clientProfile.preferences.notifications ? "Activées" : "Désactivées"}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Alertes email</span>
+                    <Badge variant={clientProfile.preferences.emailAlerts ? "default" : "secondary"}>
+                      {clientProfile.preferences.emailAlerts ? "Activées" : "Désactivées"}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Alertes SMS</span>
+                    <Badge variant={clientProfile.preferences.smsAlerts ? "default" : "secondary"}>
+                      {clientProfile.preferences.smsAlerts ? "Activées" : "Désactivées"}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+
+        {/* Edit Profile Dialog */}
+        <EditProfileDialog 
+          open={showEditProfile} 
+          onOpenChange={setShowEditProfile} 
+        />
       </div>
-
-      <Tabs defaultValue="upcoming">
-        <TabsList className="grid grid-cols-2 w-full mb-4">
-          <TabsTrigger value="upcoming">Rendez-vous à venir</TabsTrigger>
-          <TabsTrigger value="past">Services reçus</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="upcoming">
-          {upcomingAppointments.length === 0 ? (
-            <p className="text-muted-foreground text-center">Aucun rendez-vous à venir.</p>
-          ) : (
-            upcomingAppointments.map((apt) => (
-              <Card key={apt.id} className="mb-4">
-                <CardContent className="p-4">
-                  <p className="font-semibold">{apt.service}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {apt.date} à {apt.heure} — {apt.adresse}
-                  </p>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </TabsContent>
-
-        <TabsContent value="past">
-          {pastAppointments.length === 0 ? (
-            <p className="text-muted-foreground text-center">Aucun service reçu.</p>
-          ) : (
-            pastAppointments.map((apt) => (
-              <Card key={apt.id} className="mb-4 opacity-75">
-                <CardContent className="p-4">
-                  <p className="font-semibold">{apt.service}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {apt.date} à {apt.heure} — {apt.adresse}
-                  </p>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }
