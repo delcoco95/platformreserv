@@ -32,6 +32,8 @@ import {
 } from "lucide-react";
 import { professionalService } from "../services/professionalService";
 import { ProfessionalProfile } from "../types";
+import { useAuth } from "../contexts/AuthContext";
+import { DemoModeAlert } from "../components/DemoModeAlert";
 
 export default function ProfessionalsList() {
   const [searchParams] = useSearchParams();
