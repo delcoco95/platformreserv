@@ -1,4 +1,4 @@
-import { useState, Suspense, lazy } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
@@ -17,6 +17,12 @@ import {
 } from "../components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import {
+  Alert,
+  AlertDescription,
+} from "../components/ui/alert";
+import { Switch } from "../components/ui/switch";
+import { Label } from "../components/ui/label";
+import {
   Calendar,
   Clock,
   MapPin,
@@ -29,126 +35,220 @@ import {
   Mail,
   Eye,
   Car,
+  CheckCircle,
+  MessageCircle,
+  Plus,
+  AlertCircle,
+  Building,
+  Award,
+  Euro,
 } from "lucide-react";
-
-// Import Leaflet CSS
-import "leaflet/dist/leaflet.css";
-
-// Lazy load the map component
-const Map = lazy(() =>
-  import("../components/Map").then((module) => ({ default: module.Map })),
-);
+import { useAuth } from "../contexts/AuthContext";
+import { appointmentService } from "../services/appointmentService";
+import { EditProfileDialog } from "../components/EditProfileDialog";
+import { Appointment, ProfessionalProfile } from "../types";
 
 export default function ProfessionalDashboard() {
-  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const { currentUser, userProfile, loading: authLoading } = useAuth();
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [showEditProfile, setShowEditProfile] = useState(false);
 
-  // Mock data - remplacer par des vraies données API
-  const professionalInfo = {
-    companyName: "Auto Service Plus",
-    profession: "Entretien & Réparation Automobile",
-    email: "contact@autoserviceplus.fr",
-    phone: "01 23 45 67 89",
-    avatar: "",
-    address: "123 Rue de la République, 75001 Paris",
-    siret: "12345678901234",
-    rating: 4.8,
-    totalReviews: 147,
+  useEffect(() => {
+    if (authLoading) return;
+    
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
+
+    // Écouter les changements de rendez-vous en temps réel
+    const unsubscribe = appointmentService.onProfessionalAppointmentsChange(
+      currentUser.uid,
+      (appointmentsData) => {
+        setAppointments(appointmentsData);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [currentUser, authLoading]);
+
+  const handleValidateAppointment = async (appointmentId: string) => {
+    try {
+      await appointmentService.updateAppointment(appointmentId, { 
+        status: 'completed' 
+      });
+    } catch (error) {
+      console.error('Erreur lors de la validation:', error);
+      setError('Impossible de valider le rendez-vous');
+    }
   };
 
-  const stats = {
-    appointmentsThisMonth: 23,
-    attendanceRate: 96,
-    averageRating: 4.8,
-    totalEarnings: 2340,
-  };
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return 'Date non définie';
+    
+    let date: Date;
+    if (timestamp.toDate) {
+      date = timestamp.toDate();
+    } else {
+      date = new Date(timestamp);
+    }
 
-  const upcomingAppointments = [
-    {
-      id: 1,
-      clientName: "Marie",
-      clientEmail: "marie.martin@email.com",
-      clientPhone: "06 12 34 56 78",
-      service: "Vidange moteur",
-      date: "2024-01-15",
-      time: "14:30",
-      duration: "45 min",
-      price: "65€",
-      address: "15 Rue Victor Hugo, 75001 Paris",
-      lat: 48.8566,
-      lng: 2.3522,
-      status: "confirmed",
-    },
-    {
-      id: 2,
-      clientName: "Pierre",
-      clientEmail: "pierre.dubois@email.com",
-      clientPhone: "06 98 76 54 32",
-      service: "Révision complète",
-      date: "2024-01-15",
-      time: "16:00",
-      duration: "90 min",
-      price: "180€",
-      address: "42 Avenue des Champs, 75008 Paris",
-      lat: 48.8698,
-      lng: 2.3077,
-      status: "confirmed",
-    },
-    {
-      id: 3,
-      clientName: "Sophie",
-      clientEmail: "sophie.bernard@email.com",
-      clientPhone: "06 11 22 33 44",
-      service: "Freinage",
-      date: "2024-01-16",
-      time: "10:00",
-      duration: "60 min",
-      price: "120€",
-      address: "78 Boulevard Saint-Germain, 75005 Paris",
-      lat: 48.8534,
-      lng: 2.3488,
-      status: "confirmed",
-    },
-  ];
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("fr-FR", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+    return date.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
-  // Centre de la carte (Paris)
-  const mapCenter: [number, number] = [48.8566, 2.3522];
+  const formatTime = (timestamp: any) => {
+    if (!timestamp) return 'Heure non définie';
+    
+    let date: Date;
+    if (timestamp.toDate) {
+      date = timestamp.toDate();
+    } else {
+      date = new Date(timestamp);
+    }
+
+    return date.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'confirmed':
+        return <Badge className="bg-green-100 text-green-800">Confirmé</Badge>;
+      case 'pending':
+        return <Badge className="bg-yellow-100 text-yellow-800">En attente</Badge>;
+      case 'completed':
+        return <Badge className="bg-blue-100 text-blue-800">Terminé</Badge>;
+      case 'cancelled':
+        return <Badge className="bg-red-100 text-red-800">Annulé</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
+
+  const getCategoryIcon = (profession: string) => {
+    switch (profession) {
+      case 'automobile':
+        return Car;
+      case 'plomberie':
+        return Settings;
+      case 'serrurerie':
+        return Settings;
+      default:
+        return Building;
+    }
+  };
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const todayAppointments = appointments.filter(apt => {
+    if (!apt.date) return false;
+    const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
+    return date >= today && date < tomorrow && apt.status !== 'cancelled';
+  });
+
+  const upcomingAppointments = appointments.filter(apt => {
+    if (!apt.date) return false;
+    const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
+    return date >= tomorrow && apt.status !== 'cancelled';
+  });
+
+  const completedAppointments = appointments.filter(apt => apt.status === 'completed');
+  const totalEarnings = completedAppointments.reduce((sum, apt) => sum + (apt.price || 0), 0);
+
+  const professionalProfile = userProfile as ProfessionalProfile;
+  const IconComponent = getCategoryIcon(professionalProfile?.profession || '');
+
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-muted-foreground">Chargement de votre espace...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser || !userProfile) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto" />
+          <div>
+            <h3 className="text-lg font-semibold">Accès non autorisé</h3>
+            <p className="text-muted-foreground">Veuillez vous connecter pour accéder à votre espace professionnel.</p>
+          </div>
+          <Button asChild>
+            <Link to="/connexion">Se connecter</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-muted/20 py-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-8">
       <div className="container max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">
-                Espace Professionnel
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                Gérez vos rendez-vous et votre activité
-              </p>
+            <div className="flex items-center gap-4">
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={currentUser?.photoURL || ''} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-lg">
+                  {professionalProfile?.companyName?.[0] || 'P'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">
+                  {professionalProfile?.companyName || 'Espace Professionnel'}
+                </h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <IconComponent className="h-4 w-4 text-muted-foreground" />
+                  <p className="text-muted-foreground">
+                    {professionalProfile?.profession || 'Professionnel'}
+                  </p>
+                  {professionalProfile?.isVerified && (
+                    <Badge variant="secondary">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Vérifié
+                    </Badge>
+                  )}
+                </div>
+              </div>
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-2" />
-                Voir ma fiche publique
-              </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" onClick={() => setShowEditProfile(true)}>
                 <Settings className="h-4 w-4 mr-2" />
-                Modifier mes disponibilités
+                Modifier mes informations
+              </Button>
+              <Button variant="outline">
+                <Eye className="h-4 w-4 mr-2" />
+                Ma fiche publique
               </Button>
             </div>
           </div>
         </div>
+
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
@@ -163,10 +263,10 @@ export default function ProfessionalDashboard() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold">
-                        {stats.appointmentsThisMonth}
+                        {todayAppointments.length}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        RDV ce mois
+                        Aujourd'hui
                       </p>
                     </div>
                   </div>
@@ -176,14 +276,14 @@ export default function ProfessionalDashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <TrendingUp className="h-6 w-6 text-green-600" />
+                      <CheckCircle className="h-6 w-6 text-green-600" />
                     </div>
                     <div>
                       <p className="text-2xl font-bold">
-                        {stats.attendanceRate}%
+                        {completedAppointments.length}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        Taux présence
+                        RDV réalisés
                       </p>
                     </div>
                   </div>
@@ -197,7 +297,7 @@ export default function ProfessionalDashboard() {
                     </div>
                     <div>
                       <p className="text-2xl font-bold">
-                        {stats.averageRating}
+                        {professionalProfile?.rating?.toFixed(1) || '0.0'}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         Note moyenne
@@ -210,134 +310,169 @@ export default function ProfessionalDashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                      <TrendingUp className="h-6 w-6 text-purple-600" />
+                      <Euro className="h-6 w-6 text-purple-600" />
                     </div>
                     <div>
                       <p className="text-2xl font-bold">
-                        {stats.totalEarnings}€
+                        {totalEarnings}€
                       </p>
-                      <p className="text-sm text-muted-foreground">Ce mois</p>
+                      <p className="text-sm text-muted-foreground">
+                        Revenus totaux
+                      </p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Appointments and Map */}
+            {/* Appointments */}
             <Card>
               <CardHeader>
-                <CardTitle>Rendez-vous à venir</CardTitle>
+                <CardTitle>Mes rendez-vous</CardTitle>
                 <CardDescription>
-                  Vos prochains rendez-vous clients
+                  Gérez vos rendez-vous clients
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="list" className="w-full">
+                <Tabs defaultValue="today" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="list">Liste</TabsTrigger>
-                    <TabsTrigger value="map">Carte</TabsTrigger>
+                    <TabsTrigger value="today">Aujourd'hui</TabsTrigger>
+                    <TabsTrigger value="upcoming">À venir</TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="list" className="space-y-4 mt-6">
-                    {upcomingAppointments.map((appointment) => (
-                      <Card
-                        key={appointment.id}
-                        className="border-l-4 border-l-primary"
-                      >
-                        <CardContent className="p-6">
-                          <div className="flex items-start justify-between">
-                            <div className="flex gap-4">
-                              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                                <Car className="h-5 w-5 text-primary" />
+                  <TabsContent value="today" className="space-y-4 mt-6">
+                    {todayAppointments.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">Aucun rendez-vous aujourd'hui</h3>
+                        <p className="text-muted-foreground">
+                          Profitez de cette journée plus calme !
+                        </p>
+                      </div>
+                    ) : (
+                      todayAppointments.map((appointment) => (
+                        <Card
+                          key={appointment.id}
+                          className="border-l-4 border-l-primary"
+                        >
+                          <CardContent className="p-6">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1 space-y-3">
+                                <div className="flex items-center gap-3">
+                                  <h3 className="font-semibold text-lg">
+                                    {appointment.service}
+                                  </h3>
+                                  {getStatusBadge(appointment.status)}
+                                </div>
+                                
+                                <div className="text-sm">
+                                  <p className="font-medium">Client : [Client privé]</p>
+                                  <p className="text-muted-foreground">
+                                    Email : [Email protégé] • Tél : [Téléphone protégé]
+                                  </p>
+                                </div>
+                                
+                                <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="h-4 w-4" />
+                                    <span>{formatTime(appointment.date)}</span>
+                                  </div>
+                                  {appointment.duration && (
+                                    <div className="flex items-center gap-2">
+                                      <Clock className="h-4 w-4" />
+                                      <span>{appointment.duration} min</span>
+                                    </div>
+                                  )}
+                                  {appointment.address && (
+                                    <div className="flex items-center gap-2 md:col-span-2">
+                                      <MapPin className="h-4 w-4" />
+                                      <span>{appointment.address}</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {appointment.price && (
+                                  <div className="text-lg font-semibold text-primary">
+                                    {appointment.price}€
+                                  </div>
+                                )}
+
+                                {appointment.notes && (
+                                  <div className="text-sm text-muted-foreground">
+                                    <strong>Notes :</strong> {appointment.notes}
+                                  </div>
+                                )}
                               </div>
-                              <div className="flex-1 space-y-2">
-                                <div className="flex items-center gap-2">
+                              
+                              <div className="flex gap-2 ml-4">
+                                <Button variant="outline" size="sm">
+                                  <MessageCircle className="h-4 w-4" />
+                                </Button>
+                                {appointment.status === 'confirmed' && (
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleValidateAppointment(appointment.id)}
+                                  >
+                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    Valider
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="upcoming" className="space-y-4 mt-6">
+                    {upcomingAppointments.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">Aucun rendez-vous à venir</h3>
+                        <p className="text-muted-foreground">
+                          Les nouveaux rendez-vous apparaîtront ici
+                        </p>
+                      </div>
+                    ) : (
+                      upcomingAppointments.map((appointment) => (
+                        <Card key={appointment.id}>
+                          <CardContent className="p-6">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1 space-y-3">
+                                <div className="flex items-center gap-3">
                                   <h3 className="font-semibold">
                                     {appointment.service}
                                   </h3>
-                                  <Badge className="bg-green-100 text-green-800">
-                                    Confirmé
-                                  </Badge>
+                                  {getStatusBadge(appointment.status)}
                                 </div>
-                                <p className="text-sm font-medium">
-                                  Client: {appointment.clientName}
-                                </p>
-                                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                                  <div className="flex items-center gap-1">
+                                
+                                <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
+                                  <div className="flex items-center gap-2">
                                     <Calendar className="h-4 w-4" />
-                                    {formatDate(appointment.date)}
+                                    <span>{formatDate(appointment.date)}</span>
                                   </div>
-                                  <div className="flex items-center gap-1">
+                                  <div className="flex items-center gap-2">
                                     <Clock className="h-4 w-4" />
-                                    {appointment.time} ({appointment.duration})
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <MapPin className="h-4 w-4" />
-                                    {appointment.address}
+                                    <span>{formatTime(appointment.date)}</span>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-4 text-sm">
-                                  <div className="flex items-center gap-1">
-                                    <Phone className="h-4 w-4 text-muted-foreground" />
-                                    <a
-                                      href={`tel:${appointment.clientPhone}`}
-                                      className="hover:text-primary"
-                                    >
-                                      {appointment.clientPhone}
-                                    </a>
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <Mail className="h-4 w-4 text-muted-foreground" />
-                                    <a
-                                      href={`mailto:${appointment.clientEmail}`}
-                                      className="hover:text-primary"
-                                    >
-                                      {appointment.clientEmail}
-                                    </a>
-                                  </div>
-                                </div>
-                                <div className="text-lg font-semibold text-primary">
-                                  {appointment.price}
-                                </div>
-                              </div>
-                            </div>
-                            <Button variant="outline" size="sm">
-                              <Phone className="h-4 w-4 mr-2" />
-                              Contacter
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </TabsContent>
 
-                  <TabsContent value="map" className="mt-6">
-                    <div className="h-96 rounded-lg overflow-hidden border">
-                      <Suspense
-                        fallback={
-                          <div className="h-full bg-muted flex items-center justify-center">
-                            <div className="text-center space-y-2">
-                              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-                              <p className="text-muted-foreground">
-                                Chargement de la carte...
-                              </p>
+                                {appointment.price && (
+                                  <div className="text-lg font-semibold">
+                                    {appointment.price}€
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <Button variant="outline" size="sm">
+                                Détails
+                              </Button>
                             </div>
-                          </div>
-                        }
-                      >
-                        <Map
-                          appointments={upcomingAppointments}
-                          center={mapCenter}
-                          zoom={12}
-                          onMarkerClick={setSelectedAppointment}
-                        />
-                      </Suspense>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-4">
-                      Cliquez sur les marqueurs pour voir les détails des
-                      rendez-vous. Les informations des clients s'affichent dans
-                      les bulles d'information.
-                    </p>
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -352,61 +487,119 @@ export default function ProfessionalDashboard() {
                 <CardTitle>Mon profil</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src={professionalInfo.avatar} />
-                    <AvatarFallback className="text-lg bg-primary text-primary-foreground">
-                      {professionalInfo.companyName
-                        .split(" ")
-                        .map((word) => word[0])
-                        .join("")
-                        .slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-semibold">
-                      {professionalInfo.companyName}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {professionalInfo.profession}
-                    </p>
-                    <div className="flex items-center gap-1 mt-1">
-                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                      <span className="text-sm font-medium">
-                        {professionalInfo.rating}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        ({professionalInfo.totalReviews} avis)
-                      </span>
-                    </div>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Building className="h-4 w-4 text-muted-foreground" />
+                    <span>{professionalProfile?.companyName || 'Non renseigné'}</span>
                   </div>
-                </div>
-                <div className="space-y-2 pt-4 border-t">
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span>{professionalInfo.email}</span>
+                    <span>{currentUser.email}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span>{professionalInfo.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span>{professionalInfo.address}</span>
-                  </div>
+                  {professionalProfile?.phone && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span>{professionalProfile.phone}</span>
+                    </div>
+                  )}
+                  {professionalProfile?.address && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span>{professionalProfile.address}</span>
+                    </div>
+                  )}
+                  {professionalProfile?.siret && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Award className="h-4 w-4 text-muted-foreground" />
+                      <span>SIRET: {professionalProfile.siret}</span>
+                    </div>
+                  )}
                 </div>
-                <div className="space-y-2 pt-4">
-                  <Button variant="outline" className="w-full">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Modifier le profil
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    <Eye className="h-4 w-4 mr-2" />
-                    Voir ma fiche publique
-                  </Button>
-                </div>
+                
+                {professionalProfile?.rating && (
+                  <div className="flex items-center gap-2 pt-2 border-t">
+                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <span className="text-sm font-medium">
+                      {professionalProfile.rating.toFixed(1)}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      ({professionalProfile.totalReviews || 0} avis)
+                    </span>
+                  </div>
+                )}
+                
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4"
+                  onClick={() => setShowEditProfile(true)}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Modifier
+                </Button>
               </CardContent>
             </Card>
+
+            {/* Services */}
+            {professionalProfile?.services && professionalProfile.services.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Mes services</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {professionalProfile.services.map((service, index) => (
+                    <Badge key={index} variant="outline" className="mr-2 mb-2">
+                      {service}
+                    </Badge>
+                  ))}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full mt-3"
+                    onClick={() => setShowEditProfile(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Modifier mes services
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Availability */}
+            {professionalProfile?.availability && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Mes disponibilités</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {Object.entries(professionalProfile.availability).map(([day, isAvailable]) => {
+                    const dayLabels: { [key: string]: string } = {
+                      monday: 'Lundi',
+                      tuesday: 'Mardi',
+                      wednesday: 'Mercredi',
+                      thursday: 'Jeudi',
+                      friday: 'Vendredi',
+                      saturday: 'Samedi',
+                      sunday: 'Dimanche'
+                    };
+                    
+                    return (
+                      <div key={day} className="flex items-center justify-between">
+                        <Label className="text-sm">{dayLabels[day]}</Label>
+                        <Switch checked={isAvailable as boolean} disabled />
+                      </div>
+                    );
+                  })}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full mt-3"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Modifier les créneaux
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Quick Actions */}
             <Card>
@@ -414,17 +607,13 @@ export default function ProfessionalDashboard() {
                 <CardTitle>Actions rapides</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Gérer mes créneaux
-                </Button>
                 <Button variant="outline" className="w-full">
                   <Users className="h-4 w-4 mr-2" />
                   Mes statistiques
                 </Button>
                 <Button variant="outline" className="w-full">
                   <Star className="h-4 w-4 mr-2" />
-                  Mes avis clients
+                  Gérer mes avis
                 </Button>
                 <Button variant="outline" className="w-full">
                   <ExternalLink className="h-4 w-4 mr-2" />
@@ -432,33 +621,14 @@ export default function ProfessionalDashboard() {
                 </Button>
               </CardContent>
             </Card>
-
-            {/* Recent Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Activité récente</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-3 text-sm">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Nouveau rendez-vous confirmé</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>Avis 5★ reçu de Marie</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                  <span>Profil mis à jour</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>Paiement reçu: 180€</span>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
+
+        {/* Edit Profile Dialog */}
+        <EditProfileDialog 
+          open={showEditProfile} 
+          onOpenChange={setShowEditProfile} 
+        />
       </div>
     </div>
   );
