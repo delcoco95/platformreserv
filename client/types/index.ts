@@ -1,15 +1,15 @@
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp } from "firebase/firestore";
 
 export interface User {
   uid: string;
   email: string;
-  userType: 'client' | 'professionnel';
+  userType: "client" | "professionnel";
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
 
 export interface ClientProfile extends User {
-  userType: 'client';
+  userType: "client";
   firstName?: string;
   lastName?: string;
   phone?: string;
@@ -22,9 +22,9 @@ export interface ClientProfile extends User {
 }
 
 export interface ProfessionalProfile extends User {
-  userType: 'professionnel';
+  userType: "professionnel";
   companyName?: string;
-  profession?: 'automobile' | 'plomberie' | 'serrurerie';
+  profession?: "automobile" | "plomberie" | "serrurerie";
   siret?: string;
   phone?: string;
   address?: string;
@@ -45,7 +45,7 @@ export interface Appointment {
   service: string;
   date: Timestamp;
   duration: number; // en minutes
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  status: "pending" | "confirmed" | "completed" | "cancelled";
   price?: number;
   address?: string;
   coordinates?: {

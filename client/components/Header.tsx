@@ -11,15 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { 
-  Search, 
-  User, 
-  Calendar, 
-  Menu, 
+import {
+  Search,
+  User,
+  Calendar,
+  Menu,
   LogOut,
   Car,
   Wrench,
-  Key
+  Key,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -30,9 +30,9 @@ export function Header() {
   const navigate = useNavigate();
 
   const categories = [
-    { id: 'automobile', label: 'Auto', icon: Car },
-    { id: 'plomberie', label: 'Plomberie', icon: Wrench },
-    { id: 'serrurerie', label: 'Serrurier', icon: Key },
+    { id: "automobile", label: "Auto", icon: Car },
+    { id: "plomberie", label: "Plomberie", icon: Wrench },
+    { id: "serrurerie", label: "Serrurier", icon: Key },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
@@ -49,14 +49,16 @@ export function Header() {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      console.error("Erreur lors de la déconnexion:", error);
     }
   };
 
   const getDashboardPath = () => {
-    return userProfile?.userType === 'client' ? '/espace-client' : '/espace-professionnel';
+    return userProfile?.userType === "client"
+      ? "/espace-client"
+      : "/espace-professionnel";
   };
 
   return (
@@ -69,7 +71,9 @@ export function Header() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Calendar className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-primary">RendezVousPro</span>
+            <span className="text-xl font-bold text-primary">
+              RendezVousPro
+            </span>
           </Link>
 
           {/* Search bar - Desktop */}
@@ -91,14 +95,16 @@ export function Header() {
             {currentUser && userProfile ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-10 w-10 rounded-full"
+                  >
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={currentUser.photoURL || ''} />
+                      <AvatarImage src={currentUser.photoURL || ""} />
                       <AvatarFallback className="bg-primary text-primary-foreground">
-                        {userProfile.userType === 'client' 
-                          ? `${userProfile.firstName?.[0] || ''}${userProfile.lastName?.[0] || 'C'}`
-                          : userProfile.companyName?.[0] || 'P'
-                        }
+                        {userProfile.userType === "client"
+                          ? `${userProfile.firstName?.[0] || ""}${userProfile.lastName?.[0] || "C"}`
+                          : userProfile.companyName?.[0] || "P"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -107,10 +113,10 @@ export function Header() {
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {userProfile.userType === 'client'
-                          ? `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || 'Client'
-                          : userProfile.companyName || 'Professionnel'
-                        }
+                        {userProfile.userType === "client"
+                          ? `${userProfile.firstName || ""} ${userProfile.lastName || ""}`.trim() ||
+                            "Client"
+                          : userProfile.companyName || "Professionnel"}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
                         {currentUser.email}
@@ -253,7 +259,10 @@ export function Header() {
                   className="w-full justify-start"
                   asChild
                 >
-                  <Link to={getDashboardPath()} onClick={() => setIsMenuOpen(false)}>
+                  <Link
+                    to={getDashboardPath()}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     <User className="h-4 w-4 mr-2" />
                     Mon espace
                   </Link>

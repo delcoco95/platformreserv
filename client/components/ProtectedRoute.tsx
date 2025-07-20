@@ -1,13 +1,16 @@
-import { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { ReactNode } from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredUserType?: 'client' | 'professionnel';
+  requiredUserType?: "client" | "professionnel";
 }
 
-const ProtectedRoute = ({ children, requiredUserType }: ProtectedRouteProps) => {
+const ProtectedRoute = ({
+  children,
+  requiredUserType,
+}: ProtectedRouteProps) => {
   const { currentUser, userProfile, loading } = useAuth();
 
   if (loading) {
@@ -24,9 +27,10 @@ const ProtectedRoute = ({ children, requiredUserType }: ProtectedRouteProps) => 
 
   if (requiredUserType && userProfile?.userType !== requiredUserType) {
     // Rediriger vers le bon dashboard selon le type d'utilisateur
-    const redirectPath = userProfile?.userType === 'client' 
-      ? '/espace-client' 
-      : '/espace-professionnel';
+    const redirectPath =
+      userProfile?.userType === "client"
+        ? "/espace-client"
+        : "/espace-professionnel";
     return <Navigate to={redirectPath} replace />;
   }
 
