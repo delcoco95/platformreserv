@@ -72,7 +72,7 @@ export function ServicesManager() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
-  
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -87,7 +87,8 @@ export function ServicesManager() {
       {
         id: "1",
         name: "Révision complète",
-        description: "Contrôle complet du véhicule : moteur, freins, direction, éclairage",
+        description:
+          "Contrôle complet du véhicule : moteur, freins, direction, éclairage",
         price: 150,
         duration: 120,
         category: "entretien",
@@ -103,7 +104,8 @@ export function ServicesManager() {
       {
         id: "3",
         name: "Diagnostic électronique",
-        description: "Diagnostic complet des systèmes électroniques du véhicule",
+        description:
+          "Diagnostic complet des systèmes électroniques du véhicule",
         price: 80,
         duration: 60,
         category: "diagnostic",
@@ -141,7 +143,12 @@ export function ServicesManager() {
   };
 
   const handleSubmit = () => {
-    if (!formData.name || !formData.price || !formData.duration || !formData.category) {
+    if (
+      !formData.name ||
+      !formData.price ||
+      !formData.duration ||
+      !formData.category
+    ) {
       alert("Veuillez remplir tous les champs obligatoires");
       return;
     }
@@ -156,11 +163,13 @@ export function ServicesManager() {
     };
 
     if (editingService) {
-      setServices(prev => prev.map(service => 
-        service.id === editingService.id ? serviceData : service
-      ));
+      setServices((prev) =>
+        prev.map((service) =>
+          service.id === editingService.id ? serviceData : service,
+        ),
+      );
     } else {
-      setServices(prev => [...prev, serviceData]);
+      setServices((prev) => [...prev, serviceData]);
     }
 
     setShowDialog(false);
@@ -171,25 +180,31 @@ export function ServicesManager() {
 
   const deleteService = (serviceId: string) => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer ce service ?")) {
-      setServices(prev => prev.filter(service => service.id !== serviceId));
+      setServices((prev) => prev.filter((service) => service.id !== serviceId));
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     }
   };
 
   const getCategoryLabel = (category: string) => {
-    return SERVICE_CATEGORIES.find(cat => cat.value === category)?.label || category;
+    return (
+      SERVICE_CATEGORIES.find((cat) => cat.value === category)?.label ||
+      category
+    );
   };
 
   const getDurationLabel = (duration: number) => {
-    return DURATION_OPTIONS.find(opt => opt.value === duration)?.label || `${duration} min`;
+    return (
+      DURATION_OPTIONS.find((opt) => opt.value === duration)?.label ||
+      `${duration} min`
+    );
   };
 
   const saveServices = async () => {
     setIsLoading(true);
     try {
       // Ici on sauvegarderait en base de données
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
@@ -232,7 +247,9 @@ export function ServicesManager() {
               <DialogContent className="max-w-md">
                 <DialogHeader>
                   <DialogTitle>
-                    {editingService ? "Modifier le service" : "Ajouter un service"}
+                    {editingService
+                      ? "Modifier le service"
+                      : "Ajouter un service"}
                   </DialogTitle>
                   <DialogDescription>
                     Remplissez les informations du service.
@@ -244,7 +261,12 @@ export function ServicesManager() {
                     <Input
                       id="name"
                       value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
                       placeholder="Ex: Révision complète"
                     />
                   </div>
@@ -253,7 +275,12 @@ export function ServicesManager() {
                     <Textarea
                       id="description"
                       value={formData.description}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
                       placeholder="Décrivez le service en détail..."
                       rows={3}
                     />
@@ -267,7 +294,12 @@ export function ServicesManager() {
                         min="0"
                         step="0.01"
                         value={formData.price}
-                        onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            price: e.target.value,
+                          }))
+                        }
                         placeholder="50.00"
                       />
                     </div>
@@ -275,14 +307,19 @@ export function ServicesManager() {
                       <Label htmlFor="duration">Durée *</Label>
                       <Select
                         value={formData.duration}
-                        onValueChange={(value) => setFormData(prev => ({ ...prev, duration: value }))}
+                        onValueChange={(value) =>
+                          setFormData((prev) => ({ ...prev, duration: value }))
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner" />
                         </SelectTrigger>
                         <SelectContent>
-                          {DURATION_OPTIONS.map(option => (
-                            <SelectItem key={option.value} value={option.value.toString()}>
+                          {DURATION_OPTIONS.map((option) => (
+                            <SelectItem
+                              key={option.value}
+                              value={option.value.toString()}
+                            >
                               {option.label}
                             </SelectItem>
                           ))}
@@ -294,14 +331,19 @@ export function ServicesManager() {
                     <Label htmlFor="category">Catégorie *</Label>
                     <Select
                       value={formData.category}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, category: value }))
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner une catégorie" />
                       </SelectTrigger>
                       <SelectContent>
-                        {SERVICE_CATEGORIES.map(category => (
-                          <SelectItem key={category.value} value={category.value}>
+                        {SERVICE_CATEGORIES.map((category) => (
+                          <SelectItem
+                            key={category.value}
+                            value={category.value}
+                          >
                             {category.label}
                           </SelectItem>
                         ))}
@@ -343,7 +385,7 @@ export function ServicesManager() {
             </div>
           ) : (
             <div className="space-y-4">
-              {services.map(service => (
+              {services.map((service) => (
                 <div key={service.id} className="border rounded-lg p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -389,7 +431,7 @@ export function ServicesManager() {
                   </div>
                 </div>
               ))}
-              
+
               <div className="flex justify-end pt-4 border-t">
                 <Button
                   onClick={saveServices}
@@ -407,7 +449,7 @@ export function ServicesManager() {
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          <strong>Conseil :</strong> Définissez des prix justes et compétitifs. 
+          <strong>Conseil :</strong> Définissez des prix justes et compétitifs.
           Les clients pourront voir vos tarifs avant de réserver.
         </AlertDescription>
       </Alert>

@@ -48,7 +48,10 @@ import {
 import { professionalService } from "../services/professionalService";
 import { appointmentService } from "../services/appointmentService";
 import { useAuth } from "../contexts/AuthContext";
-import { ProfessionalProfile as ProfessionalType, ClientProfile } from "../types";
+import {
+  ProfessionalProfile as ProfessionalType,
+  ClientProfile,
+} from "../types";
 import { Timestamp } from "firebase/firestore";
 
 interface Service {
@@ -72,7 +75,8 @@ const mockServices: Service[] = [
   {
     id: "1",
     name: "Révision complète",
-    description: "Contrôle complet du véhicule : moteur, freins, direction, éclairage",
+    description:
+      "Contrôle complet du véhicule : moteur, freins, direction, éclairage",
     price: 150,
     duration: 120,
     category: "entretien",
@@ -98,34 +102,53 @@ const mockServices: Service[] = [
 const generateTimeSlots = (): TimeSlot[] => {
   const slots: TimeSlot[] = [];
   const today = new Date();
-  
+
   for (let i = 1; i <= 7; i++) {
     const date = new Date(today);
     date.setDate(today.getDate() + i);
-    
-    if (date.getDay() !== 0) { // Pas le dimanche
-      const morningSlots = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"];
-      const afternoonSlots = ["14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30"];
-      
+
+    if (date.getDay() !== 0) {
+      // Pas le dimanche
+      const morningSlots = [
+        "09:00",
+        "09:30",
+        "10:00",
+        "10:30",
+        "11:00",
+        "11:30",
+      ];
+      const afternoonSlots = [
+        "14:00",
+        "14:30",
+        "15:00",
+        "15:30",
+        "16:00",
+        "16:30",
+        "17:00",
+        "17:30",
+      ];
+
       [...morningSlots, ...afternoonSlots].forEach((time, index) => {
         slots.push({
-          id: `${date.toISOString().split('T')[0]}-${time}`,
+          id: `${date.toISOString().split("T")[0]}-${time}`,
           start: time,
           end: "",
-          date: date.toISOString().split('T')[0],
+          date: date.toISOString().split("T")[0],
           available: Math.random() > 0.3, // 70% de chances d'être disponible
         });
       });
     }
   }
-  
+
   return slots;
 };
 
 export default function ProfessionalProfile() {
   const { id } = useParams<{ id: string }>();
   const { currentUser, userProfile } = useAuth();
-  const [professional, setProfessional] = useState<ProfessionalType | null>(null);
+  const [professional, setProfessional] = useState<ProfessionalType | null>(
+    null,
+  );
   const [services] = useState<Service[]>(mockServices);
   const [timeSlots] = useState<TimeSlot[]>(generateTimeSlots());
   const [loading, setLoading] = useState(true);
@@ -140,7 +163,7 @@ export default function ProfessionalProfile() {
     const loadProfessional = async () => {
       try {
         const professionals = await professionalService.getAllProfessionals();
-        const found = professionals.find(p => p.uid === id);
+        const found = professionals.find((p) => p.uid === id);
         if (found) {
           setProfessional(found);
         }
@@ -165,11 +188,13 @@ export default function ProfessionalProfile() {
       const clientProfile = userProfile as ClientProfile;
       const address = clientAddress || clientProfile?.address || "";
 
-            const appointmentData = {
+      const appointmentData = {
         clientId: currentUser.uid,
         professionalId: professional.uid,
         service: selectedService.name,
-        date: Timestamp.fromDate(new Date(`${selectedSlot.date}T${selectedSlot.start}:00`)),
+        date: Timestamp.fromDate(
+          new Date(`${selectedSlot.date}T${selectedSlot.start}:00`),
+        ),
         duration: selectedService.duration,
         status: "pending" as const,
         price: selectedService.price,
@@ -184,13 +209,12 @@ export default function ProfessionalProfile() {
       await appointmentService.createAppointment(appointmentData);
       setBookingSuccess(true);
       setShowBookingDialog(false);
-      
+
       // Reset form
       setSelectedService(null);
       setSelectedSlot(null);
       setBookingNotes("");
       setClientAddress("");
-      
     } catch (error) {
       console.error("Erreur lors de la réservation:", error);
     }
@@ -207,7 +231,7 @@ export default function ProfessionalProfile() {
 
   const groupSlotsByDate = () => {
     const grouped: Record<string, TimeSlot[]> = {};
-    timeSlots.forEach(slot => {
+    timeSlots.forEach((slot) => {
       if (!grouped[slot.date]) {
         grouped[slot.date] = [];
       }
@@ -267,8 +291,9 @@ export default function ProfessionalProfile() {
           <Alert className="mb-6 border-green-200 bg-green-50">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-800">
-              <strong>Réservation confirmée !</strong> Votre demande de rendez-vous a été envoyée. 
-              Le professionnel vous contactera pour confirmer les détails.
+              <strong>Réservation confirmée !</strong> Votre demande de
+              rendez-vous a été envoyée. Le professionnel vous contactera pour
+              confirmer les détails.
             </AlertDescription>
           </Alert>
         )}
@@ -287,7 +312,9 @@ export default function ProfessionalProfile() {
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h1 className="text-2xl font-bold">{professional.companyName}</h1>
+                      <h1 className="text-2xl font-bold">
+                        {professional.companyName}
+                      </h1>
                       {professional.isVerified && (
                         <Badge variant="secondary">
                           <CheckCircle className="h-3 w-3 mr-1" />
@@ -298,12 +325,14 @@ export default function ProfessionalProfile() {
                     <p className="text-lg text-muted-foreground mb-4">
                       {professional.profession}
                     </p>
-                    
+
                     <div className="flex items-center gap-6 text-sm">
                       {professional.rating && (
                         <div className="flex items-center gap-1">
                           <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                          <span className="font-medium">{professional.rating.toFixed(1)}</span>
+                          <span className="font-medium">
+                            {professional.rating.toFixed(1)}
+                          </span>
                           <span className="text-muted-foreground">
                             ({professional.totalReviews || 0} avis)
                           </span>
@@ -318,11 +347,13 @@ export default function ProfessionalProfile() {
                     </div>
                   </div>
                 </div>
-                
+
                 {professional.description && (
                   <div className="mt-6 pt-6 border-t">
                     <h3 className="font-semibold mb-2">À propos</h3>
-                    <p className="text-muted-foreground">{professional.description}</p>
+                    <p className="text-muted-foreground">
+                      {professional.description}
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -338,7 +369,7 @@ export default function ProfessionalProfile() {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4">
-                  {services.map(service => (
+                  {services.map((service) => (
                     <div
                       key={service.id}
                       className={`border rounded-lg p-4 cursor-pointer transition-colors ${
@@ -357,7 +388,9 @@ export default function ProfessionalProfile() {
                           <div className="flex items-center gap-4 mt-3">
                             <div className="flex items-center gap-1">
                               <Euro className="h-4 w-4 text-green-600" />
-                              <span className="font-medium">{service.price}€</span>
+                              <span className="font-medium">
+                                {service.price}€
+                              </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock className="h-4 w-4 text-blue-600" />
@@ -390,10 +423,14 @@ export default function ProfessionalProfile() {
                       <div key={date}>
                         <h3 className="font-medium mb-3">{formatDate(date)}</h3>
                         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-                          {slots.map(slot => (
+                          {slots.map((slot) => (
                             <Button
                               key={slot.id}
-                              variant={selectedSlot?.id === slot.id ? "default" : "outline"}
+                              variant={
+                                selectedSlot?.id === slot.id
+                                  ? "default"
+                                  : "outline"
+                              }
                               size="sm"
                               disabled={!slot.available}
                               onClick={() => setSelectedSlot(slot)}
@@ -416,18 +453,35 @@ export default function ProfessionalProfile() {
                 <CardContent className="p-6">
                   <div className="text-center space-y-4">
                     <div className="bg-primary/5 rounded-lg p-4">
-                      <h3 className="font-semibold mb-2">Récapitulatif de votre réservation</h3>
+                      <h3 className="font-semibold mb-2">
+                        Récapitulatif de votre réservation
+                      </h3>
                       <div className="space-y-2 text-sm">
-                        <p><strong>Service :</strong> {selectedService.name}</p>
-                        <p><strong>Date :</strong> {formatDate(selectedSlot.date)}</p>
-                        <p><strong>Heure :</strong> {selectedSlot.start}</p>
-                        <p><strong>Durée :</strong> {selectedService.duration} minutes</p>
-                        <p><strong>Prix :</strong> {selectedService.price}€</p>
+                        <p>
+                          <strong>Service :</strong> {selectedService.name}
+                        </p>
+                        <p>
+                          <strong>Date :</strong>{" "}
+                          {formatDate(selectedSlot.date)}
+                        </p>
+                        <p>
+                          <strong>Heure :</strong> {selectedSlot.start}
+                        </p>
+                        <p>
+                          <strong>Durée :</strong> {selectedService.duration}{" "}
+                          minutes
+                        </p>
+                        <p>
+                          <strong>Prix :</strong> {selectedService.price}€
+                        </p>
                       </div>
                     </div>
-                    
+
                     {currentUser ? (
-                      <Dialog open={showBookingDialog} onOpenChange={setShowBookingDialog}>
+                      <Dialog
+                        open={showBookingDialog}
+                        onOpenChange={setShowBookingDialog}
+                      >
                         <DialogTrigger asChild>
                           <Button size="lg" className="w-full">
                             <Calendar className="h-4 w-4 mr-2" />
@@ -438,16 +492,21 @@ export default function ProfessionalProfile() {
                           <DialogHeader>
                             <DialogTitle>Finaliser la réservation</DialogTitle>
                             <DialogDescription>
-                              Quelques informations supplémentaires pour confirmer votre rendez-vous.
+                              Quelques informations supplémentaires pour
+                              confirmer votre rendez-vous.
                             </DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4 py-4">
                             <div className="space-y-2">
-                              <Label htmlFor="address">Adresse d'intervention</Label>
+                              <Label htmlFor="address">
+                                Adresse d'intervention
+                              </Label>
                               <Input
                                 id="address"
                                 value={clientAddress}
-                                onChange={(e) => setClientAddress(e.target.value)}
+                                onChange={(e) =>
+                                  setClientAddress(e.target.value)
+                                }
                                 placeholder="Adresse où le professionnel doit intervenir"
                               />
                             </div>
@@ -456,14 +515,19 @@ export default function ProfessionalProfile() {
                               <Textarea
                                 id="notes"
                                 value={bookingNotes}
-                                onChange={(e) => setBookingNotes(e.target.value)}
+                                onChange={(e) =>
+                                  setBookingNotes(e.target.value)
+                                }
                                 placeholder="Détails supplémentaires, instructions particulières..."
                                 rows={3}
                               />
                             </div>
                           </div>
                           <DialogFooter>
-                            <Button variant="outline" onClick={() => setShowBookingDialog(false)}>
+                            <Button
+                              variant="outline"
+                              onClick={() => setShowBookingDialog(false)}
+                            >
                               Annuler
                             </Button>
                             <Button onClick={handleBookingSubmit}>
@@ -504,14 +568,20 @@ export default function ProfessionalProfile() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="h-4 w-4 text-muted-foreground" />
-                    <a href={`mailto:${professional.email}`} className="hover:text-primary">
+                    <a
+                      href={`mailto:${professional.email}`}
+                      className="hover:text-primary"
+                    >
                       {professional.email}
                     </a>
                   </div>
                   {professional.phone && (
                     <div className="flex items-center gap-2 text-sm">
                       <Phone className="h-4 w-4 text-muted-foreground" />
-                      <a href={`tel:${professional.phone}`} className="hover:text-primary">
+                      <a
+                        href={`tel:${professional.phone}`}
+                        className="hover:text-primary"
+                      >
                         {professional.phone}
                       </a>
                     </div>
@@ -535,7 +605,10 @@ export default function ProfessionalProfile() {
                 <CardContent>
                   <div className="space-y-2">
                     {professional.services.map((service, index) => (
-                      <div key={index} className="flex items-center gap-2 text-sm">
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 text-sm"
+                      >
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         <span>{service}</span>
                       </div>

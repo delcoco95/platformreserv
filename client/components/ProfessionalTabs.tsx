@@ -28,7 +28,12 @@ interface ProfessionalTabsProps {
   upcomingAppointments: Appointment[];
   completedAppointments: Appointment[];
   totalEarnings: number;
-    chartData: { confirmed: number; completed: number; cancelled: number; pending: number };
+  chartData: {
+    confirmed: number;
+    completed: number;
+    cancelled: number;
+    pending: number;
+  };
   dashboardContent: React.ReactNode;
 }
 
@@ -93,17 +98,28 @@ export function ProfessionalTabs({
                 <div className="space-y-4">
                   <div className="border rounded-lg p-4">
                     <h4 className="font-medium mb-2">Chiffre d'affaires</h4>
-                    <p className="text-2xl font-bold text-green-600">{totalEarnings}€</p>
-                    <p className="text-sm text-muted-foreground">Total réalisé</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {totalEarnings}€
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Total réalisé
+                    </p>
                   </div>
                   <div className="border rounded-lg p-4">
                     <h4 className="font-medium mb-2">Taux de conversion</h4>
                     <p className="text-2xl font-bold text-blue-600">
-                      {appointments.length > 0 
-                        ? Math.round((completedAppointments.length / appointments.length) * 100)
-                        : 0}%
+                      {appointments.length > 0
+                        ? Math.round(
+                            (completedAppointments.length /
+                              appointments.length) *
+                              100,
+                          )
+                        : 0}
+                      %
                     </p>
-                    <p className="text-sm text-muted-foreground">Rendez-vous honorés</p>
+                    <p className="text-sm text-muted-foreground">
+                      Rendez-vous honorés
+                    </p>
                   </div>
                   <div className="border rounded-lg p-4">
                     <h4 className="font-medium mb-2">Note moyenne</h4>
