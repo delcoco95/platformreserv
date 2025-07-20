@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
@@ -42,11 +42,32 @@ import {
   Building,
   Award,
   Euro,
+  BarChart3,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { appointmentService } from "../services/appointmentService";
 import { EditProfileDialog } from "../components/EditProfileDialog";
+import { StatsChart } from "../components/StatsChart";
 import { Appointment, ProfessionalProfile } from "../types";
+
+// Import Leaflet CSS
+import "leaflet/dist/leaflet.css";
+
+// Lazy load the map component
+const MapContainer = React.lazy(() =>
+  import("react-leaflet").then((module) => ({ default: module.MapContainer })),
+);
+const TileLayer = React.lazy(() =>
+  import("react-leaflet").then((module) => ({ default: module.TileLayer })),
+);
+const Marker = React.lazy(() =>
+  import("react-leaflet").then((module) => ({ default: module.Marker })),
+);
+const Popup = React.lazy(() =>
+  import("react-leaflet").then((module) => ({ default: module.Popup })),
+);
+
+import React from "react";
 
 export default function ProfessionalDashboard() {
   const { currentUser, userProfile, loading: authLoading } = useAuth();
@@ -74,6 +95,23 @@ export default function ProfessionalDashboard() {
 
     return () => unsubscribe();
   }, [currentUser, authLoading]);
+
+  // Fix Leaflet default markers
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      import('leaflet').then((L) => {
+        delete (L.Icon.Default.prototype as any)._getIconUrl;
+        L.Icon.Default.mergeOptions({
+          iconRetinaUrl:
+            "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+          iconUrl:
+            "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+          shadowUrl:
+            "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+        });
+      });
+    }
+  }, []);
 
   const handleValidateAppointment = async (appointmentId: string) => {
     try {
@@ -168,8 +206,24 @@ export default function ProfessionalDashboard() {
   const completedAppointments = appointments.filter(apt => apt.status === 'completed');
   const totalEarnings = completedAppointments.reduce((sum, apt) => sum + (apt.price || 0), 0);
 
+  // Données pour le graphique
+  const statsData = {
+    confirmed: appointments.filter(apt => apt.status === 'confirmed').length,
+    completed: appointments.filter(apt => apt.status === 'completed').length,
+    cancelled: appointments.filter(apt => apt.status === 'cancelled').length,
+    pending: appointments.filter(apt => apt.status === 'pending').length,
+  };
+
+  // Rendez-vous avec coordonnées pour la carte
+  const appointmentsWithCoords = appointments.filter(apt => 
+    apt.coordinates && apt.coordinates.lat && apt.coordinates.lng
+  );
+
   const professionalProfile = userProfile as ProfessionalProfile;
   const IconComponent = getCategoryIcon(professionalProfile?.profession || '');
+
+  // Centre de la carte (Paris par défaut)
+  const mapCenter: [number, number] = [48.8566, 2.3522];
 
   if (authLoading || loading) {
     return (
@@ -325,6 +379,94 @@ export default function ProfessionalDashboard() {
               </Card>
             </div>
 
+            {/* Graphiques et Carte */}
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Graphique des statistiques */}
+              <StatsChart data={statsData} />
+
+              {/* Carte des rendez-vous */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Carte des rendez-vous</CardTitle>
+                  <CardDescription>
+                    Localisation de vos clients
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {appointmentsWithCoords.length === 0 ? (
+                    <div className="h-64 bg-muted/20 rounded-lg flex items-center justify-center">
+                      <div className="text-center">
+                        <MapPin className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">
+                          Aucun rendez-vous avec localisation
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="h-64 rounded-lg overflow-hidden border">
+                      <Suspense
+                        fallback={
+                          <div className="h-full bg-muted flex items-center justify-center">
+                            <div className="text-center space-y-2">
+                              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+                              <p className="text-muted-foreground">
+                                Chargement de la carte...
+                              </p>
+                            </div>
+                          </div>
+                        }
+                      >
+                        <MapContainer
+                          center={mapCenter}
+                          zoom={12}
+                          className="h-full w-full"
+                        >
+                          <TileLayer
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          />
+                          {appointmentsWithCoords.map((appointment) => (
+                            <Marker
+                              key={appointment.id}
+                              position={[appointment.coordinates!.lat, appointment.coordinates!.lng]}
+                            >
+                              <Popup>
+                                <div className="space-y-2 min-w-48">
+                                  <h4 className="font-semibold">
+                                    {appointment.service}
+                                  </h4>
+                                  <div className="space-y-1 text-sm">
+                                    <div>
+                                      <strong>Date:</strong>{" "}
+                                      {formatDate(appointment.date)} à{" "}
+                                      {formatTime(appointment.date)}
+                                    </div>
+                                    <div>
+                                      <strong>Adresse:</strong>{" "}
+                                      {appointment.address}
+                                    </div>
+                                    <div>
+                                      <strong>Statut:</strong>{" "}
+                                      {appointment.status}
+                                    </div>
+                                    {appointment.price && (
+                                      <div className="text-lg font-semibold text-primary pt-2">
+                                        {appointment.price}€
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </Popup>
+                            </Marker>
+                          ))}
+                        </MapContainer>
+                      </Suspense>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
             {/* Appointments */}
             <Card>
               <CardHeader>
@@ -363,13 +505,6 @@ export default function ProfessionalDashboard() {
                                     {appointment.service}
                                   </h3>
                                   {getStatusBadge(appointment.status)}
-                                </div>
-                                
-                                <div className="text-sm">
-                                  <p className="font-medium">Client : [Client privé]</p>
-                                  <p className="text-muted-foreground">
-                                    Email : [Email protégé] • Tél : [Téléphone protégé]
-                                  </p>
                                 </div>
                                 
                                 <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
@@ -608,7 +743,7 @@ export default function ProfessionalDashboard() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button variant="outline" className="w-full">
-                  <Users className="h-4 w-4 mr-2" />
+                  <BarChart3 className="h-4 w-4 mr-2" />
                   Mes statistiques
                 </Button>
                 <Button variant="outline" className="w-full">
