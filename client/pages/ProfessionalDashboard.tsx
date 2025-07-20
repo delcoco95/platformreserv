@@ -71,9 +71,10 @@ const Popup = React.lazy(() =>
 export default function ProfessionalDashboard() {
   const { currentUser, userProfile, loading: authLoading } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   useEffect(() => {
     if (authLoading) return;
