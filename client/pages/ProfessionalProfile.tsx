@@ -49,6 +49,7 @@ import { professionalService } from "../services/professionalService";
 import { appointmentService } from "../services/appointmentService";
 import { useAuth } from "../contexts/AuthContext";
 import { ProfessionalProfile as ProfessionalType, ClientProfile } from "../types";
+import { Timestamp } from "firebase/firestore";
 
 interface Service {
   id: string;
