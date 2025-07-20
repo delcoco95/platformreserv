@@ -35,7 +35,8 @@ const demoProfessionals: ProfessionalProfile[] = [
     profession: "plomberie",
     phone: "01 98 76 54 32",
     address: "456 Avenue des Champs, 75008 Paris",
-    description: "Intervention rapide 24h/24 pour tous vos problèmes de plomberie",
+    description:
+      "Intervention rapide 24h/24 pour tous vos problèmes de plomberie",
     services: ["Fuite", "Débouchage", "Installation", "Réparation"],
     rating: 4.8,
     totalReviews: 67,
@@ -52,7 +53,12 @@ const demoProfessionals: ProfessionalProfile[] = [
     phone: "01 11 22 33 44",
     address: "789 Boulevard Saint-Germain, 75006 Paris",
     description: "Serrurier agréé assurance, intervention 24h/24",
-    services: ["Ouverture de porte", "Changement serrure", "Blindage", "Dépannage"],
+    services: [
+      "Ouverture de porte",
+      "Changement serrure",
+      "Blindage",
+      "Dépannage",
+    ],
     rating: 4.3,
     totalReviews: 28,
     isVerified: true,
@@ -77,7 +83,9 @@ export const professionalService = {
         orderBy("companyName", "asc"),
       );
       const snapshot = await getDocs(q);
-      const professionals = snapshot.docs.map((doc) => doc.data() as ProfessionalProfile);
+      const professionals = snapshot.docs.map(
+        (doc) => doc.data() as ProfessionalProfile,
+      );
 
       // Si aucun professionnel trouvé, retourner les données démo
       return professionals.length > 0 ? professionals : demoProfessionals;
@@ -87,13 +95,15 @@ export const professionalService = {
     }
   },
 
-    // Récupérer les professionnels par catégorie
+  // Récupérer les professionnels par catégorie
   async getProfessionalsByCategory(
     profession: string,
   ): Promise<ProfessionalProfile[]> {
     try {
       if (!auth.currentUser) {
-        return demoProfessionals.filter((prof) => prof.profession === profession);
+        return demoProfessionals.filter(
+          (prof) => prof.profession === profession,
+        );
       }
 
       const q = query(
@@ -103,7 +113,9 @@ export const professionalService = {
         orderBy("companyName", "asc"),
       );
       const snapshot = await getDocs(q);
-      const professionals = snapshot.docs.map((doc) => doc.data() as ProfessionalProfile);
+      const professionals = snapshot.docs.map(
+        (doc) => doc.data() as ProfessionalProfile,
+      );
 
       return professionals.length > 0
         ? professionals
@@ -132,7 +144,7 @@ export const professionalService = {
     );
   },
 
-    // Écouter les changements de professionnels en temps réel
+  // Écouter les changements de professionnels en temps réel
   onProfessionalsChange(
     callback: (professionals: ProfessionalProfile[]) => void,
   ) {
@@ -155,12 +167,17 @@ export const professionalService = {
           const professionals = snapshot.docs.map(
             (doc) => doc.data() as ProfessionalProfile,
           );
-          callback(professionals.length > 0 ? professionals : demoProfessionals);
+          callback(
+            professionals.length > 0 ? professionals : demoProfessionals,
+          );
         },
         (error) => {
-          console.warn("Erreur dans l'écoute Firebase, utilisation des données démo:", error);
+          console.warn(
+            "Erreur dans l'écoute Firebase, utilisation des données démo:",
+            error,
+          );
           callback(demoProfessionals);
-        }
+        },
       );
     } catch (error) {
       console.warn("Erreur Firebase, utilisation des données démo:", error);
@@ -169,14 +186,16 @@ export const professionalService = {
     }
   },
 
-    // Écouter les professionnels par catégorie en temps réel
+  // Écouter les professionnels par catégorie en temps réel
   onProfessionalsByCategoryChange(
     profession: string,
     callback: (professionals: ProfessionalProfile[]) => void,
   ) {
     try {
       if (!auth.currentUser) {
-        const filtered = demoProfessionals.filter((prof) => prof.profession === profession);
+        const filtered = demoProfessionals.filter(
+          (prof) => prof.profession === profession,
+        );
         setTimeout(() => callback(filtered), 100);
         return () => {};
       }
@@ -194,18 +213,27 @@ export const professionalService = {
           const professionals = snapshot.docs.map(
             (doc) => doc.data() as ProfessionalProfile,
           );
-          const filtered = demoProfessionals.filter((prof) => prof.profession === profession);
+          const filtered = demoProfessionals.filter(
+            (prof) => prof.profession === profession,
+          );
           callback(professionals.length > 0 ? professionals : filtered);
         },
         (error) => {
-          console.warn("Erreur dans l'écoute Firebase, utilisation des données démo:", error);
-          const filtered = demoProfessionals.filter((prof) => prof.profession === profession);
+          console.warn(
+            "Erreur dans l'écoute Firebase, utilisation des données démo:",
+            error,
+          );
+          const filtered = demoProfessionals.filter(
+            (prof) => prof.profession === profession,
+          );
           callback(filtered);
-        }
+        },
       );
     } catch (error) {
       console.warn("Erreur Firebase, utilisation des données démo:", error);
-      const filtered = demoProfessionals.filter((prof) => prof.profession === profession);
+      const filtered = demoProfessionals.filter(
+        (prof) => prof.profession === profession,
+      );
       setTimeout(() => callback(filtered), 100);
       return () => {};
     }

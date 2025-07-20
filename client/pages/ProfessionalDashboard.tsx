@@ -121,10 +121,6 @@ export default function ProfessionalDashboard() {
     }
   };
 
-  
-
-  
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
@@ -160,13 +156,13 @@ export default function ProfessionalDashboard() {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-        const todayAppointments = appointments.filter((apt) => {
+  const todayAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     const date = parseDate(apt.date);
     return date >= today && date < tomorrow && apt.status !== "cancelled";
   });
 
-        const upcomingAppointments = appointments.filter((apt) => {
+  const upcomingAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     const date = parseDate(apt.date);
     return date >= tomorrow && apt.status !== "cancelled";
@@ -210,7 +206,7 @@ export default function ProfessionalDashboard() {
     );
   }
 
-    if (!currentUser || !userProfile) {
+  if (!currentUser || !userProfile) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center space-y-4">

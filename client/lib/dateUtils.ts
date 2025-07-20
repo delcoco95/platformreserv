@@ -6,7 +6,12 @@ import { Timestamp } from "firebase/firestore";
 export function parseDate(rawDate: any): Date {
   if (!rawDate) return new Date(0);
   if (rawDate instanceof Timestamp) return rawDate.toDate();
-  if (typeof rawDate === 'object' && rawDate !== null && 'toDate' in rawDate && typeof rawDate.toDate === 'function') {
+  if (
+    typeof rawDate === "object" &&
+    rawDate !== null &&
+    "toDate" in rawDate &&
+    typeof rawDate.toDate === "function"
+  ) {
     return rawDate.toDate();
   }
   const parsed = new Date(rawDate);

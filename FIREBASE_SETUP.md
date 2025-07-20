@@ -38,6 +38,7 @@ Si vous n'avez pas encore configuré Firebase, l'application fonctionne automati
 ### 5. Créer les collections Firestore
 
 Les collections suivantes seront créées automatiquement lors de la première utilisation :
+
 - `users` : Profils des utilisateurs (clients et professionnels)
 - `appointments` : Rendez-vous
 - `reviews` : Avis et évaluations
@@ -51,6 +52,7 @@ Les collections suivantes seront créées automatiquement lors de la première u
 ### 7. Test en mode démo
 
 L'application affiche automatiquement des données d'exemple si :
+
 - L'utilisateur n'est pas connecté
 - Firebase n'est pas configuré
 - Il y a des erreurs de permissions

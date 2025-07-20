@@ -60,8 +60,6 @@ export default function ClientDashboard() {
       return;
     }
 
-    
-
     const unsubscribe = appointmentService.onClientAppointmentsChange(
       currentUser.uid,
       async (appointmentsData) => {
@@ -109,10 +107,6 @@ export default function ClientDashboard() {
     }
   };
 
-  
-
-  
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
@@ -130,13 +124,13 @@ export default function ClientDashboard() {
     }
   };
 
-        const upcomingAppointments = appointments.filter((apt) => {
+  const upcomingAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     const date = parseDate(apt.date);
     return date > new Date() && apt.status !== "cancelled";
   });
 
-        const pastAppointments = appointments.filter((apt) => {
+  const pastAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     const date = parseDate(apt.date);
     return date <= new Date() || apt.status === "completed";
@@ -155,7 +149,7 @@ export default function ClientDashboard() {
     );
   }
 
-    if (!currentUser || !userProfile) {
+  if (!currentUser || !userProfile) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -187,7 +181,9 @@ export default function ClientDashboard() {
             </p>
           </div>
           <Button asChild>
-            <Link to="/espace-professionnel">Aller à l'espace professionnel</Link>
+            <Link to="/espace-professionnel">
+              Aller à l'espace professionnel
+            </Link>
           </Button>
         </div>
       </div>

@@ -60,7 +60,7 @@ export const appointmentService = {
     return docRef.id;
   },
 
-    // Récupérer les rendez-vous d'un client
+  // Récupérer les rendez-vous d'un client
   async getClientAppointments(clientId: string) {
     try {
       if (!auth.currentUser) {
@@ -81,16 +81,21 @@ export const appointmentService = {
         ? appointments
         : demoAppointments.filter((apt) => apt.clientId === clientId);
     } catch (error) {
-      console.warn("Erreur Firebase pour les rendez-vous client, utilisation des données démo:", error);
+      console.warn(
+        "Erreur Firebase pour les rendez-vous client, utilisation des données démo:",
+        error,
+      );
       return demoAppointments.filter((apt) => apt.clientId === clientId);
     }
   },
 
-    // Récupérer les rendez-vous d'un professionnel
+  // Récupérer les rendez-vous d'un professionnel
   async getProfessionalAppointments(professionalId: string) {
     try {
       if (!auth.currentUser) {
-        return demoAppointments.filter((apt) => apt.professionalId === professionalId);
+        return demoAppointments.filter(
+          (apt) => apt.professionalId === professionalId,
+        );
       }
 
       const q = query(
@@ -105,21 +110,30 @@ export const appointmentService = {
 
       return appointments.length > 0
         ? appointments
-        : demoAppointments.filter((apt) => apt.professionalId === professionalId);
+        : demoAppointments.filter(
+            (apt) => apt.professionalId === professionalId,
+          );
     } catch (error) {
-      console.warn("Erreur Firebase pour les rendez-vous professionnel, utilisation des données démo:", error);
-      return demoAppointments.filter((apt) => apt.professionalId === professionalId);
+      console.warn(
+        "Erreur Firebase pour les rendez-vous professionnel, utilisation des données démo:",
+        error,
+      );
+      return demoAppointments.filter(
+        (apt) => apt.professionalId === professionalId,
+      );
     }
   },
 
-    // Écouter les changements en temps réel pour un client
+  // Écouter les changements en temps réel pour un client
   onClientAppointmentsChange(
     clientId: string,
     callback: (appointments: Appointment[]) => void,
   ) {
     try {
       if (!auth.currentUser) {
-        const filtered = demoAppointments.filter((apt) => apt.clientId === clientId);
+        const filtered = demoAppointments.filter(
+          (apt) => apt.clientId === clientId,
+        );
         setTimeout(() => callback(filtered), 100);
         return () => {};
       }
@@ -140,31 +154,42 @@ export const appointmentService = {
                 ...doc.data(),
               }) as Appointment,
           );
-          const filtered = demoAppointments.filter((apt) => apt.clientId === clientId);
+          const filtered = demoAppointments.filter(
+            (apt) => apt.clientId === clientId,
+          );
           callback(appointments.length > 0 ? appointments : filtered);
         },
         (error) => {
-          console.warn("Erreur dans l'écoute Firebase des rendez-vous client:", error);
-          const filtered = demoAppointments.filter((apt) => apt.clientId === clientId);
+          console.warn(
+            "Erreur dans l'écoute Firebase des rendez-vous client:",
+            error,
+          );
+          const filtered = demoAppointments.filter(
+            (apt) => apt.clientId === clientId,
+          );
           callback(filtered);
-        }
+        },
       );
     } catch (error) {
       console.warn("Erreur Firebase, utilisation des données démo:", error);
-      const filtered = demoAppointments.filter((apt) => apt.clientId === clientId);
+      const filtered = demoAppointments.filter(
+        (apt) => apt.clientId === clientId,
+      );
       setTimeout(() => callback(filtered), 100);
       return () => {};
     }
   },
 
-    // Écouter les changements en temps réel pour un professionnel
+  // Écouter les changements en temps réel pour un professionnel
   onProfessionalAppointmentsChange(
     professionalId: string,
     callback: (appointments: Appointment[]) => void,
   ) {
     try {
       if (!auth.currentUser) {
-        const filtered = demoAppointments.filter((apt) => apt.professionalId === professionalId);
+        const filtered = demoAppointments.filter(
+          (apt) => apt.professionalId === professionalId,
+        );
         setTimeout(() => callback(filtered), 100);
         return () => {};
       }
@@ -185,18 +210,27 @@ export const appointmentService = {
                 ...doc.data(),
               }) as Appointment,
           );
-          const filtered = demoAppointments.filter((apt) => apt.professionalId === professionalId);
+          const filtered = demoAppointments.filter(
+            (apt) => apt.professionalId === professionalId,
+          );
           callback(appointments.length > 0 ? appointments : filtered);
         },
         (error) => {
-          console.warn("Erreur dans l'écoute Firebase des rendez-vous professionnel:", error);
-          const filtered = demoAppointments.filter((apt) => apt.professionalId === professionalId);
+          console.warn(
+            "Erreur dans l'écoute Firebase des rendez-vous professionnel:",
+            error,
+          );
+          const filtered = demoAppointments.filter(
+            (apt) => apt.professionalId === professionalId,
+          );
           callback(filtered);
-        }
+        },
       );
     } catch (error) {
       console.warn("Erreur Firebase, utilisation des données démo:", error);
-      const filtered = demoAppointments.filter((apt) => apt.professionalId === professionalId);
+      const filtered = demoAppointments.filter(
+        (apt) => apt.professionalId === professionalId,
+      );
       setTimeout(() => callback(filtered), 100);
       return () => {};
     }
