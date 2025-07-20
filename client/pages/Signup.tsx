@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { useState, useEffect } from "react";
-=======
-import { useState } from "react";
->>>>>>> 9f20e99a960cae40a824599d36478131091d8c5c
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -35,21 +31,19 @@ import {
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
-
 type AccountType = "client" | "professionnel" | "";
 
 export default function Signup() {
-  const navigate = useNavigate();
   const [accountType, setAccountType] = useState<AccountType>("");
   const [formData, setFormData] = useState({
+    // Client fields
     firstName: "",
     lastName: "",
+    // Professional fields
     companyName: "",
     profession: "",
     siret: "",
+    // Common fields
     email: "",
     password: "",
     confirmPassword: "",
@@ -59,17 +53,15 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-<<<<<<< HEAD
   const { register, currentUser, userProfile } = useAuth();
   const navigate = useNavigate();
 
   // Rediriger si déjà connecté
   useEffect(() => {
     if (currentUser && userProfile) {
-      const redirectPath =
-        userProfile.userType === "client"
-          ? "/espace-client"
-          : "/espace-professionnel";
+      const redirectPath = userProfile.userType === 'client' 
+        ? '/espace-client' 
+        : '/espace-professionnel';
       navigate(redirectPath, { replace: true });
     }
   }, [currentUser, userProfile, navigate]);
@@ -82,26 +74,20 @@ export default function Signup() {
     return /^\d{14}$/.test(siret);
   };
 
-=======
->>>>>>> 9f20e99a960cae40a824599d36478131091d8c5c
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
-
-  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validateSiret = (siret: string) => /^\d{14}$/.test(siret);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!accountType) return setError("Veuillez sélectionner un type de compte");
-    if (!formData.email || !formData.password || !formData.confirmPassword) return setError("Veuillez remplir tous les champs");
-    if (!validateEmail(formData.email)) return setError("Adresse email invalide");
-    if (formData.password.length < 6) return setError("Mot de passe trop court");
-    if (formData.password !== formData.confirmPassword) return setError("Les mots de passe ne correspondent pas");
+    // Validation du type de compte
+    if (!accountType) {
+      setError("Veuillez sélectionner un type de compte");
+      return;
+    }
 
-<<<<<<< HEAD
     // Validation des champs communs
     if (!formData.email || !formData.password || !formData.confirmPassword) {
       setError("Veuillez remplir tous les champs obligatoires");
@@ -137,8 +123,8 @@ export default function Signup() {
         preferences: {
           notifications: true,
           smsAlerts: false,
-          emailAlerts: true,
-        },
+          emailAlerts: true
+        }
       };
     } else if (accountType === "professionnel") {
       if (!formData.companyName || !formData.profession || !formData.siret) {
@@ -164,75 +150,36 @@ export default function Signup() {
           thursday: true,
           friday: true,
           saturday: false,
-          sunday: false,
-        },
+          sunday: false
+        }
       };
     }
 
     setIsLoading(true);
 
     try {
-      await register(
-        formData.email,
-        formData.password,
-        accountType,
-        additionalData,
-      );
+      await register(formData.email, formData.password, accountType, additionalData);
       // La redirection se fera via useEffect quand currentUser sera mis à jour
     } catch (error: any) {
-      console.error("Erreur d'inscription:", error);
-
+      console.error('Erreur d\'inscription:', error);
+      
       // Messages d'erreur Firebase traduits
       switch (error.code) {
-        case "auth/email-already-in-use":
+        case 'auth/email-already-in-use':
           setError("Cette adresse email est déjà utilisée");
           break;
-        case "auth/invalid-email":
+        case 'auth/invalid-email':
           setError("Adresse email invalide");
           break;
-        case "auth/weak-password":
+        case 'auth/weak-password':
           setError("Le mot de passe est trop faible");
           break;
-        case "auth/operation-not-allowed":
+        case 'auth/operation-not-allowed':
           setError("L'inscription n'est pas autorisée");
           break;
         default:
           setError("Une erreur est survenue lors de l'inscription");
       }
-=======
-    if (accountType === "client") {
-      if (!formData.firstName || !formData.lastName) return setError("Prénom et nom requis");
-    } else if (accountType === "professionnel") {
-      if (!formData.companyName || !formData.profession || !formData.siret) return setError("Champs pro requis");
-      if (!validateSiret(formData.siret)) return setError("SIRET invalide");
-    }
-
-    setIsLoading(true);
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      const user = userCredential.user;
-
-      const userData = {
-        role: accountType,
-        email: formData.email,
-        ...(accountType === "client"
-          ? {
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-            }
-          : {
-              companyName: formData.companyName,
-              profession: formData.profession,
-              siret: formData.siret,
-            }),
-      };
-
-      await setDoc(doc(db, "users", user.uid), userData);
-      navigate(accountType === "client" ? "/espace-client" : "/professionnels");
-    } catch (err: any) {
-      console.error(err);
-      setError(err.code === "auth/email-already-in-use" ? "Cet email est déjà utilisé." : "Erreur : " + err.message);
->>>>>>> 9f20e99a960cae40a824599d36478131091d8c5c
     } finally {
       setIsLoading(false);
     }
