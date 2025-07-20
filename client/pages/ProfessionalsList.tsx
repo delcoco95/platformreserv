@@ -343,7 +343,11 @@ export default function ProfessionalsList() {
                           <Mail className="h-4 w-4" />
                         </Button>
                       </div>
-                      <Button size="sm">Voir le profil</Button>
+                                            <Button size="sm" asChild>
+                        <Link to={`/professionnel/${professional.uid}`}>
+                          Voir le profil
+                        </Link>
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
