@@ -42,8 +42,9 @@ export default function Index() {
   const [postalCode, setPostalCode] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  const services = [
+    const services = [
     {
+      id: "automobile",
       icon: Car,
       title: "Entretien & Réparation Automobile",
       description: "Tous vos besoins automotive",
@@ -57,6 +58,7 @@ export default function Index() {
       color: "bg-blue-50 text-blue-700 border-blue-200",
     },
     {
+      id: "plomberie",
       icon: Wrench,
       title: "Plomberie",
       description: "Installation et dépannage",
@@ -68,6 +70,7 @@ export default function Index() {
       color: "bg-green-50 text-green-700 border-green-200",
     },
     {
+      id: "serrurerie",
       icon: Key,
       title: "Serrurerie",
       description: "Sécurité et urgences",
@@ -250,12 +253,12 @@ export default function Index() {
                       </div>
                     ))}
                   </div>
-                  <Button
+                                    <Button
                     variant="outline"
                     className="w-full mt-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                     asChild
                   >
-                    <Link to="/professionnels">
+                    <Link to={`/professionnels?categorie=${service.id}`}>
                       Voir les professionnels
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
