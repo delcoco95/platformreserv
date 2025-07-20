@@ -51,7 +51,7 @@ export default function ClientDashboard() {
   const [error, setError] = useState("");
   const [showEditProfile, setShowEditProfile] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
     if (authLoading) return;
 
     if (!currentUser) {
@@ -114,7 +114,7 @@ export default function ClientDashboard() {
     }
   };
 
-    const formatDate = (timestamp: any) => {
+  const formatDate = (timestamp: any) => {
     if (!timestamp) return "Date non définie";
 
     let date: Date;
@@ -134,7 +134,7 @@ export default function ClientDashboard() {
     });
   };
 
-    const formatTime = (timestamp: any) => {
+  const formatTime = (timestamp: any) => {
     if (!timestamp) return "Heure non définie";
 
     let date: Date;
@@ -169,7 +169,7 @@ export default function ClientDashboard() {
     }
   };
 
-    const upcomingAppointments = appointments.filter((apt) => {
+  const upcomingAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     let date: Date;
     if (apt.date instanceof Timestamp) {
@@ -182,7 +182,7 @@ export default function ClientDashboard() {
     return date > new Date() && apt.status !== "cancelled";
   });
 
-    const pastAppointments = appointments.filter((apt) => {
+  const pastAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     let date: Date;
     if (apt.date instanceof Timestamp) {

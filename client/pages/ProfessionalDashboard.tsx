@@ -64,8 +64,6 @@ const Popup = React.lazy(() =>
   import("react-leaflet").then((module) => ({ default: module.Popup })),
 );
 
-
-
 export default function ProfessionalDashboard() {
   const { currentUser, userProfile, loading: authLoading } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
