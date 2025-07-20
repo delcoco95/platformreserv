@@ -46,8 +46,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { appointmentService } from "../services/appointmentService";
 import { EditProfileDialog } from "../components/EditProfileDialog";
 import { StatsChart } from "../components/StatsChart";
-import { AvailabilityManager } from "../components/AvailabilityManager";
-import { ServicesManager } from "../components/ServicesManager";
 import { Appointment, ProfessionalProfile } from "../types";
 import { parseDate, formatDate, formatTime } from "../lib/dateUtils";
 
@@ -71,10 +69,9 @@ const Popup = React.lazy(() =>
 export default function ProfessionalDashboard() {
   const { currentUser, userProfile, loading: authLoading } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showEditProfile, setShowEditProfile] = useState(false);
-  const [activeTab, setActiveTab] = useState("dashboard");
 
   useEffect(() => {
     if (authLoading) return;
@@ -295,68 +292,14 @@ export default function ProfessionalDashboard() {
           </div>
         </div>
 
-                {error && (
+        {error && (
           <Alert variant="destructive" className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        {/* Navigation Tabs */}
-        <div className="mb-8">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
-              <button
-                onClick={() => setActiveTab("dashboard")}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "dashboard"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                <BarChart3 className="h-4 w-4 inline mr-2" />
-                Tableau de bord
-              </button>
-              <button
-                onClick={() => setActiveTab("availability")}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "availability"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                <Calendar className="h-4 w-4 inline mr-2" />
-                Disponibilités
-              </button>
-              <button
-                onClick={() => setActiveTab("services")}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "services"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                <Euro className="h-4 w-4 inline mr-2" />
-                Services & Prix
-              </button>
-              <button
-                onClick={() => setActiveTab("stats")}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "stats"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                <TrendingUp className="h-4 w-4 inline mr-2" />
-                Statistiques
-              </button>
-            </nav>
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        {activeTab === "dashboard" && (
-          <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Stats Cards */}
@@ -818,69 +761,9 @@ export default function ProfessionalDashboard() {
                   Support pro
                 </Button>
               </CardContent>
-                        </Card>
-          </div>
-        }
-
-        {/* Availability Tab */}
-        {activeTab === "availability" && (
-          <AvailabilityManager />
-        )}
-
-        {/* Services Tab */}
-        {activeTab === "services" && (
-          <ServicesManager />
-        )}
-
-        {/* Stats Tab */}
-        {activeTab === "stats" && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Statistiques détaillées</CardTitle>
-                <CardDescription>
-                  Analysez vos performances et votre activité
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-semibold mb-4">Rendez-vous par statut</h3>
-                    <StatsChart data={chartData} />
-                  </div>
-                  <div className="space-y-4">
-                    <div className="border rounded-lg p-4">
-                      <h4 className="font-medium mb-2">Chiffre d'affaires</h4>
-                      <p className="text-2xl font-bold text-green-600">{totalEarnings}€</p>
-                      <p className="text-sm text-muted-foreground">Total réalisé</p>
-                    </div>
-                    <div className="border rounded-lg p-4">
-                      <h4 className="font-medium mb-2">Taux de conversion</h4>
-                      <p className="text-2xl font-bold text-blue-600">
-                        {appointments.length > 0
-                          ? Math.round((completedAppointments.length / appointments.length) * 100)
-                          : 0}%
-                      </p>
-                      <p className="text-sm text-muted-foreground">Rendez-vous honorés</p>
-                    </div>
-                    <div className="border rounded-lg p-4">
-                      <h4 className="font-medium mb-2">Note moyenne</h4>
-                      <div className="flex items-center gap-2">
-                        <p className="text-2xl font-bold text-yellow-600">
-                          {professionalProfile?.rating?.toFixed(1) || "N/A"}
-                        </p>
-                        <Star className="h-5 w-5 text-yellow-500 fill-current" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Sur {professionalProfile?.totalReviews || 0} avis
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
             </Card>
           </div>
-        )}
+        </div>
 
         {/* Edit Profile Dialog */}
         <EditProfileDialog

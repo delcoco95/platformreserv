@@ -42,9 +42,8 @@ export default function Index() {
   const [postalCode, setPostalCode] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
-    const services = [
+  const services = [
     {
-      id: "automobile",
       icon: Car,
       title: "Entretien & Réparation Automobile",
       description: "Tous vos besoins automotive",
@@ -58,7 +57,6 @@ export default function Index() {
       color: "bg-blue-50 text-blue-700 border-blue-200",
     },
     {
-      id: "plomberie",
       icon: Wrench,
       title: "Plomberie",
       description: "Installation et dépannage",
@@ -70,7 +68,6 @@ export default function Index() {
       color: "bg-green-50 text-green-700 border-green-200",
     },
     {
-      id: "serrurerie",
       icon: Key,
       title: "Serrurerie",
       description: "Sécurité et urgences",
@@ -253,12 +250,12 @@ export default function Index() {
                       </div>
                     ))}
                   </div>
-                                    <Button
+                  <Button
                     variant="outline"
                     className="w-full mt-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                     asChild
                   >
-                    <Link to={`/professionnels?categorie=${service.id}`}>
+                    <Link to="/professionnels">
                       Voir les professionnels
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
@@ -365,10 +362,10 @@ export default function Index() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-                            <Button
+              <Button
                 size="lg"
                 variant="outline"
-                className="border-white/80 text-white bg-white/5 hover:bg-white/20 hover:border-white hover:text-white backdrop-blur-sm shadow-lg"
+                className="border-white text-white hover:bg-white/10 hover:border-white/80 backdrop-blur-sm"
               >
                 En savoir plus
               </Button>
