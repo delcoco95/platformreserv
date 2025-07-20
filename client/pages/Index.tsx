@@ -136,10 +136,15 @@ export default function Index() {
     },
   ];
 
-  const handleSearch = () => {
+    const handleSearch = () => {
     // Navigate to search results with parameters
-    if (postalCode && selectedCategory) {
-      window.location.href = `/recherche?code=${postalCode}&service=${selectedCategory}`;
+    if (postalCode || selectedCategory) {
+      const params = new URLSearchParams();
+      if (postalCode) params.set('code', postalCode);
+      if (selectedCategory) params.set('categorie', selectedCategory);
+      window.location.href = `/professionnels?${params.toString()}`;
+    } else {
+      window.location.href = '/professionnels';
     }
   };
 
