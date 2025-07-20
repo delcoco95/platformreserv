@@ -138,8 +138,13 @@ export default function Index() {
 
   const handleSearch = () => {
     // Navigate to search results with parameters
-    if (postalCode && selectedCategory) {
-      window.location.href = `/recherche?code=${postalCode}&service=${selectedCategory}`;
+    if (postalCode || selectedCategory) {
+      const params = new URLSearchParams();
+      if (postalCode) params.set("code", postalCode);
+      if (selectedCategory) params.set("categorie", selectedCategory);
+      window.location.href = `/professionnels?${params.toString()}`;
+    } else {
+      window.location.href = "/professionnels";
     }
   };
 
@@ -248,9 +253,12 @@ export default function Index() {
                   <Button
                     variant="outline"
                     className="w-full mt-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                    asChild
                   >
-                    Voir les professionnels
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <Link to="/professionnels">
+                      Voir les professionnels
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>

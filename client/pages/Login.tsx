@@ -41,6 +41,7 @@ export default function Login() {
     e.preventDefault();
     setError("");
 
+    // Validation
     if (!email || !password) {
       setError("Veuillez remplir tous les champs");
       return;

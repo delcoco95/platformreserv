@@ -39,11 +39,14 @@ export default function Signup() {
 
   const [accountType, setAccountType] = useState<AccountType>("");
   const [formData, setFormData] = useState({
+    // Client fields
     firstName: "",
     lastName: "",
+    // Professional fields
     companyName: "",
     profession: "",
     siret: "",
+    // Common fields
     email: "",
     password: "",
     confirmPassword: "",

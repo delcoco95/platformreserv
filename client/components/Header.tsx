@@ -30,20 +30,31 @@ export function Header() {
   const navigate = useNavigate();
 
   const categories = [
-    { id: "automobile", label: "Auto", icon: Car },
-    { id: "plomberie", label: "Plomberie", icon: Wrench },
-    { id: "serrurerie", label: "Serrurier", icon: Key },
+    {
+      id: "automobile",
+      label: "Auto",
+      icon: Car,
+      path: "/professionnels?categorie=automobile",
+    },
+    {
+      id: "plomberie",
+      label: "Plomberie",
+      icon: Wrench,
+      path: "/professionnels?categorie=plomberie",
+    },
+    {
+      id: "serrurerie",
+      label: "Serrurier",
+      icon: Key,
+      path: "/professionnels?categorie=serrurerie",
+    },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/recherche?q=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/professionnels?q=${encodeURIComponent(searchQuery.trim())}`);
     }
-  };
-
-  const handleCategoryClick = (categoryId: string) => {
-    navigate(`/professionnels?categorie=${categoryId}`);
   };
 
   const handleLogout = async () => {
@@ -171,16 +182,16 @@ export function Header() {
             {/* Categories - Desktop */}
             <div className="hidden md:flex items-center space-x-1">
               {categories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleCategoryClick(category.id)}
-                  className="flex items-center space-x-2 h-12 px-4 hover:bg-white hover:shadow-sm rounded-none border-b-2 border-transparent hover:border-primary transition-all"
-                >
-                  <category.icon className="h-4 w-4" />
-                  <span>{category.label}</span>
-                </Button>
+                <Link key={category.id} to={category.path}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center space-x-2 h-12 px-4 hover:bg-white hover:shadow-sm rounded-none border-b-2 border-transparent hover:border-primary transition-all"
+                  >
+                    <category.icon className="h-4 w-4" />
+                    <span>{category.label}</span>
+                  </Button>
+                </Link>
               ))}
             </div>
 
@@ -215,20 +226,31 @@ export function Header() {
             {/* Mobile Categories */}
             <div className="grid grid-cols-3 gap-2">
               {categories.map((category) => (
+                <Link key={category.id} to={category.path}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex flex-col items-center space-y-1 h-16 w-full"
+                  >
+                    <category.icon className="h-5 w-5" />
+                    <span className="text-xs">{category.label}</span>
+                  </Button>
+                </Link>
+              ))}
+            </div>
+
+            <div className="pt-2">
+              <Link to="/professionnels">
                 <Button
-                  key={category.id}
                   variant="outline"
                   size="sm"
-                  onClick={() => {
-                    handleCategoryClick(category.id);
-                    setIsMenuOpen(false);
-                  }}
-                  className="flex flex-col items-center space-y-1 h-16"
+                  className="w-full"
+                  onClick={() => setIsMenuOpen(false)}
                 >
-                  <category.icon className="h-5 w-5" />
-                  <span className="text-xs">{category.label}</span>
+                  Voir tous les professionnels
                 </Button>
-              ))}
+              </Link>
             </div>
 
             {/* Mobile Auth */}

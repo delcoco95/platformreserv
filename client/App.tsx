@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import { AutoRedirect } from "./components/AutoRedirect";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
 import ProfessionalProfile from "./pages/ProfessionalProfile";
@@ -10,6 +11,7 @@ import ProfessionalDashboard from "./pages/ProfessionalDashboard";
 import ProfessionalsList from "./pages/ProfessionalsList";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import TestData from "./pages/TestData";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -18,6 +20,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <div className="min-h-screen bg-background flex flex-col">
+          <AutoRedirect />
           <Header />
           <main className="flex-1">
             <Routes>
@@ -46,6 +49,7 @@ function App() {
               />
               <Route path="/connexion" element={<Login />} />
               <Route path="/inscription" element={<Signup />} />
+              <Route path="/test-data" element={<TestData />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

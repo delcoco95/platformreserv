@@ -11,7 +11,7 @@ import {
   onSnapshot,
   Timestamp,
 } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "../firebase";
 import { Appointment } from "../types";
 
 export const appointmentService = {
