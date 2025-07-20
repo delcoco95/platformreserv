@@ -165,11 +165,11 @@ export default function ProfessionalProfile() {
       const clientProfile = userProfile as ClientProfile;
       const address = clientAddress || clientProfile?.address || "";
 
-      const appointmentData = {
+            const appointmentData = {
         clientId: currentUser.uid,
         professionalId: professional.uid,
         service: selectedService.name,
-        date: new Date(`${selectedSlot.date}T${selectedSlot.start}:00`),
+        date: Timestamp.fromDate(new Date(`${selectedSlot.date}T${selectedSlot.start}:00`)),
         duration: selectedService.duration,
         status: "pending" as const,
         price: selectedService.price,
