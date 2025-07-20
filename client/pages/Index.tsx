@@ -245,12 +245,15 @@ export default function Index() {
                       </div>
                     ))}
                   </div>
-                  <Button
+                                    <Button
                     variant="outline"
                     className="w-full mt-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                    asChild
                   >
-                    Voir les professionnels
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <Link to="/professionnels">
+                      Voir les professionnels
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
