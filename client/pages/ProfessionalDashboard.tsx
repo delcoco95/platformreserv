@@ -47,6 +47,7 @@ import { appointmentService } from "../services/appointmentService";
 import { EditProfileDialog } from "../components/EditProfileDialog";
 import { StatsChart } from "../components/StatsChart";
 import { Appointment, ProfessionalProfile } from "../types";
+import { parseDate, formatDate, formatTime } from "../lib/dateUtils";
 
 // Import Leaflet CSS
 import "leaflet/dist/leaflet.css";
@@ -120,39 +121,9 @@ export default function ProfessionalDashboard() {
     }
   };
 
-  const formatDate = (timestamp: any) => {
-    if (!timestamp) return "Date non définie";
+  
 
-    let date: Date;
-    if (timestamp.toDate) {
-      date = timestamp.toDate();
-    } else {
-      date = new Date(timestamp);
-    }
-
-    return date.toLocaleDateString("fr-FR", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const formatTime = (timestamp: any) => {
-    if (!timestamp) return "Heure non définie";
-
-    let date: Date;
-    if (timestamp.toDate) {
-      date = timestamp.toDate();
-    } else {
-      date = new Date(timestamp);
-    }
-
-    return date.toLocaleTimeString("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -189,29 +160,15 @@ export default function ProfessionalDashboard() {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-      const todayAppointments = appointments.filter((apt) => {
+        const todayAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
-    let date: Date;
-    if (apt.date instanceof Timestamp) {
-      date = apt.date.toDate();
-    } else if (typeof apt.date === 'object' && apt.date !== null && 'toDate' in apt.date) {
-      date = (apt.date as any).toDate();
-    } else {
-      date = new Date(apt.date as any);
-    }
+    const date = parseDate(apt.date);
     return date >= today && date < tomorrow && apt.status !== "cancelled";
   });
 
-      const upcomingAppointments = appointments.filter((apt) => {
+        const upcomingAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
-    let date: Date;
-    if (apt.date instanceof Timestamp) {
-      date = apt.date.toDate();
-    } else if (typeof apt.date === 'object' && apt.date !== null && 'toDate' in apt.date) {
-      date = (apt.date as any).toDate();
-    } else {
-      date = new Date(apt.date as any);
-    }
+    const date = parseDate(apt.date);
     return date >= tomorrow && apt.status !== "cancelled";
   });
 
