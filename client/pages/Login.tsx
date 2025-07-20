@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -12,6 +12,7 @@ import {
 } from "../components/ui/card";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -19,6 +20,19 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
+  const { login, currentUser, userProfile } = useAuth();
+  const navigate = useNavigate();
+
+  // Rediriger si déjà connecté
+  useEffect(() => {
+    if (currentUser && userProfile) {
+      const redirectPath = userProfile.userType === 'client' 
+        ? '/espace-client' 
+        : '/espace-professionnel';
+      navigate(redirectPath, { replace: true });
+    }
+  }, [currentUser, userProfile, navigate]);
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -39,35 +53,41 @@ export default function Login() {
       return;
     }
 
-    if (password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
-      return;
-    }
-
     setIsLoading(true);
 
-    // Simulation d'une connexion (à remplacer par votre API)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Simulation d'une erreur de connexion
-      if (email === "test@error.com") {
-        setError("Email ou mot de passe incorrect");
-        return;
+      await login(email, password);
+      // La redirection se fera via useEffect quand currentUser sera mis à jour
+    } catch (error: any) {
+      console.error('Erreur de connexion:', error);
+      
+      // Messages d'erreur Firebase traduits
+      switch (error.code) {
+        case 'auth/user-not-found':
+          setError("Aucun compte trouvé avec cette adresse email");
+          break;
+        case 'auth/wrong-password':
+          setError("Mot de passe incorrect");
+          break;
+        case 'auth/invalid-email':
+          setError("Adresse email invalide");
+          break;
+        case 'auth/user-disabled':
+          setError("Ce compte a été désactivé");
+          break;
+        case 'auth/too-many-requests':
+          setError("Trop de tentatives. Veuillez réessayer plus tard");
+          break;
+        default:
+          setError("Une erreur est survenue lors de la connexion");
       }
-
-      // Redirection après connexion réussie
-      console.log("Connexion réussie:", { email });
-      // window.location.href = "/espace-client";
-    } catch (err) {
-      setError("Une erreur est survenue. Veuillez réessayer.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-muted/20">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-foreground">Connexion</h1>
@@ -76,7 +96,7 @@ export default function Login() {
           </p>
         </div>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-lg bg-white">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">Se connecter</CardTitle>
             <CardDescription className="text-center">
@@ -104,6 +124,7 @@ export default function Login() {
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -120,11 +141,13 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 pr-10"
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    disabled={isLoading}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -162,16 +185,6 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Demo info */}
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground">
-            Demo : utilisez n'importe quel email valide et mot de passe (6+
-            caractères)
-            <br />
-            Testez une erreur avec : test@error.com
-          </p>
-        </div>
       </div>
     </div>
   );
