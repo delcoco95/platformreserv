@@ -6,7 +6,7 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "../firebase";
 import { ProfessionalProfile } from "../types";
 
 export const professionalService = {
