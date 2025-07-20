@@ -46,6 +46,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { appointmentService } from "../services/appointmentService";
 import { EditProfileDialog } from "../components/EditProfileDialog";
 import { StatsChart } from "../components/StatsChart";
+import { ProfessionalTabs } from "../components/ProfessionalTabs";
 import { Appointment, ProfessionalProfile } from "../types";
 import { parseDate, formatDate, formatTime } from "../lib/dateUtils";
 
