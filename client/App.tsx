@@ -18,8 +18,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+            <BrowserRouter>
         <div className="min-h-screen bg-background flex flex-col">
+          <AutoRedirect />
           <Header />
           <main className="flex-1">
             <Routes>
