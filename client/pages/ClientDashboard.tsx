@@ -155,7 +155,7 @@ export default function ClientDashboard() {
     );
   }
 
-  if (!currentUser || !userProfile) {
+    if (!currentUser || !userProfile) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -168,6 +168,26 @@ export default function ClientDashboard() {
           </div>
           <Button asChild>
             <Link to="/connexion">Se connecter</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Vérifier que c'est bien un profil client
+  if (userProfile.userType !== "client") {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto" />
+          <div>
+            <h3 className="text-lg font-semibold">Accès non autorisé</h3>
+            <p className="text-muted-foreground">
+              Cette page est réservée aux clients.
+            </p>
+          </div>
+          <Button asChild>
+            <Link to="/espace-professionnel">Aller à l'espace professionnel</Link>
           </Button>
         </div>
       </div>
