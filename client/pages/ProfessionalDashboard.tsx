@@ -820,7 +820,67 @@ export default function ProfessionalDashboard() {
               </CardContent>
             </Card>
           </div>
-        </div>
+                )}
+
+        {/* Availability Tab */}
+        {activeTab === "availability" && (
+          <AvailabilityManager />
+        )}
+
+        {/* Services Tab */}
+        {activeTab === "services" && (
+          <ServicesManager />
+        )}
+
+        {/* Stats Tab */}
+        {activeTab === "stats" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Statistiques détaillées</CardTitle>
+                <CardDescription>
+                  Analysez vos performances et votre activité
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold mb-4">Rendez-vous par statut</h3>
+                    <StatsChart data={chartData} />
+                  </div>
+                  <div className="space-y-4">
+                    <div className="border rounded-lg p-4">
+                      <h4 className="font-medium mb-2">Chiffre d'affaires</h4>
+                      <p className="text-2xl font-bold text-green-600">{totalEarnings}€</p>
+                      <p className="text-sm text-muted-foreground">Total réalisé</p>
+                    </div>
+                    <div className="border rounded-lg p-4">
+                      <h4 className="font-medium mb-2">Taux de conversion</h4>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {appointments.length > 0
+                          ? Math.round((completedAppointments.length / appointments.length) * 100)
+                          : 0}%
+                      </p>
+                      <p className="text-sm text-muted-foreground">Rendez-vous honorés</p>
+                    </div>
+                    <div className="border rounded-lg p-4">
+                      <h4 className="font-medium mb-2">Note moyenne</h4>
+                      <div className="flex items-center gap-2">
+                        <p className="text-2xl font-bold text-yellow-600">
+                          {professionalProfile?.rating?.toFixed(1) || "N/A"}
+                        </p>
+                        <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Sur {professionalProfile?.totalReviews || 0} avis
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Edit Profile Dialog */}
         <EditProfileDialog
