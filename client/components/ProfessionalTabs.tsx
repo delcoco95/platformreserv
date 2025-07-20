@@ -28,7 +28,7 @@ interface ProfessionalTabsProps {
   upcomingAppointments: Appointment[];
   completedAppointments: Appointment[];
   totalEarnings: number;
-  chartData: Array<{ name: string; value: number; color: string }>;
+    chartData: { confirmed: number; completed: number; cancelled: number; pending: number };
   dashboardContent: React.ReactNode;
 }
 
