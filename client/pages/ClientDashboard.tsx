@@ -169,26 +169,26 @@ export default function ClientDashboard() {
     }
   };
 
-    const upcomingAppointments = appointments.filter((apt) => {
+      const upcomingAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     let date: Date;
     if (apt.date instanceof Timestamp) {
       date = apt.date.toDate();
-    } else if (typeof apt.date === 'object' && apt.date !== null && 'toDate' in apt.date && typeof apt.date.toDate === 'function') {
-      date = apt.date.toDate();
+    } else if (typeof apt.date === 'object' && apt.date !== null && 'toDate' in apt.date) {
+      date = (apt.date as any).toDate();
     } else {
       date = new Date(apt.date as any);
     }
     return date > new Date() && apt.status !== "cancelled";
   });
 
-    const pastAppointments = appointments.filter((apt) => {
+      const pastAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
     let date: Date;
     if (apt.date instanceof Timestamp) {
       date = apt.date.toDate();
-    } else if (typeof apt.date === 'object' && apt.date !== null && 'toDate' in apt.date && typeof apt.date.toDate === 'function') {
-      date = apt.date.toDate();
+    } else if (typeof apt.date === 'object' && apt.date !== null && 'toDate' in apt.date) {
+      date = (apt.date as any).toDate();
     } else {
       date = new Date(apt.date as any);
     }
