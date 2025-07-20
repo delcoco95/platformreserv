@@ -33,8 +33,11 @@ import {
 } from "lucide-react";
 import { professionalService } from "../services/professionalService";
 import { ProfessionalProfile } from "../types";
+import { useAuth } from "../contexts/AuthContext";
+import { DemoModeAlert } from "../components/DemoModeAlert";
 
 export default function ProfessionalsList() {
+  const { currentUser } = useAuth();
   const [searchParams] = useSearchParams();
   const [professionals, setProfessionals] = useState<ProfessionalProfile[]>([]);
   const [filteredProfessionals, setFilteredProfessionals] = useState<ProfessionalProfile[]>([]);
@@ -146,6 +149,10 @@ export default function ProfessionalsList() {
           <p className="text-muted-foreground">Découvrez les prestataires inscrits</p>
         </div>
 
+        {/* Demo Mode Alert */}
+        {!currentUser && <DemoModeAlert />}
+
+        {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">

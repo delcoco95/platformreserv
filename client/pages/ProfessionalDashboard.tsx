@@ -1,4 +1,5 @@
-import { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { Timestamp } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
@@ -46,6 +47,7 @@ import { appointmentService } from "../services/appointmentService";
 import { EditProfileDialog } from "../components/EditProfileDialog";
 import { StatsChart } from "../components/StatsChart";
 import { Appointment, ProfessionalProfile } from "../types";
+import { parseDate, formatDate, formatTime } from "../lib/dateUtils";
 
 // Import Leaflet CSS
 import "leaflet/dist/leaflet.css";
@@ -63,8 +65,6 @@ const Marker = React.lazy(() =>
 const Popup = React.lazy(() =>
   import("react-leaflet").then((module) => ({ default: module.Popup })),
 );
-
-import React from "react";
 
 export default function ProfessionalDashboard() {
   const { currentUser, userProfile, loading: authLoading } = useAuth();
@@ -121,40 +121,6 @@ export default function ProfessionalDashboard() {
     }
   };
 
-  const formatDate = (timestamp: any) => {
-    if (!timestamp) return "Date non définie";
-
-    let date: Date;
-    if (timestamp.toDate) {
-      date = timestamp.toDate();
-    } else {
-      date = new Date(timestamp);
-    }
-
-    return date.toLocaleDateString("fr-FR", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const formatTime = (timestamp: any) => {
-    if (!timestamp) return "Heure non définie";
-
-    let date: Date;
-    if (timestamp.toDate) {
-      date = timestamp.toDate();
-    } else {
-      date = new Date(timestamp);
-    }
-
-    return date.toLocaleTimeString("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
@@ -192,13 +158,13 @@ export default function ProfessionalDashboard() {
 
   const todayAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
-    const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
+    const date = parseDate(apt.date);
     return date >= today && date < tomorrow && apt.status !== "cancelled";
   });
 
   const upcomingAppointments = appointments.filter((apt) => {
     if (!apt.date) return false;
-    const date = apt.date.toDate ? apt.date.toDate() : new Date(apt.date);
+    const date = parseDate(apt.date);
     return date >= tomorrow && apt.status !== "cancelled";
   });
 
@@ -253,6 +219,26 @@ export default function ProfessionalDashboard() {
           </div>
           <Button asChild>
             <Link to="/connexion">Se connecter</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Vérifier que c'est bien un profil professionnel
+  if (userProfile.userType !== "professionnel") {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto" />
+          <div>
+            <h3 className="text-lg font-semibold">Accès non autorisé</h3>
+            <p className="text-muted-foreground">
+              Cette page est réservée aux professionnels.
+            </p>
+          </div>
+          <Button asChild>
+            <Link to="/espace-client">Aller à l'espace client</Link>
           </Button>
         </div>
       </div>
