@@ -67,7 +67,13 @@ export default function ProfessionalsList() {
   ];
 
   useEffect(() => {
-    loadProfessionals();
+    // Utiliser un listener temps réel pour les professionnels
+    const unsubscribe = professionalService.onProfessionalsChange((data) => {
+      setProfessionals(data);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
