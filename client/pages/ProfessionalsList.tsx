@@ -58,7 +58,6 @@ export default function ProfessionalsList() {
     searchParams.get("categorie") || "all",
   );
 
-
   const categories = [
     { value: "all", label: "Toutes les catégories", icon: Users },
     { value: "automobile", label: "Automobile", icon: Car },
