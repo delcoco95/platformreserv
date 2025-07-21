@@ -47,6 +47,7 @@ import {
 } from "lucide-react";
 import { professionalService } from "../services/professionalService";
 import { appointmentService } from "../services/appointmentService";
+import { emailService } from "../services/emailService";
 import { useAuth } from "../contexts/AuthContext";
 import {
   ProfessionalProfile as ProfessionalType,
@@ -206,7 +207,37 @@ export default function ProfessionalProfile() {
         },
       };
 
+      // Créer le rendez-vous
       await appointmentService.createAppointment(appointmentData);
+
+      // Envoyer les emails de confirmation
+      const appointment = {
+        ...appointmentData,
+        id: "temp-id", // L'ID réel serait retourné par createAppointment
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+      };
+
+      try {
+        const emailResults = await emailService.sendBookingConfirmationEmails(
+          appointment,
+          professional,
+          clientProfile,
+        );
+
+        if (emailResults.clientSent && emailResults.professionalSent) {
+          console.log("✅ Emails de confirmation envoyés avec succès");
+        } else {
+          console.warn(
+            "⚠️ Certains emails n'ont pas pu être envoyés",
+            emailResults,
+          );
+        }
+      } catch (emailError) {
+        console.error("Erreur lors de l'envoi des emails:", emailError);
+        // On continue même si les emails échouent
+      }
+
       setBookingSuccess(true);
       setShowBookingDialog(false);
 

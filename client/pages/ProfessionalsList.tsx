@@ -14,6 +14,14 @@ import {
 import { Badge } from "../components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -30,12 +38,14 @@ import {
   Wrench,
   Key,
   Users,
+  Filter,
+  Building,
 } from "lucide-react";
 import { professionalService } from "../services/professionalService";
 import { ProfessionalProfile } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import { DemoModeAlert } from "../components/DemoModeAlert";
-import { ProfessionalTabs } from "@/components/ProfessionalTabs";
+import { NewProfessionalAlert } from "../components/NewProfessionalAlert";
 
 export default function ProfessionalsList() {
   const { currentUser } = useAuth();
@@ -45,7 +55,12 @@ export default function ProfessionalsList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("categorie") || "all");
+  const [selectedCategory, setSelectedCategory] = useState(
+    searchParams.get("categorie") || "all",
+  );
+  const [selectedProfessional, setSelectedProfessional] =
+    useState<ProfessionalProfile | null>(null);
+  const [showContactDialog, setShowContactDialog] = useState(false);
 
   const categories = [
     { value: "all", label: "Toutes les catégories", icon: Users },
@@ -55,7 +70,13 @@ export default function ProfessionalsList() {
   ];
 
   useEffect(() => {
-    loadProfessionals();
+    // Utiliser un listener temps réel pour les professionnels
+    const unsubscribe = professionalService.onProfessionalsChange((data) => {
+      setProfessionals(data);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -75,6 +96,14 @@ export default function ProfessionalsList() {
     }
   };
 
+  // Fonction pour normaliser le texte (insensible aux accents)
+  const normalizeText = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  };
+
   const filterProfessionals = () => {
     let filtered = [...professionals];
 
@@ -82,13 +111,18 @@ export default function ProfessionalsList() {
       filtered = filtered.filter((prof) => prof.profession === selectedCategory);
     }
 
+    // Filtrer par recherche (insensible aux accents et à la casse)
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((prof) =>
-        prof.companyName?.toLowerCase().includes(query) ||
-        prof.profession?.toLowerCase().includes(query) ||
-        prof.address?.toLowerCase().includes(query) ||
-        prof.services?.some((s) => s.toLowerCase().includes(query))
+      const query = normalizeText(searchQuery);
+      filtered = filtered.filter(
+        (prof) =>
+          normalizeText(prof.companyName || "").includes(query) ||
+          normalizeText(prof.profession || "").includes(query) ||
+          prof.services?.some((service) =>
+            normalizeText(service).includes(query),
+          ) ||
+          normalizeText(prof.address || "").includes(query) ||
+          normalizeText(prof.description || "").includes(query),
       );
     }
 
@@ -144,6 +178,7 @@ export default function ProfessionalsList() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      <NewProfessionalAlert professionals={professionals} />
       <div className="container max-w-7xl mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Nos professionnels</h1>
@@ -228,12 +263,111 @@ export default function ProfessionalsList() {
                 <Card key={prof.uid} className="hover:shadow-lg transition-shadow">
                   <CardHeader className="pb-4">
                     <div className="flex items-start space-x-4">
-                      <Avatar className="h-16 w-16">
-                        <AvatarImage src="" />
-                        <AvatarFallback className="bg-primary text-white text-lg">
-                          {prof.companyName?.[0] || "P"}
-                        </AvatarFallback>
-                      </Avatar>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Avatar className="h-16 w-16 cursor-pointer hover:opacity-80 transition-opacity">
+                            <AvatarImage src="" />
+                            <AvatarFallback className="bg-primary text-primary-foreground text-lg">
+                              {professional.companyName?.[0] || "P"}
+                            </AvatarFallback>
+                          </Avatar>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-md">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                                  {professional.companyName?.[0] || "P"}
+                                </AvatarFallback>
+                              </Avatar>
+                              {professional.companyName}
+                            </DialogTitle>
+                            <DialogDescription>
+                              Informations de contact
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-3">
+                                <Mail className="h-4 w-4 text-muted-foreground" />
+                                <div>
+                                  <p className="text-sm font-medium">Email</p>
+                                  <a
+                                    href={`mailto:${professional.email}`}
+                                    className="text-sm text-primary hover:underline"
+                                  >
+                                    {professional.email}
+                                  </a>
+                                </div>
+                              </div>
+                              {professional.phone && (
+                                <div className="flex items-center gap-3">
+                                  <Phone className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm font-medium">
+                                      Téléphone
+                                    </p>
+                                    <a
+                                      href={`tel:${professional.phone}`}
+                                      className="text-sm text-primary hover:underline"
+                                    >
+                                      {professional.phone}
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+                              {professional.address && (
+                                <div className="flex items-center gap-3">
+                                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm font-medium">
+                                      Adresse
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                      {professional.address}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-3">
+                                <Building className="h-4 w-4 text-muted-foreground" />
+                                <div>
+                                  <p className="text-sm font-medium">
+                                    Spécialité
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {getProfessionLabel(
+                                      professional.profession || "",
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                              {professional.rating && (
+                                <div className="flex items-center gap-3">
+                                  <Star className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm font-medium">Note</p>
+                                    <div className="flex items-center gap-1">
+                                      <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                                      <span className="text-sm">
+                                        {professional.rating.toFixed(1)} (
+                                        {professional.totalReviews || 0} avis)
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            <div className="border-t pt-4">
+                              <Button className="w-full" asChild>
+                                <Link to={`/professionnel/${professional.uid}`}>
+                                  Voir le profil complet
+                                </Link>
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                       <div className="flex-1 min-w-0">
                         <CardTitle className="text-lg truncate">
                           {prof.companyName || "Professionnel"}

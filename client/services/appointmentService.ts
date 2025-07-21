@@ -253,6 +253,24 @@ export const appointmentService = {
     await this.updateAppointment(appointmentId, { status: "cancelled" });
   },
 
+  // Confirmer un rendez-vous (pour les professionnels)
+  async confirmAppointment(appointmentId: string) {
+    await this.updateAppointment(appointmentId, { status: "confirmed" });
+  },
+
+  // Marquer un rendez-vous comme terminé
+  async completeAppointment(appointmentId: string) {
+    await this.updateAppointment(appointmentId, { status: "completed" });
+  },
+
+  // Changer le statut d'un rendez-vous
+  async updateAppointmentStatus(
+    appointmentId: string,
+    status: "pending" | "confirmed" | "completed" | "cancelled",
+  ) {
+    await this.updateAppointment(appointmentId, { status });
+  },
+
   // Supprimer un rendez-vous
   async deleteAppointment(appointmentId: string) {
     const appointmentRef = doc(db, "appointments", appointmentId);
