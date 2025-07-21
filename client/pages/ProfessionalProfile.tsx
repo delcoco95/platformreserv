@@ -214,6 +214,8 @@ export default function ProfessionalProfile() {
       const appointment = {
         ...appointmentData,
         id: 'temp-id', // L'ID réel serait retourné par createAppointment
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
       };
 
       try {
