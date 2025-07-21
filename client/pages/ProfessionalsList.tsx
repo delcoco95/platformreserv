@@ -37,6 +37,7 @@ import {
   Key,
   Users,
   Filter,
+  Building,
 } from "lucide-react";
 import { professionalService } from "../services/professionalService";
 import { ProfessionalProfile } from "../types";
