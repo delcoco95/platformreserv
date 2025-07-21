@@ -57,9 +57,7 @@ export default function ProfessionalsList() {
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("categorie") || "all",
   );
-  const [selectedProfessional, setSelectedProfessional] =
-    useState<ProfessionalProfile | null>(null);
-  const [showContactDialog, setShowContactDialog] = useState(false);
+
 
   const categories = [
     { value: "all", label: "Toutes les catégories", icon: Users },
