@@ -75,6 +75,14 @@ export default function ProfessionalsList() {
     }
   };
 
+  // Fonction pour normaliser le texte (insensible aux accents)
+  const normalizeText = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  };
+
   const filterProfessionals = () => {
     let filtered = [...professionals];
 
@@ -85,17 +93,18 @@ export default function ProfessionalsList() {
       );
     }
 
-    // Filtrer par recherche
+    // Filtrer par recherche (insensible aux accents et à la casse)
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
+      const query = normalizeText(searchQuery);
       filtered = filtered.filter(
         (prof) =>
-          prof.companyName?.toLowerCase().includes(query) ||
-          prof.profession?.toLowerCase().includes(query) ||
+          normalizeText(prof.companyName || "").includes(query) ||
+          normalizeText(prof.profession || "").includes(query) ||
           prof.services?.some((service) =>
-            service.toLowerCase().includes(query),
+            normalizeText(service).includes(query),
           ) ||
-          prof.address?.toLowerCase().includes(query),
+          normalizeText(prof.address || "").includes(query) ||
+          normalizeText(prof.description || "").includes(query),
       );
     }
 
