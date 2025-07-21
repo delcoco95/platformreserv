@@ -57,7 +57,8 @@ export default function ProfessionalsList() {
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("categorie") || "all",
   );
-  const [selectedProfessional, setSelectedProfessional] = useState<ProfessionalProfile | null>(null);
+  const [selectedProfessional, setSelectedProfessional] =
+    useState<ProfessionalProfile | null>(null);
   const [showContactDialog, setShowContactDialog] = useState(false);
 
   const categories = [
@@ -316,7 +317,9 @@ export default function ProfessionalsList() {
                                 <div className="flex items-center gap-3">
                                   <Phone className="h-4 w-4 text-muted-foreground" />
                                   <div>
-                                    <p className="text-sm font-medium">Téléphone</p>
+                                    <p className="text-sm font-medium">
+                                      Téléphone
+                                    </p>
                                     <a
                                       href={`tel:${professional.phone}`}
                                       className="text-sm text-primary hover:underline"
@@ -330,7 +333,9 @@ export default function ProfessionalsList() {
                                 <div className="flex items-center gap-3">
                                   <MapPin className="h-4 w-4 text-muted-foreground" />
                                   <div>
-                                    <p className="text-sm font-medium">Adresse</p>
+                                    <p className="text-sm font-medium">
+                                      Adresse
+                                    </p>
                                     <p className="text-sm text-muted-foreground">
                                       {professional.address}
                                     </p>
@@ -340,9 +345,13 @@ export default function ProfessionalsList() {
                               <div className="flex items-center gap-3">
                                 <Building className="h-4 w-4 text-muted-foreground" />
                                 <div>
-                                  <p className="text-sm font-medium">Spécialité</p>
+                                  <p className="text-sm font-medium">
+                                    Spécialité
+                                  </p>
                                   <p className="text-sm text-muted-foreground">
-                                    {getProfessionLabel(professional.profession || "")}
+                                    {getProfessionLabel(
+                                      professional.profession || "",
+                                    )}
                                   </p>
                                 </div>
                               </div>
@@ -354,7 +363,8 @@ export default function ProfessionalsList() {
                                     <div className="flex items-center gap-1">
                                       <Star className="h-3 w-3 text-yellow-500 fill-current" />
                                       <span className="text-sm">
-                                        {professional.rating.toFixed(1)} ({professional.totalReviews || 0} avis)
+                                        {professional.rating.toFixed(1)} (
+                                        {professional.totalReviews || 0} avis)
                                       </span>
                                     </div>
                                   </div>

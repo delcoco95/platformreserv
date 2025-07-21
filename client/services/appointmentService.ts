@@ -264,7 +264,10 @@ export const appointmentService = {
   },
 
   // Changer le statut d'un rendez-vous
-  async updateAppointmentStatus(appointmentId: string, status: "pending" | "confirmed" | "completed" | "cancelled") {
+  async updateAppointmentStatus(
+    appointmentId: string,
+    status: "pending" | "confirmed" | "completed" | "cancelled",
+  ) {
     await this.updateAppointment(appointmentId, { status });
   },
 

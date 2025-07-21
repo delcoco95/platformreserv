@@ -10,7 +10,7 @@ interface EmailData {
 const generateClientConfirmationEmail = (
   appointment: Appointment,
   professional: ProfessionalProfile,
-  client: ClientProfile
+  client: ClientProfile,
 ): EmailData => {
   const date = appointment.date.toDate();
   const formattedDate = date.toLocaleDateString("fr-FR", {
@@ -55,16 +55,16 @@ const generateClientConfirmationEmail = (
             <p><strong>Heure :</strong> ${formattedTime}</p>
             <p><strong>Durée :</strong> ${appointment.duration} minutes</p>
             <p><strong>Prix :</strong> ${appointment.price}€</p>
-            ${appointment.address ? `<p><strong>Adresse :</strong> ${appointment.address}</p>` : ''}
-            ${appointment.notes ? `<p><strong>Notes :</strong> ${appointment.notes}</p>` : ''}
+            ${appointment.address ? `<p><strong>Adresse :</strong> ${appointment.address}</p>` : ""}
+            ${appointment.notes ? `<p><strong>Notes :</strong> ${appointment.notes}</p>` : ""}
           </div>
 
           <div class="details">
             <h3>Professionnel</h3>
             <p><strong>Entreprise :</strong> ${professional.companyName}</p>
             <p><strong>Email :</strong> ${professional.email}</p>
-            ${professional.phone ? `<p><strong>Téléphone :</strong> ${professional.phone}</p>` : ''}
-            ${professional.address ? `<p><strong>Adresse :</strong> ${professional.address}</p>` : ''}
+            ${professional.phone ? `<p><strong>Téléphone :</strong> ${professional.phone}</p>` : ""}
+            ${professional.address ? `<p><strong>Adresse :</strong> ${professional.address}</p>` : ""}
           </div>
 
           <p><strong>Statut :</strong> En attente de confirmation</p>
@@ -90,7 +90,7 @@ const generateClientConfirmationEmail = (
 const generateProfessionalNotificationEmail = (
   appointment: Appointment,
   professional: ProfessionalProfile,
-  client: ClientProfile
+  client: ClientProfile,
 ): EmailData => {
   const date = appointment.date.toDate();
   const formattedDate = date.toLocaleDateString("fr-FR", {
@@ -135,16 +135,16 @@ const generateProfessionalNotificationEmail = (
             <p><strong>Heure :</strong> ${formattedTime}</p>
             <p><strong>Durée :</strong> ${appointment.duration} minutes</p>
             <p><strong>Prix :</strong> ${appointment.price}€</p>
-            ${appointment.address ? `<p><strong>Adresse d'intervention :</strong> ${appointment.address}</p>` : ''}
-            ${appointment.notes ? `<p><strong>Notes du client :</strong> ${appointment.notes}</p>` : ''}
+            ${appointment.address ? `<p><strong>Adresse d'intervention :</strong> ${appointment.address}</p>` : ""}
+            ${appointment.notes ? `<p><strong>Notes du client :</strong> ${appointment.notes}</p>` : ""}
           </div>
 
           <div class="details">
             <h3>Informations client</h3>
-            <p><strong>Nom :</strong> ${client.firstName || ''} ${client.lastName || ''}</p>
+            <p><strong>Nom :</strong> ${client.firstName || ""} ${client.lastName || ""}</p>
             <p><strong>Email :</strong> ${client.email}</p>
-            ${client.phone ? `<p><strong>Téléphone :</strong> ${client.phone}</p>` : ''}
-            ${client.address ? `<p><strong>Adresse :</strong> ${client.address}</p>` : ''}
+            ${client.phone ? `<p><strong>Téléphone :</strong> ${client.phone}</p>` : ""}
+            ${client.address ? `<p><strong>Adresse :</strong> ${client.address}</p>` : ""}
           </div>
 
           <p><strong>Action requise :</strong> Contactez le client pour confirmer les détails et finaliser le rendez-vous.</p>
@@ -160,7 +160,7 @@ const generateProfessionalNotificationEmail = (
 
   return {
     to: professional.email,
-    subject: `Nouvelle demande de rendez-vous - ${client.firstName || 'Client'} ${client.lastName || ''}`,
+    subject: `Nouvelle demande de rendez-vous - ${client.firstName || "Client"} ${client.lastName || ""}`,
     html,
   };
 };
@@ -170,23 +170,27 @@ export const emailService = {
   async sendClientConfirmation(
     appointment: Appointment,
     professional: ProfessionalProfile,
-    client: ClientProfile
+    client: ClientProfile,
   ): Promise<boolean> {
     try {
-      const emailData = generateClientConfirmationEmail(appointment, professional, client);
-      
+      const emailData = generateClientConfirmationEmail(
+        appointment,
+        professional,
+        client,
+      );
+
       // En mode démo, on simule l'envoi
       console.log("📧 Email de confirmation client envoyé:", emailData);
-      
+
       // Ici, on intégrerait un vrai service email comme:
       // - SendGrid
       // - Mailgun
       // - Amazon SES
       // - Resend
-      
+
       // Simulation d'un délai d'envoi
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       return true;
     } catch (error) {
       console.error("Erreur lors de l'envoi de l'email client:", error);
@@ -198,17 +202,21 @@ export const emailService = {
   async sendProfessionalNotification(
     appointment: Appointment,
     professional: ProfessionalProfile,
-    client: ClientProfile
+    client: ClientProfile,
   ): Promise<boolean> {
     try {
-      const emailData = generateProfessionalNotificationEmail(appointment, professional, client);
-      
+      const emailData = generateProfessionalNotificationEmail(
+        appointment,
+        professional,
+        client,
+      );
+
       // En mode démo, on simule l'envoi
       console.log("📧 Email de notification professionnel envoyé:", emailData);
-      
+
       // Simulation d'un délai d'envoi
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       return true;
     } catch (error) {
       console.error("Erreur lors de l'envoi de l'email professionnel:", error);
@@ -220,13 +228,13 @@ export const emailService = {
   async sendBookingConfirmationEmails(
     appointment: Appointment,
     professional: ProfessionalProfile,
-    client: ClientProfile
+    client: ClientProfile,
   ): Promise<{ clientSent: boolean; professionalSent: boolean }> {
     const [clientSent, professionalSent] = await Promise.all([
       this.sendClientConfirmation(appointment, professional, client),
-      this.sendProfessionalNotification(appointment, professional, client)
+      this.sendProfessionalNotification(appointment, professional, client),
     ]);
 
     return { clientSent, professionalSent };
-  }
+  },
 };

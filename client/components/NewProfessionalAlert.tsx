@@ -10,9 +10,13 @@ interface NewProfessionalAlertProps {
   professionals: ProfessionalProfile[];
 }
 
-export function NewProfessionalAlert({ professionals }: NewProfessionalAlertProps) {
+export function NewProfessionalAlert({
+  professionals,
+}: NewProfessionalAlertProps) {
   const [previousCount, setPreviousCount] = useState(0);
-  const [newProfessionals, setNewProfessionals] = useState<ProfessionalProfile[]>([]);
+  const [newProfessionals, setNewProfessionals] = useState<
+    ProfessionalProfile[]
+  >([]);
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
@@ -27,7 +31,7 @@ export function NewProfessionalAlert({ professionals }: NewProfessionalAlertProp
       const newOnes = professionals.slice(-1); // Prendre le dernier ajouté
       setNewProfessionals(newOnes);
       setShowAlert(true);
-      
+
       // Auto-hide après 10 secondes
       const timer = setTimeout(() => {
         setShowAlert(false);
@@ -59,7 +63,10 @@ export function NewProfessionalAlert({ professionals }: NewProfessionalAlertProp
                 <div className="space-y-2">
                   <p className="font-semibold">Nouveau professionnel !</p>
                   {newProfessionals.map((professional) => (
-                    <div key={professional.uid} className="flex items-center gap-2">
+                    <div
+                      key={professional.uid}
+                      className="flex items-center gap-2"
+                    >
                       <Avatar className="h-6 w-6">
                         <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                           {professional.companyName?.[0] || "P"}

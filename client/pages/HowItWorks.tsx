@@ -28,12 +28,13 @@ export default function HowItWorks() {
     {
       number: "01",
       title: "Recherchez",
-      description: "Trouvez un professionnel près de chez vous selon vos besoins",
+      description:
+        "Trouvez un professionnel près de chez vous selon vos besoins",
       icon: Search,
       color: "bg-blue-100 text-blue-600",
     },
     {
-      number: "02", 
+      number: "02",
       title: "Réservez",
       description: "Choisissez un créneau disponible directement en ligne",
       icon: Calendar,
@@ -53,19 +54,31 @@ export default function HowItWorks() {
       icon: Car,
       title: "Automobile",
       description: "Entretien, réparation, vidange, révision complète",
-      features: ["Déplacement à domicile", "Diagnostic gratuit", "Pièces d'origine"],
+      features: [
+        "Déplacement à domicile",
+        "Diagnostic gratuit",
+        "Pièces d'origine",
+      ],
     },
     {
       icon: Wrench,
-      title: "Plomberie", 
+      title: "Plomberie",
       description: "Installation, dépannage, urgences 24h/24",
-      features: ["Intervention rapide", "Devis transparent", "Garantie travaux"],
+      features: [
+        "Intervention rapide",
+        "Devis transparent",
+        "Garantie travaux",
+      ],
     },
     {
       icon: Key,
       title: "Serrurerie",
       description: "Ouverture de porte, installation, sécurisation",
-      features: ["Service d'urgence", "Sécurité renforcée", "Conseils personnalisés"],
+      features: [
+        "Service d'urgence",
+        "Sécurité renforcée",
+        "Conseils personnalisés",
+      ],
     },
   ];
 
@@ -101,7 +114,8 @@ export default function HowItWorks() {
             Comment ça marche ?
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-            Découvrez comment réserver facilement vos services à domicile en quelques étapes simples.
+            Découvrez comment réserver facilement vos services à domicile en
+            quelques étapes simples.
           </p>
           <Button size="lg" asChild>
             <Link to="/professionnels">
@@ -126,9 +140,14 @@ export default function HowItWorks() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {steps.map((step, index) => (
-              <Card key={index} className="relative text-center hover:shadow-lg transition-shadow">
+              <Card
+                key={index}
+                className="relative text-center hover:shadow-lg transition-shadow"
+              >
                 <CardHeader className="pb-4">
-                  <div className={`w-16 h-16 rounded-full ${step.color} flex items-center justify-center mx-auto mb-4`}>
+                  <div
+                    className={`w-16 h-16 rounded-full ${step.color} flex items-center justify-center mx-auto mb-4`}
+                  >
                     <step.icon className="h-8 w-8" />
                   </div>
                   <Badge variant="outline" className="w-fit mx-auto mb-2">
@@ -175,14 +194,19 @@ export default function HowItWorks() {
                 <CardContent>
                   <ul className="space-y-2">
                     {service.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center gap-2 text-sm">
+                      <li
+                        key={featureIndex}
+                        className="flex items-center gap-2 text-sm"
+                      >
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         {feature}
                       </li>
                     ))}
                   </ul>
                   <Button variant="outline" className="w-full mt-4" asChild>
-                    <Link to={`/professionnels?categorie=${service.title.toLowerCase()}`}>
+                    <Link
+                      to={`/professionnels?categorie=${service.title.toLowerCase()}`}
+                    >
                       Voir les professionnels
                     </Link>
                   </Button>
@@ -211,8 +235,12 @@ export default function HowItWorks() {
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <advantage.icon className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-semibold text-lg mb-2">{advantage.title}</h3>
-                <p className="text-muted-foreground text-sm">{advantage.description}</p>
+                <h3 className="font-semibold text-lg mb-2">
+                  {advantage.title}
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  {advantage.description}
+                </p>
               </div>
             ))}
           </div>
@@ -235,10 +263,13 @@ export default function HowItWorks() {
                 Trouver un professionnel
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" asChild>
-              <Link to="/inscription">
-                Devenir professionnel
-              </Link>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white text-white hover:bg-white/10"
+              asChild
+            >
+              <Link to="/inscription">Devenir professionnel</Link>
             </Button>
           </div>
         </div>

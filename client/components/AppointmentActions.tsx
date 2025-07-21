@@ -17,14 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "./ui/alert-dialog";
-import {
-  CheckCircle,
-  Clock,
-  X,
-  MoreVertical,
-  Ban,
-  Award,
-} from "lucide-react";
+import { CheckCircle, Clock, X, MoreVertical, Ban, Award } from "lucide-react";
 import { appointmentService } from "../services/appointmentService";
 import { Appointment } from "../types";
 
@@ -33,16 +26,24 @@ interface AppointmentActionsProps {
   onStatusChange?: (appointmentId: string, newStatus: string) => void;
 }
 
-export function AppointmentActions({ appointment, onStatusChange }: AppointmentActionsProps) {
+export function AppointmentActions({
+  appointment,
+  onStatusChange,
+}: AppointmentActionsProps) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 
-  const handleStatusChange = async (newStatus: "confirmed" | "completed" | "cancelled") => {
+  const handleStatusChange = async (
+    newStatus: "confirmed" | "completed" | "cancelled",
+  ) => {
     if (isUpdating) return;
 
     setIsUpdating(true);
     try {
-      await appointmentService.updateAppointmentStatus(appointment.id, newStatus);
+      await appointmentService.updateAppointmentStatus(
+        appointment.id,
+        newStatus,
+      );
       onStatusChange?.(appointment.id, newStatus);
       setShowCancelDialog(false);
     } catch (error) {
@@ -89,12 +90,13 @@ export function AppointmentActions({ appointment, onStatusChange }: AppointmentA
 
   const canConfirm = appointment.status === "pending";
   const canComplete = appointment.status === "confirmed";
-  const canCancel = appointment.status === "pending" || appointment.status === "confirmed";
+  const canCancel =
+    appointment.status === "pending" || appointment.status === "confirmed";
 
   return (
     <div className="flex items-center gap-2">
       {getStatusBadge(appointment.status)}
-      
+
       {(canConfirm || canComplete || canCancel) && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -130,13 +132,14 @@ export function AppointmentActions({ appointment, onStatusChange }: AppointmentA
           <AlertDialogHeader>
             <AlertDialogTitle>Annuler le rendez-vous</AlertDialogTitle>
             <AlertDialogDescription>
-              Êtes-vous sûr de vouloir annuler ce rendez-vous ? Cette action est irréversible.
-              Le client sera automatiquement notifié de l'annulation.
+              Êtes-vous sûr de vouloir annuler ce rendez-vous ? Cette action est
+              irréversible. Le client sera automatiquement notifié de
+              l'annulation.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Retour</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={() => handleStatusChange("cancelled")}
               className="bg-red-600 hover:bg-red-700"
             >

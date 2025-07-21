@@ -213,7 +213,7 @@ export default function ProfessionalProfile() {
       // Envoyer les emails de confirmation
       const appointment = {
         ...appointmentData,
-        id: 'temp-id', // L'ID réel serait retourné par createAppointment
+        id: "temp-id", // L'ID réel serait retourné par createAppointment
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       };
@@ -222,13 +222,16 @@ export default function ProfessionalProfile() {
         const emailResults = await emailService.sendBookingConfirmationEmails(
           appointment,
           professional,
-          clientProfile
+          clientProfile,
         );
 
         if (emailResults.clientSent && emailResults.professionalSent) {
           console.log("✅ Emails de confirmation envoyés avec succès");
         } else {
-          console.warn("⚠️ Certains emails n'ont pas pu être envoyés", emailResults);
+          console.warn(
+            "⚠️ Certains emails n'ont pas pu être envoyés",
+            emailResults,
+          );
         }
       } catch (emailError) {
         console.error("Erreur lors de l'envoi des emails:", emailError);
