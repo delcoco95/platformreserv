@@ -47,6 +47,7 @@ import {
 } from "lucide-react";
 import { professionalService } from "../services/professionalService";
 import { appointmentService } from "../services/appointmentService";
+import { emailService } from "../services/emailService";
 import { useAuth } from "../contexts/AuthContext";
 import {
   ProfessionalProfile as ProfessionalType,
