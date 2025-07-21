@@ -35,6 +35,7 @@ import { professionalService } from "../services/professionalService";
 import { ProfessionalProfile } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import { DemoModeAlert } from "../components/DemoModeAlert";
+import { ProfessionalTabs } from "@/components/ProfessionalTabs";
 
 export default function ProfessionalsList() {
   const { currentUser } = useAuth();
@@ -308,7 +309,9 @@ export default function ProfessionalsList() {
                         </Button>
                       </div>
                       <Button size="sm" asChild>
-                        <Link to={`/professionnel/${prof.uid}`}>Voir le profil</Link>
+                          <Link to={`/professionnel/${prof.uid}`}>
+                          Voir le profil
+                        </Link>
                       </Button>
                     </div>
                   </CardContent>
