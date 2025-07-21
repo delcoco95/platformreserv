@@ -16,6 +16,14 @@ import NotFound from "./pages/NotFound";
 import HowItWorks from "./pages/HowItWorks";
 import FAQ from "./pages/FAQ";
 import LegalNotice from "./pages/LegalNotice";
+import {
+  Guarantees,
+  Coverage,
+  Help,
+  Terms,
+  Privacy,
+  Cookies,
+} from "./pages/SimplePages";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -55,6 +63,12 @@ function App() {
               <Route path="/comment-ca-marche" element={<HowItWorks />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/mentions-legales" element={<LegalNotice />} />
+              <Route path="/garanties" element={<Guarantees />} />
+              <Route path="/zones" element={<Coverage />} />
+              <Route path="/aide" element={<Help />} />
+              <Route path="/conditions" element={<Terms />} />
+              <Route path="/confidentialite" element={<Privacy />} />
+              <Route path="/cookies" element={<Cookies />} />
               <Route path="/test-data" element={<TestData />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
