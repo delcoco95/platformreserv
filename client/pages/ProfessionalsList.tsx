@@ -43,6 +43,7 @@ import { professionalService } from "../services/professionalService";
 import { ProfessionalProfile } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import { DemoModeAlert } from "../components/DemoModeAlert";
+import { NewProfessionalAlert } from "../components/NewProfessionalAlert";
 
 export default function ProfessionalsList() {
   const { currentUser } = useAuth();
