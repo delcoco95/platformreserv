@@ -265,7 +265,7 @@ export default function ProfessionalsList() {
                           <Avatar className="h-16 w-16 cursor-pointer hover:opacity-80 transition-opacity">
                             <AvatarImage src="" />
                             <AvatarFallback className="bg-primary text-primary-foreground text-lg">
-                              {professional.companyName?.[0] || "P"}
+                              {prof.companyName?.[0] || "P"}
                             </AvatarFallback>
                           </Avatar>
                         </DialogTrigger>
@@ -274,10 +274,10 @@ export default function ProfessionalsList() {
                             <DialogTitle className="flex items-center gap-2">
                               <Avatar className="h-8 w-8">
                                 <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                                  {professional.companyName?.[0] || "P"}
+                                  {prof.companyName?.[0] || "P"}
                                 </AvatarFallback>
                               </Avatar>
-                              {professional.companyName}
+                              {prof.companyName}
                             </DialogTitle>
                             <DialogDescription>
                               Informations de contact
@@ -290,14 +290,14 @@ export default function ProfessionalsList() {
                                 <div>
                                   <p className="text-sm font-medium">Email</p>
                                   <a
-                                    href={`mailto:${professional.email}`}
+                                    href={`mailto:${prof.email}`}
                                     className="text-sm text-primary hover:underline"
                                   >
-                                    {professional.email}
+                                    {prof.email}
                                   </a>
                                 </div>
                               </div>
-                              {professional.phone && (
+                              {prof.phone && (
                                 <div className="flex items-center gap-3">
                                   <Phone className="h-4 w-4 text-muted-foreground" />
                                   <div>
@@ -305,15 +305,15 @@ export default function ProfessionalsList() {
                                       Téléphone
                                     </p>
                                     <a
-                                      href={`tel:${professional.phone}`}
+                                      href={`tel:${prof.phone}`}
                                       className="text-sm text-primary hover:underline"
                                     >
-                                      {professional.phone}
+                                      {prof.phone}
                                     </a>
                                   </div>
                                 </div>
                               )}
-                              {professional.address && (
+                              {prof.address && (
                                 <div className="flex items-center gap-3">
                                   <MapPin className="h-4 w-4 text-muted-foreground" />
                                   <div>
@@ -321,7 +321,7 @@ export default function ProfessionalsList() {
                                       Adresse
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                      {professional.address}
+                                      {prof.address}
                                     </p>
                                   </div>
                                 </div>
@@ -334,12 +334,12 @@ export default function ProfessionalsList() {
                                   </p>
                                   <p className="text-sm text-muted-foreground">
                                     {getProfessionLabel(
-                                      professional.profession || "",
+                                      prof.profession || "",
                                     )}
                                   </p>
                                 </div>
                               </div>
-                              {professional.rating && (
+                              {prof.rating && (
                                 <div className="flex items-center gap-3">
                                   <Star className="h-4 w-4 text-muted-foreground" />
                                   <div>
@@ -347,8 +347,8 @@ export default function ProfessionalsList() {
                                     <div className="flex items-center gap-1">
                                       <Star className="h-3 w-3 text-yellow-500 fill-current" />
                                       <span className="text-sm">
-                                        {professional.rating.toFixed(1)} (
-                                        {professional.totalReviews || 0} avis)
+                                        {prof.rating.toFixed(1)} (
+                                        {prof.totalReviews || 0} avis)
                                       </span>
                                     </div>
                                   </div>
@@ -357,7 +357,7 @@ export default function ProfessionalsList() {
                             </div>
                             <div className="border-t pt-4">
                               <Button className="w-full" asChild>
-                                <Link to={`/professionnel/${professional.uid}`}>
+                                <Link to={`/professionnel/${prof.uid}`}>
                                   Voir le profil complet
                                 </Link>
                               </Button>
