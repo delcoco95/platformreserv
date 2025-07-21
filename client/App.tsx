@@ -16,7 +16,14 @@ import NotFound from "./pages/NotFound";
 import HowItWorks from "./pages/HowItWorks";
 import FAQ from "./pages/FAQ";
 import LegalNotice from "./pages/LegalNotice";
-import { Guarantees, Coverage, Help, Terms, Privacy, Cookies } from "./pages/SimplePages";
+import {
+  Guarantees,
+  Coverage,
+  Help,
+  Terms,
+  Privacy,
+  Cookies,
+} from "./pages/SimplePages";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
