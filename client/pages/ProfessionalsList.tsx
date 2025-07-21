@@ -170,6 +170,7 @@ export default function ProfessionalsList() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      <NewProfessionalAlert professionals={professionals} />
       <div className="container max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
