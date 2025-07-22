@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase/firestore";
+// Types sans dépendance Firebase
 
 export interface User {
   uid: string;
