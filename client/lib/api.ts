@@ -1,6 +1,4 @@
-// client/lib/api.ts
-
-const API_BASE_URL = "http://localhost:5000/api"; // adapte au besoin
+const API_BASE_URL = "http://localhost:5000/api";
 
 interface ApiResponse<T> {
   success: boolean;

@@ -141,7 +141,17 @@ export default function Signup() {
               address: formData.address,
             };
 
-      await register(formData.email, formData.password, accountType);
+await register(
+  formData.email,
+  formData.password,
+  accountType,
+  { ...(accountType === "client"
+      ? { nom: formData.lastName, prenom: formData.firstName, telephone: formData.phone, adresse: formData.address,
+        }
+      : { nom: formData.companyName, metier: formData.profession, siret: formData.siret, telephone: formData.phone, adresse: formData.address,
+        }),
+  }
+);
     } catch (error: any) {
       console.error("Erreur d'inscription:", error);
 
