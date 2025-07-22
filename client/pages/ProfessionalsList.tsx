@@ -122,11 +122,17 @@ export default function ProfessionalsList() {
 
         {/* Results */}
         {filteredProfessionals.length === 0 ? (
-          <EmptyState hasFilters={hasFilters} onResetFilters={handleResetFilters} />
+          <EmptyState
+            hasFilters={hasFilters}
+            onResetFilters={handleResetFilters}
+          />
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProfessionals.map((professional) => (
-              <ProfessionalCard key={professional.uid} professional={professional} />
+              <ProfessionalCard
+                key={professional.uid}
+                professional={professional}
+              />
             ))}
           </div>
         )}

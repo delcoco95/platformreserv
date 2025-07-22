@@ -1,13 +1,13 @@
-const User = require('../models/User');
+const User = require("../models/User");
 
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password');
-    
+    const user = await User.findById(req.params.id).select("-password");
+
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'Utilisateur non trouvé'
+        message: "Utilisateur non trouvé",
       });
     }
 
@@ -22,11 +22,11 @@ exports.getUserById = async (req, res) => {
       address: user.address,
     };
 
-    if (user.userType === 'client') {
+    if (user.userType === "client") {
       userData.firstName = user.firstName;
       userData.lastName = user.lastName;
       userData.preferences = user.preferences;
-    } else if (user.userType === 'professionnel') {
+    } else if (user.userType === "professionnel") {
       userData.companyName = user.companyName;
       userData.profession = user.profession;
       userData.siret = user.siret;
@@ -41,13 +41,13 @@ exports.getUserById = async (req, res) => {
 
     res.json({
       success: true,
-      data: userData
+      data: userData,
     });
   } catch (err) {
-    console.error('Erreur getUserById:', err);
+    console.error("Erreur getUserById:", err);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur'
+      message: "Erreur serveur",
     });
   }
 };
@@ -61,7 +61,7 @@ exports.updateUser = async (req, res) => {
     if (req.user.id !== userId) {
       return res.status(403).json({
         success: false,
-        message: 'Non autorisé à modifier ce profil'
+        message: "Non autorisé à modifier ce profil",
       });
     }
 
@@ -70,16 +70,15 @@ exports.updateUser = async (req, res) => {
     delete updateData._id;
     delete updateData.uid;
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      updateData,
-      { new: true, runValidators: true }
-    ).select('-password');
+    const user = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'Utilisateur non trouvé'
+        message: "Utilisateur non trouvé",
       });
     }
 
@@ -94,11 +93,11 @@ exports.updateUser = async (req, res) => {
       address: user.address,
     };
 
-    if (user.userType === 'client') {
+    if (user.userType === "client") {
       userData.firstName = user.firstName;
       userData.lastName = user.lastName;
       userData.preferences = user.preferences;
-    } else if (user.userType === 'professionnel') {
+    } else if (user.userType === "professionnel") {
       userData.companyName = user.companyName;
       userData.profession = user.profession;
       userData.siret = user.siret;
@@ -113,24 +112,24 @@ exports.updateUser = async (req, res) => {
 
     res.json({
       success: true,
-      data: userData
+      data: userData,
     });
   } catch (err) {
-    console.error('Erreur updateUser:', err);
+    console.error("Erreur updateUser:", err);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur lors de la mise à jour'
+      message: "Erreur serveur lors de la mise à jour",
     });
   }
 };
 
 exports.getAllProfessionals = async (req, res) => {
   try {
-    const professionals = await User.find({ userType: 'professionnel' })
-      .select('-password')
+    const professionals = await User.find({ userType: "professionnel" })
+      .select("-password")
       .sort({ createdAt: -1 });
 
-    const transformedProfessionals = professionals.map(prof => ({
+    const transformedProfessionals = professionals.map((prof) => ({
       uid: prof._id,
       email: prof.email,
       userType: prof.userType,
@@ -152,13 +151,13 @@ exports.getAllProfessionals = async (req, res) => {
 
     res.json({
       success: true,
-      data: transformedProfessionals
+      data: transformedProfessionals,
     });
   } catch (err) {
-    console.error('Erreur getAllProfessionals:', err);
+    console.error("Erreur getAllProfessionals:", err);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur'
+      message: "Erreur serveur",
     });
   }
 };
@@ -166,34 +165,34 @@ exports.getAllProfessionals = async (req, res) => {
 exports.searchProfessionals = async (req, res) => {
   try {
     const { q, profession, location } = req.query;
-    let query = { userType: 'professionnel' };
+    let query = { userType: "professionnel" };
 
     // Filtre par profession
-    if (profession && profession !== 'all') {
+    if (profession && profession !== "all") {
       query.profession = profession;
     }
 
     // Recherche textuelle
     if (q) {
-      const searchRegex = new RegExp(q, 'i');
+      const searchRegex = new RegExp(q, "i");
       query.$or = [
         { companyName: searchRegex },
         { description: searchRegex },
         { services: { $in: [searchRegex] } },
-        { address: searchRegex }
+        { address: searchRegex },
       ];
     }
 
     // Filtre par localisation (pour plus tard)
     if (location) {
-      query.address = new RegExp(location, 'i');
+      query.address = new RegExp(location, "i");
     }
 
     const professionals = await User.find(query)
-      .select('-password')
+      .select("-password")
       .sort({ rating: -1, createdAt: -1 });
 
-    const transformedProfessionals = professionals.map(prof => ({
+    const transformedProfessionals = professionals.map((prof) => ({
       uid: prof._id,
       email: prof.email,
       userType: prof.userType,
@@ -215,13 +214,13 @@ exports.searchProfessionals = async (req, res) => {
 
     res.json({
       success: true,
-      data: transformedProfessionals
+      data: transformedProfessionals,
     });
   } catch (err) {
-    console.error('Erreur searchProfessionals:', err);
+    console.error("Erreur searchProfessionals:", err);
     res.status(500).json({
       success: false,
-      message: 'Erreur serveur'
+      message: "Erreur serveur",
     });
   }
 };

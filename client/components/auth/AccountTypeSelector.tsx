@@ -9,7 +9,10 @@ interface AccountTypeSelectorProps {
   onChange: (value: AccountType) => void;
 }
 
-export const AccountTypeSelector = ({ value, onChange }: AccountTypeSelectorProps) => {
+export const AccountTypeSelector = ({
+  value,
+  onChange,
+}: AccountTypeSelectorProps) => {
   return (
     <div>
       <Label className="text-base font-semibold">Type de compte *</Label>

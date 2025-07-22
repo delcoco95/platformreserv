@@ -1,49 +1,52 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const appointmentSchema = new mongoose.Schema({
-  clientId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
+const appointmentSchema = new mongoose.Schema(
+  {
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    professionalId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    service: {
+      type: String,
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    duration: {
+      type: Number,
+      required: true,
+    }, // en minutes
+    status: {
+      type: String,
+      enum: ["pending", "confirmed", "completed", "cancelled"],
+      default: "pending",
+    },
+    price: Number,
+    address: String,
+    coordinates: {
+      lat: Number,
+      lng: Number,
+    },
+    notes: String,
   },
-  professionalId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
-  service: { 
-    type: String, 
-    required: true 
-  },
-  date: { 
-    type: Date, 
-    required: true 
-  },
-  duration: { 
-    type: Number, 
-    required: true 
-  }, // en minutes
-  status: { 
-    type: String, 
-    enum: ['pending', 'confirmed', 'completed', 'cancelled'], 
-    default: 'pending' 
-  },
-  price: Number,
-  address: String,
-  coordinates: {
-    lat: Number,
-    lng: Number
-  },
-  notes: String
-}, { 
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-});
+);
 
 // Virtual pour l'ID frontend
-appointmentSchema.virtual('id').get(function() {
+appointmentSchema.virtual("id").get(function () {
   return this._id.toHexString();
 });
 
-module.exports = mongoose.model('Appointment', appointmentSchema);
+module.exports = mongoose.model("Appointment", appointmentSchema);

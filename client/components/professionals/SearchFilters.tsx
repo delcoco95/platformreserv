@@ -1,10 +1,10 @@
 import { Input } from "../ui/input";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "../ui/select";
 import { Search, Car, Wrench, Key, Users } from "lucide-react";
 

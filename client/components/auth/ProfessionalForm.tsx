@@ -1,11 +1,11 @@
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "../ui/select";
 
 interface ProfessionalFormProps {
@@ -18,10 +18,10 @@ interface ProfessionalFormProps {
   isLoading: boolean;
 }
 
-export const ProfessionalForm = ({ 
-  formData, 
-  onInputChange, 
-  isLoading 
+export const ProfessionalForm = ({
+  formData,
+  onInputChange,
+  isLoading,
 }: ProfessionalFormProps) => {
   return (
     <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">

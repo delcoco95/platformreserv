@@ -15,7 +15,11 @@ interface CommonFieldsProps {
   isLoading: boolean;
 }
 
-export const CommonFields = ({ formData, onInputChange, isLoading }: CommonFieldsProps) => {
+export const CommonFields = ({
+  formData,
+  onInputChange,
+  isLoading,
+}: CommonFieldsProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -58,7 +62,11 @@ export const CommonFields = ({ formData, onInputChange, isLoading }: CommonField
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
             </button>
           </div>
         </div>
@@ -81,7 +89,11 @@ export const CommonFields = ({ formData, onInputChange, isLoading }: CommonField
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showConfirmPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
             </button>
           </div>
         </div>
