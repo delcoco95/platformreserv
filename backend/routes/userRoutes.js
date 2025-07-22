@@ -1,10 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../Middleware/auth'); // 👈 middleware d'authentification
+const auth = require('../middleware/auth');
+const { 
+  getUserById, 
+  updateUser, 
+  getAllProfessionals, 
+  searchProfessionals 
+} = require('../controllers/userController');
 
-// Route pour récupérer le profil de l'utilisateur connecté
+// Routes utilisateurs
 router.get('/me', auth, (req, res) => {
   res.json(req.user);
 });
+router.get('/:id', auth, getUserById);
+router.put('/:id', auth, updateUser);
 
 module.exports = router;
