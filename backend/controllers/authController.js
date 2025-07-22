@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   try {
-<<<<<<< HEAD
     const {
       email,
       password,
@@ -19,27 +18,20 @@ exports.register = async (req, res) => {
       profession,
       siret,
     } = req.body;
-=======
-    const { role, email, password } = req.body;
 
-    if (!role || !email || !password) {
+    if (!email || !password || !userType) {
       return res.status(400).json({
         success: false,
-        error: "Champs requis manquants (role, email ou password)"
+        message: "Champs requis manquants (email, password ou userType)"
       });
     }
->>>>>>> e92b838680099adeeb2f2a262baad75269ed2085
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
         success: false,
-<<<<<<< HEAD
         message: "Cette adresse email est déjà utilisée",
-=======
-        error: "Email déjà utilisé."
->>>>>>> e92b838680099adeeb2f2a262baad75269ed2085
       });
     }
 
@@ -61,7 +53,6 @@ exports.register = async (req, res) => {
       }
     }
 
-<<<<<<< HEAD
     // Hacher le mot de passe
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -73,18 +64,6 @@ exports.register = async (req, res) => {
       phone,
       address,
     };
-=======
-    const newUser = new User({
-      role,
-      email,
-      password: hashedPassword,
-      nom: req.body.nom || "",
-      telephone: req.body.telephone || "",
-      adresse: req.body.adresse || "",
-      siret: req.body.siret || "",
-      metier: req.body.metier || ""
-    });
->>>>>>> e92b838680099adeeb2f2a262baad75269ed2085
 
     if (userType === "client") {
       userData.firstName = firstName;
@@ -98,7 +77,6 @@ exports.register = async (req, res) => {
     const newUser = new User(userData);
     await newUser.save();
 
-<<<<<<< HEAD
     // Générer le token JWT
     const token = jwt.sign(
       { id: newUser._id, userType: newUser.userType },
@@ -122,30 +100,6 @@ exports.register = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Erreur serveur lors de l'inscription",
-=======
-    const token = jwt.sign(
-      { id: newUser._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    return res.status(201).json({
-      success: true,
-      data: {
-        token,
-        user: {
-          uid: newUser._id,
-          email: newUser.email,
-          role: newUser.role,
-        }
-      }
-    });
-  } catch (err) {
-    console.error("Erreur d'inscription :", err);
-    return res.status(500).json({
-      success: false,
-      error: "Erreur serveur"
->>>>>>> e92b838680099adeeb2f2a262baad75269ed2085
     });
   }
 };
@@ -159,11 +113,7 @@ exports.login = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         success: false,
-<<<<<<< HEAD
         message: "Aucun compte trouvé avec cette adresse email",
-=======
-        error: "Utilisateur introuvable."
->>>>>>> e92b838680099adeeb2f2a262baad75269ed2085
       });
     }
 
@@ -172,7 +122,6 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-<<<<<<< HEAD
         message: "Mot de passe incorrect",
       });
     }
@@ -229,34 +178,6 @@ exports.me = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Erreur serveur",
-=======
-        error: "Mot de passe incorrect."
-      });
-    }
-
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    return res.status(200).json({
-      success: true,
-      data: {
-        token,
-        user: {
-          uid: user._id,
-          email: user.email,
-          role: user.role,
-        }
-      }
-    });
-  } catch (err) {
-    console.error("Erreur login :", err);
-    return res.status(500).json({
-      success: false,
-      error: "Erreur serveur"
->>>>>>> e92b838680099adeeb2f2a262baad75269ed2085
     });
   }
 };
