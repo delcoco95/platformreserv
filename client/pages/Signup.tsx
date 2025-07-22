@@ -50,14 +50,15 @@ export default function Signup() {
     email: "",
     password: "",
     confirmPassword: "",
+    phone: "",
+    address: "",
   });
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirection si déjà connecté
+  // Redirection automatique si déjà connecté
   useEffect(() => {
     if (currentUser && userProfile) {
       const redirectPath =
@@ -68,26 +69,10 @@ export default function Signup() {
     }
   }, [currentUser, userProfile, navigate]);
 
-  // ------------------ VALIDATIONS ------------------
   const validateEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const validateSiret = (siret: string) => /^\d{14}$/.test(siret);
-
-  // Si tu veux une validation SIRET plus poussée, remplace par cette fonction :
-  /*
-  const validateSiretLuhn = (siret: string) => {
-    if (!/^\d{14}$/.test(siret)) return false;
-    let sum = 0;
-    for (let i = 0; i < 14; i++) {
-      let digit = parseInt(siret.charAt(i), 10);
-      if (i % 2 === 0) digit *= 2;
-      if (digit > 9) digit -= 9;
-      sum += digit;
-    }
-    return sum % 10 === 0;
-  };
-  */
+  const validatePassword = (password: string) => password.length >= 6;
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -97,68 +82,66 @@ export default function Signup() {
     e.preventDefault();
     setError("");
 
-    if (!accountType) return setError("Veuillez sélectionner un type de compte");
-
-    // Champs communs
-    const { email, password, confirmPassword } = formData;
-    if (!email || !password || !confirmPassword) {
-      return setError("Veuillez remplir tous les champs obligatoires");
+    // Validation
+    if (!accountType) {
+      setError("Veuillez sélectionner un type de compte");
+      return;
     }
-    if (!validateEmail(email)) return setError("Adresse email invalide");
-    if (password.length < 6) return setError("Mot de passe trop court");
-    if (password !== confirmPassword) return setError("Les mots de passe ne correspondent pas");
 
-    // Champs spécifiques
-    let additionalData = {};
+    if (!formData.email || !formData.password || !formData.confirmPassword) {
+      setError("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
 
+    if (!validateEmail(formData.email)) {
+      setError("Veuillez entrer une adresse email valide");
+      return;
+    }
+
+    if (!validatePassword(formData.password)) {
+      setError("Le mot de passe doit contenir au moins 6 caractères");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Les mots de passe ne correspondent pas");
+      return;
+    }
+
+    // Validation spécifique au type de compte
     if (accountType === "client") {
-      const { firstName, lastName } = formData;
-      if (!firstName || !lastName) {
-        return setError("Veuillez remplir votre prénom et nom");
+      if (!formData.firstName || !formData.lastName) {
+        setError("Veuillez remplir votre nom et prénom");
+        return;
       }
-      additionalData = {
-        firstName,
-        lastName,
-        preferences: {
-          notifications: true,
-          smsAlerts: false,
-          emailAlerts: true,
-        },
-      };
-    }
-
-    if (accountType === "professionnel") {
-      const { companyName, profession, siret } = formData;
-      if (!companyName || !profession || !siret) {
-        return setError("Veuillez remplir tous les champs professionnels");
+    } else if (accountType === "professionnel") {
+      if (!formData.companyName || !formData.profession) {
+        setError("Veuillez remplir le nom de l'entreprise et la profession");
+        return;
       }
-      if (!validateSiret(siret)) {
-        return setError("Le numéro SIRET doit contenir 14 chiffres valides");
-      }
-      additionalData = {
-        companyName,
-        profession,
-        siret,
-        rating: 0,
-        totalReviews: 0,
-        isVerified: false,
-        services: [],
-        availability: {
-          monday: true,
-          tuesday: true,
-          wednesday: true,
-          thursday: true,
-          friday: true,
-          saturday: false,
-          sunday: false,
-        },
-      };
     }
 
     setIsLoading(true);
 
     try {
-      await register(email, password, accountType, additionalData);
+      // Préparer les données additionnelles selon le type de compte
+      const additionalData =
+        accountType === "client"
+          ? {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              phone: formData.phone,
+              address: formData.address,
+            }
+          : {
+              companyName: formData.companyName,
+              profession: formData.profession,
+              siret: formData.siret,
+              phone: formData.phone,
+              address: formData.address,
+            };
+
+      await register(formData.email, formData.password, accountType);
     } catch (error: any) {
       console.error("Erreur d'inscription:", error);
 
@@ -175,35 +158,38 @@ export default function Signup() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="max-w-lg w-full space-y-8">
+      <div className="max-w-2xl w-full space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-foreground">Inscription</h1>
-          <p className="mt-2 text-muted-foreground">
-            Créez votre compte RendezVousPro
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
+              <UserCheck className="h-8 w-8 text-primary-foreground" />
+            </div>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900">Créer un compte</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Rejoignez notre plateforme en quelques minutes
           </p>
         </div>
 
-        <Card className="shadow-lg bg-white">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">
-              Créer un compte
-            </CardTitle>
-            <CardDescription className="text-center">
-              Choisissez votre type de compte et complétez vos informations
+        <Card>
+          <CardHeader>
+            <CardTitle>Inscription</CardTitle>
+            <CardDescription>
+              Choisissez votre type de compte et remplissez vos informations
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+            {error && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-              {/* Étape 1: Choix du type de compte */}
-              <div className="space-y-3">
-                <Label className="text-base font-medium">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Sélection du type de compte */}
+              <div>
+                <Label className="text-base font-semibold">
                   Type de compte *
                 </Label>
                 <RadioGroup
@@ -211,42 +197,33 @@ export default function Signup() {
                   onValueChange={(value) =>
                     setAccountType(value as AccountType)
                   }
-                  className="grid grid-cols-2 gap-4"
-                  disabled={isLoading}
+                  className="mt-3"
                 >
-                  <div>
-                    <RadioGroupItem
-                      value="client"
-                      id="client"
-                      className="peer sr-only"
-                    />
+                  <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <RadioGroupItem value="client" id="client" />
                     <Label
                       htmlFor="client"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors"
+                      className="flex items-center space-x-3 cursor-pointer flex-1"
                     >
-                      <User className="mb-3 h-6 w-6" />
-                      <div className="text-center">
+                      <User className="h-5 w-5 text-blue-600" />
+                      <div>
                         <div className="font-medium">Client</div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-sm text-gray-600">
                           Je recherche des services
                         </div>
                       </div>
                     </Label>
                   </div>
-                  <div>
-                    <RadioGroupItem
-                      value="professionnel"
-                      id="professionnel"
-                      className="peer sr-only"
-                    />
+                  <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <RadioGroupItem value="professionnel" id="professionnel" />
                     <Label
                       htmlFor="professionnel"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors"
+                      className="flex items-center space-x-3 cursor-pointer flex-1"
                     >
-                      <Building className="mb-3 h-6 w-6" />
-                      <div className="text-center">
+                      <Building className="h-5 w-5 text-green-600" />
+                      <div>
                         <div className="font-medium">Professionnel</div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-sm text-gray-600">
                           Je propose mes services
                         </div>
                       </div>
@@ -255,219 +232,246 @@ export default function Signup() {
                 </RadioGroup>
               </div>
 
-              {/* Étape 2: Champs selon le type de compte */}
+              {/* Champs spécifiques au client */}
+              {accountType === "client" && (
+                <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h3 className="font-semibold text-blue-900">
+                    Informations personnelles
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="firstName">Prénom *</Label>
+                      <Input
+                        id="firstName"
+                        value={formData.firstName}
+                        onChange={(e) =>
+                          handleInputChange("firstName", e.target.value)
+                        }
+                        placeholder="Votre prénom"
+                        disabled={isLoading}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="lastName">Nom *</Label>
+                      <Input
+                        id="lastName"
+                        value={formData.lastName}
+                        onChange={(e) =>
+                          handleInputChange("lastName", e.target.value)
+                        }
+                        placeholder="Votre nom"
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Champs spécifiques au professionnel */}
+              {accountType === "professionnel" && (
+                <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                  <h3 className="font-semibold text-green-900">
+                    Informations professionnelles
+                  </h3>
+                  <div>
+                    <Label htmlFor="companyName">Nom de l'entreprise *</Label>
+                    <Input
+                      id="companyName"
+                      value={formData.companyName}
+                      onChange={(e) =>
+                        handleInputChange("companyName", e.target.value)
+                      }
+                      placeholder="Nom de votre entreprise"
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="profession">Profession *</Label>
+                      <Select
+                        value={formData.profession}
+                        onValueChange={(value) =>
+                          handleInputChange("profession", value)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choisir..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="automobile">Automobile</SelectItem>
+                          <SelectItem value="plomberie">Plomberie</SelectItem>
+                          <SelectItem value="serrurerie">Serrurerie</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="siret">SIRET (optionnel)</Label>
+                      <Input
+                        id="siret"
+                        value={formData.siret}
+                        onChange={(e) =>
+                          handleInputChange("siret", e.target.value)
+                        }
+                        placeholder="Numéro SIRET"
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Champs communs */}
               {accountType && (
-                <div className="space-y-4 border-t pt-6">
-                  {accountType === "client" && (
-                    <>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="firstName">Prénom *</Label>
-                          <Input
-                            id="firstName"
-                            type="text"
-                            placeholder="Jean"
-                            value={formData.firstName}
-                            onChange={(e) =>
-                              handleInputChange("firstName", e.target.value)
-                            }
-                            required
-                            disabled={isLoading}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="lastName">Nom *</Label>
-                          <Input
-                            id="lastName"
-                            type="text"
-                            placeholder="Dupont"
-                            value={formData.lastName}
-                            onChange={(e) =>
-                              handleInputChange("lastName", e.target.value)
-                            }
-                            required
-                            disabled={isLoading}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
+                <div className="space-y-4">
+                  <h3 className="font-semibold">Informations de contact</h3>
 
-                  {accountType === "professionnel" && (
-                    <>
-                      <div className="space-y-2">
-                        <Label htmlFor="companyName">
-                          Nom de l'entreprise *
-                        </Label>
-                        <Input
-                          id="companyName"
-                          type="text"
-                          placeholder="Auto Service Plus"
-                          value={formData.companyName}
-                          onChange={(e) =>
-                            handleInputChange("companyName", e.target.value)
-                          }
-                          required
-                          disabled={isLoading}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="profession">Métier *</Label>
-                        <Select
-                          value={formData.profession}
-                          onValueChange={(value) =>
-                            handleInputChange("profession", value)
-                          }
-                          disabled={isLoading}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choisir votre métier" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="automobile">
-                              Entretien & Réparation Automobile
-                            </SelectItem>
-                            <SelectItem value="plomberie">Plomberie</SelectItem>
-                            <SelectItem value="serrurerie">
-                              Serrurerie
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="siret">SIRET *</Label>
-                        <Input
-                          id="siret"
-                          type="text"
-                          placeholder="12345678901234"
-                          value={formData.siret}
-                          onChange={(e) =>
-                            handleInputChange("siret", e.target.value)
-                          }
-                          maxLength={14}
-                          required
-                          disabled={isLoading}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          14 chiffres de votre numéro SIRET
-                        </p>
-                      </div>
-                    </>
-                  )}
-
-                  {/* Champs communs */}
-                  <div className="space-y-2">
+                  <div>
                     <Label htmlFor="email">Adresse email *</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <div className="relative mt-1">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
                         id="email"
                         type="email"
-                        placeholder="votre@email.com"
                         value={formData.email}
                         onChange={(e) =>
                           handleInputChange("email", e.target.value)
                         }
                         className="pl-10"
-                        required
+                        placeholder="votre@email.com"
                         disabled={isLoading}
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Mot de passe *</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="password">Mot de passe *</Label>
+                      <div className="relative mt-1">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          value={formData.password}
+                          onChange={(e) =>
+                            handleInputChange("password", e.target.value)
+                          }
+                          className="pl-10 pr-10"
+                          placeholder="••••••••"
+                          disabled={isLoading}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="confirmPassword">
+                        Confirmer le mot de passe *
+                      </Label>
+                      <div className="relative mt-1">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="confirmPassword"
+                          type={showConfirmPassword ? "text" : "password"}
+                          value={formData.confirmPassword}
+                          onChange={(e) =>
+                            handleInputChange("confirmPassword", e.target.value)
+                          }
+                          className="pl-10 pr-10"
+                          placeholder="••••••••"
+                          disabled={isLoading}
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="phone">Téléphone (optionnel)</Label>
                       <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={formData.password}
+                        id="phone"
+                        type="tel"
+                        value={formData.phone}
                         onChange={(e) =>
-                          handleInputChange("password", e.target.value)
+                          handleInputChange("phone", e.target.value)
                         }
-                        className="pl-10 pr-10"
-                        required
+                        placeholder="06 12 34 56 78"
                         disabled={isLoading}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-muted-foreground hover:text-foreground disabled:opacity-50"
-                        disabled={isLoading}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">
-                      Confirmer le mot de passe *
-                    </Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <Label htmlFor="address">Adresse (optionnel)</Label>
                       <Input
-                        id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={formData.confirmPassword}
+                        id="address"
+                        value={formData.address}
                         onChange={(e) =>
-                          handleInputChange("confirmPassword", e.target.value)
+                          handleInputChange("address", e.target.value)
                         }
-                        className="pl-10 pr-10"
-                        required
+                        placeholder="Votre adresse"
                         disabled={isLoading}
                       />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowConfirmPassword(!showConfirmPassword)
-                        }
-                        className="absolute right-3 top-3 text-muted-foreground hover:text-foreground disabled:opacity-50"
-                        disabled={isLoading}
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
                     </div>
                   </div>
-
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <UserCheck className="mr-2 h-4 w-4 animate-spin" />
-                        Création du compte...
-                      </>
-                    ) : (
-                      "Créer mon compte"
-                    )}
-                  </Button>
                 </div>
+              )}
+
+              {accountType && (
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                  size="lg"
+                >
+                  {isLoading ? "Création du compte..." : "Créer mon compte"}
+                </Button>
               )}
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Vous avez déjà un compte ?{" "}
+              <p className="text-sm text-gray-600">
+                Déjà un compte ?{" "}
                 <Link
                   to="/connexion"
-                  className="font-medium text-primary hover:underline"
+                  className="font-semibold text-primary hover:text-primary/80 transition-colors"
                 >
-                  Connectez-vous
+                  Se connecter
                 </Link>
               </p>
             </div>
           </CardContent>
         </Card>
+
+        {/* Lien de retour */}
+        <div className="text-center">
+          <Link
+            to="/"
+            className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            ← Retour à l'accueil
+          </Link>
+        </div>
       </div>
     </div>
   );

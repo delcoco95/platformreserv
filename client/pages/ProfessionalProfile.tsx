@@ -53,7 +53,7 @@ import {
   ProfessionalProfile as ProfessionalType,
   ClientProfile,
 } from "../types";
-import { now } from "../lib/dateUtils";
+import { now, formatDate } from "../lib/dateUtils";
 
 interface Service {
   id: string;
@@ -249,15 +249,6 @@ export default function ProfessionalProfile() {
     } catch (error) {
       console.error("Erreur lors de la réservation:", error);
     }
-  };
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("fr-FR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-    });
   };
 
   const groupSlotsByDate = () => {

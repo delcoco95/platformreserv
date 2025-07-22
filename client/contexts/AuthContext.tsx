@@ -1,15 +1,15 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import api from "../lib/api";
-import { ClientProfile, ProfessionalProfile } from "../types";
+import { User, ClientProfile, ProfessionalProfile } from "../types";
 
 interface AuthUser {
   uid: string;
   email: string;
   userType: "client" | "professionnel";
+  photoURL?: string;
 }
 
 interface AuthContextType {
-  token: string | null;
   currentUser: AuthUser | null;
   userProfile: ClientProfile | ProfessionalProfile | null;
   loading: boolean;
@@ -17,11 +17,11 @@ interface AuthContextType {
   register: (
     email: string,
     password: string,
-    userType: "client" | "professionnel"
+    userType: "client" | "professionnel",
   ) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateUserProfile: (
-    data: Partial<ClientProfile | ProfessionalProfile>
+    data: Partial<ClientProfile | ProfessionalProfile>,
   ) => Promise<void>;
 }
 
@@ -35,15 +35,20 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(localStorage.getItem("auth_token"));
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
-  const [userProfile, setUserProfile] = useState<ClientProfile | ProfessionalProfile | null>(null);
+  const [userProfile, setUserProfile] = useState<
+    ClientProfile | ProfessionalProfile | null
+  >(null);
   const [loading, setLoading] = useState(true);
 
-  const loadUserProfile = async (uid: string) => {
+  const loadUserProfile = async (user: AuthUser) => {
     try {
-      const profile = await api.get<ClientProfile | ProfessionalProfile>(`/users/${uid}`);
+      const profile = await api.get<ClientProfile | ProfessionalProfile>(
+        `/users/${user.uid}`,
+      );
       setUserProfile(profile);
     } catch (err) {
       console.error("Erreur chargement profil :", err);
@@ -67,9 +72,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (email: string, password: string, userType: "client" | "professionnel") => {
+  const register = async (
+    email: string,
+    password: string,
+    userType: "client" | "professionnel",
+  ) => {
     try {
-      const { token, user } = await api.post<{ token: string; user: AuthUser }>(
+      const response = await api.post<{ user: AuthUser; token: string }>(
         "/auth/register",
         { email, password, role: userType }
       );
@@ -84,15 +93,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("auth_token");
-    setToken(null);
-    setCurrentUser(null);
-    setUserProfile(null);
+  const logout = async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch (error) {
+      console.error("Erreur de déconnexion:", error);
+    } finally {
+      localStorage.removeItem("auth_token");
+      setCurrentUser(null);
+      setUserProfile(null);
+    }
   };
 
-  const updateUserProfile = async (data: Partial<ClientProfile | ProfessionalProfile>) => {
-    if (!currentUser) throw new Error("Non connecté");
+  const updateUserProfile = async (
+    data: Partial<ClientProfile | ProfessionalProfile>,
+  ) => {
+    if (!currentUser) throw new Error("Utilisateur non connecté");
 
     try {
       const updatedProfile = await api.put<ClientProfile | ProfessionalProfile>(
@@ -128,8 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, [token]);
 
-  const value: AuthContextType = {
-    token,
+  const value = {
     currentUser,
     userProfile,
     loading,
@@ -139,5 +154,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateUserProfile,
   };
 
-  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

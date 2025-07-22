@@ -1,6 +1,6 @@
 // Types sans dépendance Firebase
 
-export interface BaseUser {
+export interface User {
   uid: string;
   email: string;
   userType: "client" | "professionnel";
@@ -8,7 +8,7 @@ export interface BaseUser {
   updatedAt: string; // ISO date string
 }
 
-export interface ClientProfile extends BaseUser {
+export interface ClientProfile extends User {
   userType: "client";
   firstName?: string;
   lastName?: string;
@@ -21,7 +21,7 @@ export interface ClientProfile extends BaseUser {
   };
 }
 
-export interface ProfessionalProfile extends BaseUser {
+export interface ProfessionalProfile extends User {
   userType: "professionnel";
   companyName?: string;
   profession?: "automobile" | "plomberie" | "serrurerie";
