@@ -43,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     ClientProfile | ProfessionalProfile | null
   >(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const loadUserProfile = async (user: AuthUser) => {
     try {
@@ -50,13 +51,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         `/users/${user.uid}`,
       );
       setUserProfile(profile);
+      setError(null);
     } catch (error) {
       console.error("Erreur lors du chargement du profil:", error);
+      setError("Impossible de charger le profil utilisateur");
+      // Ne pas faire échouer complètement, juste log l'erreur
     }
   };
 
   const login = async (email: string, password: string) => {
     try {
+      setError(null);
       const response = await api.post<{ user: AuthUser; token: string }>(
         "/auth/login",
         {
@@ -70,6 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await loadUserProfile(response.user);
     } catch (error) {
       console.error("Erreur de connexion:", error);
+      setError("Erreur de connexion");
       throw error;
     }
   };
@@ -80,6 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     userType: "client" | "professionnel",
   ) => {
     try {
+      setError(null);
       const response = await api.post<{ user: AuthUser; token: string }>(
         "/auth/register",
         {
@@ -94,6 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await loadUserProfile(response.user);
     } catch (error) {
       console.error("Erreur d'inscription:", error);
+      setError("Erreur d'inscription");
       throw error;
     }
   };
@@ -130,18 +138,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Vérifier l'authentification au chargement
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        try {
-          const user = await api.get<AuthUser>("/auth/me");
-          setCurrentUser(user);
-          await loadUserProfile(user);
-        } catch (error) {
-          console.error("Token invalide:", error);
-          localStorage.removeItem("auth_token");
+      try {
+        const token = localStorage.getItem("auth_token");
+        if (token) {
+          try {
+            const user = await api.get<AuthUser>("/auth/me");
+            setCurrentUser(user);
+            await loadUserProfile(user);
+          } catch (error) {
+            console.error("Token invalide:", error);
+            localStorage.removeItem("auth_token");
+          }
         }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la vérification de l'authentification:",
+          error,
+        );
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkAuth();
@@ -157,5 +173,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     updateUserProfile,
   };
 
+  // Toujours retourner le provider, même en cas d'erreur
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

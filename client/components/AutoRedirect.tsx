@@ -3,9 +3,27 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 export function AutoRedirect() {
-  const { currentUser, userProfile, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Utilisation défensive de useAuth
+  let currentUser = null;
+  let userProfile = null;
+  let loading = true;
+
+  try {
+    const authContext = useAuth();
+    currentUser = authContext.currentUser;
+    userProfile = authContext.userProfile;
+    loading = authContext.loading;
+  } catch (error) {
+    console.error(
+      "Erreur lors de l'accès au contexte d'authentification:",
+      error,
+    );
+    // En cas d'erreur, on considère que l'utilisateur n'est pas connecté
+    loading = false;
+  }
 
   useEffect(() => {
     // Ne rien faire pendant le chargement
