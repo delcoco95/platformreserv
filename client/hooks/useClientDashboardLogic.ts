@@ -18,8 +18,6 @@ export const useClientDashboardLogic = () => {
 
   const parseDate = (rawDate: any): Date => {
     if (!rawDate) return new Date(0);
-    // Suppression de la référence à Timestamp de Firebase
-    if (rawDate.toDate) return rawDate.toDate();
     const parsed = new Date(rawDate);
     return isNaN(parsed.getTime()) ? new Date(0) : parsed;
   };
