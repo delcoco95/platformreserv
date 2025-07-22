@@ -119,38 +119,28 @@ export default function Signup() {
     setIsLoading(true);
 
     try {
-<<<<<<< HEAD
-      await register(formData.email, formData.password, accountType);
-=======
       // Préparer les données additionnelles selon le type de compte
-      const additionalData =
-        accountType === "client"
-          ? {
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-              phone: formData.phone,
-              address: formData.address,
-            }
-          : {
-              companyName: formData.companyName,
-              profession: formData.profession,
-              siret: formData.siret,
-              phone: formData.phone,
-              address: formData.address,
-            };
+      const additionalData = accountType === "client"
+        ? {
+            nom: formData.lastName,
+            prenom: formData.firstName,
+            telephone: formData.phone,
+            adresse: formData.address,
+          }
+        : {
+            nom: formData.companyName,
+            metier: formData.profession,
+            siret: formData.siret,
+            telephone: formData.phone,
+            adresse: formData.address,
+          };
 
-await register(
-  formData.email,
-  formData.password,
-  accountType,
-  { ...(accountType === "client"
-      ? { nom: formData.lastName, prenom: formData.firstName, telephone: formData.phone, adresse: formData.address,
-        }
-      : { nom: formData.companyName, metier: formData.profession, siret: formData.siret, telephone: formData.phone, adresse: formData.address,
-        }),
-  }
-);
->>>>>>> e92b838680099adeeb2f2a262baad75269ed2085
+      await register(
+        formData.email,
+        formData.password,
+        accountType,
+        additionalData
+      );
     } catch (error: any) {
       console.error("Erreur d'inscription:", error);
       if (error.message) {
