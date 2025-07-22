@@ -193,9 +193,7 @@ export default function ProfessionalProfile() {
         clientId: currentUser.uid,
         professionalId: professional.uid,
         service: selectedService.name,
-        date: Timestamp.fromDate(
-          new Date(`${selectedSlot.date}T${selectedSlot.start}:00`),
-        ),
+        date: new Date(`${selectedSlot.date}T${selectedSlot.start}:00`).toISOString(),
         duration: selectedService.duration,
         status: "pending" as const,
         price: selectedService.price,
@@ -214,8 +212,8 @@ export default function ProfessionalProfile() {
       const appointment = {
         ...appointmentData,
         id: "temp-id", // L'ID réel serait retourné par createAppointment
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
+        createdAt: now(),
+        updatedAt: now(),
       };
 
       try {
