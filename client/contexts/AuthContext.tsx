@@ -18,6 +18,7 @@ interface AuthContextType {
     email: string,
     password: string,
     userType: "client" | "professionnel",
+    additionalData?: Partial<ClientProfile | ProfessionalProfile>,
   ) => Promise<void>;
   logout: () => Promise<void>;
   updateUserProfile: (
@@ -80,31 +81,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const register = async (
-    email: string,
-    password: string,
-    userType: "client" | "professionnel",
-  ) => {
-    try {
-      setError(null);
-      const response = await api.post<{ user: AuthUser; token: string }>(
-        "/auth/register",
-        {
-          email,
-          password,
-          userType,
-        },
-      );
+const register = async (
+  email: string,
+  password: string,
+  userType: "client" | "professionnel",
+  additionalData: Partial<ClientProfile | ProfessionalProfile> = {}
+) => {
+  try {
+    const response = await api.post<{ user: AuthUser; token: string }>(
+      "/auth/register",
+      {
+        email,
+        password,
+        role: userType,
+        ...additionalData,
+      }
+    );
 
-      localStorage.setItem("auth_token", response.token);
-      setCurrentUser(response.user);
-      await loadUserProfile(response.user);
-    } catch (error) {
-      console.error("Erreur d'inscription:", error);
-      setError("Erreur d'inscription");
-      throw error;
-    }
-  };
+    const { user, token } = response;
+
+    localStorage.setItem("auth_token", token);
+    setCurrentUser(user);
+    await loadUserProfile(user);
+  } catch (error) {
+    console.error("Erreur d'inscription :", error);
+    throw error;
+  }
+};
 
   const logout = async () => {
     try {
