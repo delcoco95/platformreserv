@@ -1,33 +1,28 @@
+// client/services/appointmentService.ts
 import api from "../lib/api";
-import { Appointment } from "../types";
 
-interface CreateAppointmentData {
+export interface Appointment {
   clientId: string;
   professionalId: string;
   service: string;
-  date: string; // ISO date string
+  date: Date;
   duration: number;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
-  price?: number;
-  address?: string;
+  status: "pending" | "confirmed" | "completed";
+  price: number;
+  address: string;
+  notes?: string;
   coordinates?: {
     lat: number;
     lng: number;
   };
-  notes?: string;
 }
 
-class AppointmentService {
-  // Créer un rendez-vous
-  async createAppointment(data: CreateAppointmentData): Promise<Appointment> {
-    try {
-      return await api.post<Appointment>("/appointments", data);
-    } catch (error) {
-      console.error("Erreur lors de la création du rendez-vous:", error);
-      throw error;
-    }
-  }
+export const appointmentService = {
+  async createAppointment(data: Appointment) {
+    return await api.post<Appointment>("/appointments", data);
+  },
 
+<<<<<<< HEAD
   // Récupérer tous les rendez-vous d'un utilisateur
   async getUserAppointments(userId: string): Promise<Appointment[]> {
     try {
@@ -181,3 +176,9 @@ class AppointmentService {
 }
 
 export const appointmentService = new AppointmentService();
+=======
+  async getMyAppointments(): Promise<Appointment[]> {
+    return await api.get<Appointment[]>("/appointments/me");
+  },
+};
+>>>>>>> ca4d23a693dc66045048cf272f5860e467ffbf21

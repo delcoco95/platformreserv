@@ -39,7 +39,6 @@ import { appointmentService } from "../services/appointmentService";
 import { professionalService } from "../services/professionalService";
 import { EditProfileDialog } from "../components/EditProfileDialog";
 import { Appointment, ClientProfile, ProfessionalProfile } from "../types";
-import { parseDate, formatDate, formatTime } from "../lib/dateUtils";
 
 export default function ClientDashboard() {
   const { currentUser, userProfile, loading: authLoading } = useAuth();

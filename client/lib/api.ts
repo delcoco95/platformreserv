@@ -1,5 +1,6 @@
-// Service API REST pour remplacer Firebase
-const API_BASE_URL = "http://localhost:5000/api";
+// client/lib/api.ts
+
+const API_BASE_URL = "http://localhost:5000/api"; // adapte au besoin
 
 interface ApiResponse<T> {
   success: boolean;
@@ -7,10 +8,10 @@ interface ApiResponse<T> {
   error?: string;
 }
 
-// Utilitaires pour les appels API
 const api = {
   async get<T>(endpoint: string): Promise<T> {
     const token = localStorage.getItem("auth_token");
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
         "Content-Type": "application/json",
@@ -18,13 +19,10 @@ const api = {
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-
     const result: ApiResponse<T> = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || "API Error");
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || response.statusText);
     }
 
     return result.data!;
@@ -32,6 +30,7 @@ const api = {
 
   async post<T>(endpoint: string, data?: any): Promise<T> {
     const token = localStorage.getItem("auth_token");
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: "POST",
       headers: {
@@ -41,13 +40,10 @@ const api = {
       body: data ? JSON.stringify(data) : undefined,
     });
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-
     const result: ApiResponse<T> = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || "API Error");
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || response.statusText);
     }
 
     return result.data!;
@@ -55,6 +51,7 @@ const api = {
 
   async put<T>(endpoint: string, data: any): Promise<T> {
     const token = localStorage.getItem("auth_token");
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: "PUT",
       headers: {
@@ -64,13 +61,10 @@ const api = {
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-
     const result: ApiResponse<T> = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || "API Error");
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || response.statusText);
     }
 
     return result.data!;
@@ -78,6 +72,7 @@ const api = {
 
   async delete<T>(endpoint: string): Promise<T> {
     const token = localStorage.getItem("auth_token");
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: "DELETE",
       headers: {
@@ -86,13 +81,10 @@ const api = {
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-
     const result: ApiResponse<T> = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || "API Error");
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || response.statusText);
     }
 
     return result.data!;
