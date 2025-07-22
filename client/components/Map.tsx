@@ -35,15 +35,7 @@ interface MapProps {
   onMarkerClick?: (appointment: Appointment) => void;
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("fr-FR", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
+
 
 export function Map({
   appointments,
