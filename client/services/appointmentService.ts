@@ -175,6 +175,9 @@ class AppointmentService {
       }
     };
   }
+
+  // Alias pour la compatibilité
+  onClientAppointmentsChange = this.onUserAppointmentsChange;
 }
 
 export const appointmentService = new AppointmentService();
