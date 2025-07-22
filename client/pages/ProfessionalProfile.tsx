@@ -251,14 +251,7 @@ export default function ProfessionalProfile() {
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("fr-FR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-    });
-  };
+
 
   const groupSlotsByDate = () => {
     const grouped: Record<string, TimeSlot[]> = {};
