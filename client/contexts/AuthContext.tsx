@@ -86,6 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     userType: "client" | "professionnel",
   ) => {
     try {
+      setError(null);
       const response = await api.post<{ user: AuthUser; token: string }>(
         "/auth/register",
         {
@@ -100,6 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await loadUserProfile(response.user);
     } catch (error) {
       console.error("Erreur d'inscription:", error);
+      setError("Erreur d'inscription");
       throw error;
     }
   };
