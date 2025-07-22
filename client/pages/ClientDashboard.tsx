@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { formatDate, formatTime } from "../lib/dateUtils";
 import { Link } from "react-router-dom";
@@ -27,7 +28,6 @@ import {
   Phone,
   Mail,
   Star,
-  TrendingUp,
   CalendarCheck,
   X,
   MessageCircle,
@@ -52,9 +52,21 @@ export default function ClientDashboard() {
   const [error, setError] = useState("");
   const [showEditProfile, setShowEditProfile] = useState(false);
 
+  const now = new Date();
+
+  const clientProfile: ClientProfile | null =
+    userProfile?.userType === "client" ? (userProfile as ClientProfile) : null;
+
+  const parseDate = (rawDate: any): Date => {
+    if (!rawDate) return new Date(0);
+    if (rawDate instanceof Timestamp) return rawDate.toDate();
+    if (rawDate.toDate) return rawDate.toDate();
+    const parsed = new Date(rawDate);
+    return isNaN(parsed.getTime()) ? new Date(0) : parsed;
+  };
+
   useEffect(() => {
     if (authLoading) return;
-
     if (!currentUser) {
       setLoading(false);
       return;
@@ -70,7 +82,7 @@ export default function ClientDashboard() {
             const dateA = parseDate(a.date);
             const dateB = parseDate(b.date);
             return dateB.getTime() - dateA.getTime();
-          })[0];
+          })[appointmentsData.length - 1];
 
           if (lastAppointment.professionalId) {
             try {
@@ -79,14 +91,9 @@ export default function ClientDashboard() {
               const professional = professionals.find(
                 (p) => p.uid === lastAppointment.professionalId,
               );
-              if (professional) {
-                setLastProfessional(professional);
-              }
+              if (professional) setLastProfessional(professional);
             } catch (error) {
-              console.error(
-                "Erreur lors de la récupération du professionnel:",
-                error,
-              );
+              console.error("Erreur pro :", error);
             }
           }
         }
@@ -102,7 +109,7 @@ export default function ClientDashboard() {
     try {
       await appointmentService.cancelAppointment(appointmentId);
     } catch (error) {
-      console.error("Erreur lors de l'annulation:", error);
+      console.error("Erreur annulation:", error);
       setError("Impossible d'annuler le rendez-vous");
     }
   };
@@ -135,8 +142,6 @@ export default function ClientDashboard() {
     const date = parseDate(apt.date);
     return date <= new Date() || apt.status === "completed";
   });
-
-  const clientProfile = userProfile as ClientProfile;
 
   if (authLoading || loading) {
     return (

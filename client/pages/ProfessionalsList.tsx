@@ -1,3 +1,5 @@
+// client/pages/ProfessionalsList.tsx
+
 import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
@@ -49,10 +51,9 @@ export default function ProfessionalsList() {
   const { currentUser } = useAuth();
   const [searchParams] = useSearchParams();
   const [professionals, setProfessionals] = useState<ProfessionalProfile[]>([]);
-  const [filteredProfessionals, setFilteredProfessionals] = useState<
-    ProfessionalProfile[]
-  >([]);
+  const [filteredProfessionals, setFilteredProfessionals] = useState<ProfessionalProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("categorie") || "all",
@@ -84,8 +85,9 @@ export default function ProfessionalsList() {
       setLoading(true);
       const data = await professionalService.getAllProfessionals();
       setProfessionals(data);
-    } catch (error) {
-      console.error("Erreur lors du chargement des professionnels:", error);
+    } catch (err) {
+      console.error("Erreur lors du chargement :", err);
+      setError("Impossible de charger les professionnels pour le moment.");
     } finally {
       setLoading(false);
     }
@@ -102,11 +104,8 @@ export default function ProfessionalsList() {
   const filterProfessionals = () => {
     let filtered = [...professionals];
 
-    // Filtrer par catégorie
     if (selectedCategory !== "all") {
-      filtered = filtered.filter(
-        (prof) => prof.profession === selectedCategory,
-      );
+      filtered = filtered.filter((prof) => prof.profession === selectedCategory);
     }
 
     // Filtrer par recherche (insensible aux accents et à la casse)
@@ -157,10 +156,18 @@ export default function ProfessionalsList() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-          <p className="text-muted-foreground">
-            Chargement des professionnels...
-          </p>
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
+          <p className="text-muted-foreground">Chargement des professionnels...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-2">
+          <p className="text-red-500 font-medium">{error}</p>
         </div>
       </div>
     );
@@ -170,14 +177,9 @@ export default function ProfessionalsList() {
     <div className="min-h-screen bg-gray-50 py-8">
       <NewProfessionalAlert professionals={professionals} />
       <div className="container max-w-7xl mx-auto px-4">
-        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Nos professionnels
-          </h1>
-          <p className="text-muted-foreground">
-            Découvrez tous les professionnels disponibles sur notre plateforme
-          </p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Nos professionnels</h1>
+          <p className="text-muted-foreground">Découvrez les prestataires inscrits</p>
         </div>
 
         {/* Demo Mode Alert */}
@@ -186,13 +188,12 @@ export default function ProfessionalsList() {
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Rechercher par nom, service, ville..."
+                  placeholder="Rechercher par nom, métier, service..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -200,12 +201,8 @@ export default function ProfessionalsList() {
               </div>
             </div>
 
-            {/* Category filter */}
             <div className="md:w-64">
-              <Select
-                value={selectedCategory}
-                onValueChange={setSelectedCategory}
-              >
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger>
                   <SelectValue placeholder="Catégorie" />
                 </SelectTrigger>
@@ -223,7 +220,6 @@ export default function ProfessionalsList() {
             </div>
           </div>
 
-          {/* Results count */}
           <div className="mt-4 pt-4 border-t">
             <p className="text-sm text-muted-foreground">
               {filteredProfessionals.length} professionnel
@@ -233,19 +229,15 @@ export default function ProfessionalsList() {
           </div>
         </div>
 
-        {/* Results */}
         {filteredProfessionals.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="h-8 w-8 text-gray-400" />
-            </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Aucun professionnel trouvé
             </h3>
             <p className="text-gray-600 mb-6">
               {searchQuery || selectedCategory !== "all"
-                ? "Essayez de modifier vos critères de recherche"
-                : "Aucun professionnel n'est inscrit pour le moment"}
+                ? "Essayez d’élargir vos critères"
+                : "Aucun professionnel inscrit pour le moment"}
             </p>
             {(searchQuery || selectedCategory !== "all") && (
               <Button
@@ -261,16 +253,11 @@ export default function ProfessionalsList() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProfessionals.map((professional) => {
-              const IconComponent = getCategoryIcon(
-                professional.profession || "",
-              );
+            {filteredProfessionals.map((prof) => {
+              const Icon = getCategoryIcon(prof.profession || "");
 
               return (
-                <Card
-                  key={professional.uid}
-                  className="hover:shadow-lg transition-shadow"
-                >
+                <Card key={prof.uid} className="hover:shadow-lg transition-shadow">
                   <CardHeader className="pb-4">
                     <div className="flex items-start space-x-4">
                       <Dialog>
@@ -278,7 +265,7 @@ export default function ProfessionalsList() {
                           <Avatar className="h-16 w-16 cursor-pointer hover:opacity-80 transition-opacity">
                             <AvatarImage src="" />
                             <AvatarFallback className="bg-primary text-primary-foreground text-lg">
-                              {professional.companyName?.[0] || "P"}
+                              {prof.companyName?.[0] || "P"}
                             </AvatarFallback>
                           </Avatar>
                         </DialogTrigger>
@@ -287,10 +274,10 @@ export default function ProfessionalsList() {
                             <DialogTitle className="flex items-center gap-2">
                               <Avatar className="h-8 w-8">
                                 <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                                  {professional.companyName?.[0] || "P"}
+                                  {prof.companyName?.[0] || "P"}
                                 </AvatarFallback>
                               </Avatar>
-                              {professional.companyName}
+                              {prof.companyName}
                             </DialogTitle>
                             <DialogDescription>
                               Informations de contact
@@ -303,14 +290,14 @@ export default function ProfessionalsList() {
                                 <div>
                                   <p className="text-sm font-medium">Email</p>
                                   <a
-                                    href={`mailto:${professional.email}`}
+                                    href={`mailto:${prof.email}`}
                                     className="text-sm text-primary hover:underline"
                                   >
-                                    {professional.email}
+                                    {prof.email}
                                   </a>
                                 </div>
                               </div>
-                              {professional.phone && (
+                              {prof.phone && (
                                 <div className="flex items-center gap-3">
                                   <Phone className="h-4 w-4 text-muted-foreground" />
                                   <div>
@@ -318,15 +305,15 @@ export default function ProfessionalsList() {
                                       Téléphone
                                     </p>
                                     <a
-                                      href={`tel:${professional.phone}`}
+                                      href={`tel:${prof.phone}`}
                                       className="text-sm text-primary hover:underline"
                                     >
-                                      {professional.phone}
+                                      {prof.phone}
                                     </a>
                                   </div>
                                 </div>
                               )}
-                              {professional.address && (
+                              {prof.address && (
                                 <div className="flex items-center gap-3">
                                   <MapPin className="h-4 w-4 text-muted-foreground" />
                                   <div>
@@ -334,7 +321,7 @@ export default function ProfessionalsList() {
                                       Adresse
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                      {professional.address}
+                                      {prof.address}
                                     </p>
                                   </div>
                                 </div>
@@ -347,12 +334,12 @@ export default function ProfessionalsList() {
                                   </p>
                                   <p className="text-sm text-muted-foreground">
                                     {getProfessionLabel(
-                                      professional.profession || "",
+                                      prof.profession || "",
                                     )}
                                   </p>
                                 </div>
                               </div>
-                              {professional.rating && (
+                              {prof.rating && (
                                 <div className="flex items-center gap-3">
                                   <Star className="h-4 w-4 text-muted-foreground" />
                                   <div>
@@ -360,8 +347,8 @@ export default function ProfessionalsList() {
                                     <div className="flex items-center gap-1">
                                       <Star className="h-3 w-3 text-yellow-500 fill-current" />
                                       <span className="text-sm">
-                                        {professional.rating.toFixed(1)} (
-                                        {professional.totalReviews || 0} avis)
+                                        {prof.rating.toFixed(1)} (
+                                        {prof.totalReviews || 0} avis)
                                       </span>
                                     </div>
                                   </div>
@@ -370,7 +357,7 @@ export default function ProfessionalsList() {
                             </div>
                             <div className="border-t pt-4">
                               <Button className="w-full" asChild>
-                                <Link to={`/professionnel/${professional.uid}`}>
+                                <Link to={`/professionnel/${prof.uid}`}>
                                   Voir le profil complet
                                 </Link>
                               </Button>
@@ -380,86 +367,70 @@ export default function ProfessionalsList() {
                       </Dialog>
                       <div className="flex-1 min-w-0">
                         <CardTitle className="text-lg truncate">
-                          {professional.companyName || "Professionnel"}
+                          {prof.companyName || "Professionnel"}
                         </CardTitle>
                         <div className="flex items-center space-x-2 mt-1">
-                          <IconComponent className="h-4 w-4 text-muted-foreground" />
+                          <Icon className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm text-muted-foreground">
-                            {getProfessionLabel(professional.profession || "")}
+                            {getProfessionLabel(prof.profession || "")}
                           </span>
                         </div>
-                        {professional.isVerified && (
-                          <Badge variant="secondary" className="mt-2">
-                            Vérifié
-                          </Badge>
+                        {prof.isVerified && (
+                          <Badge variant="secondary" className="mt-2">Vérifié</Badge>
                         )}
                       </div>
                     </div>
                   </CardHeader>
 
                   <CardContent className="space-y-4">
-                    {/* Rating */}
-                    {professional.rating && (
+                    {prof.rating && (
                       <div className="flex items-center space-x-2">
-                        <div className="flex items-center">
-                          <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                          <span className="text-sm font-medium ml-1">
-                            {professional.rating.toFixed(1)}
-                          </span>
-                        </div>
-                        {professional.totalReviews && (
+                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                        <span className="text-sm font-medium ml-1">
+                          {prof.rating.toFixed(1)}
+                        </span>
+                        {prof.totalReviews && (
                           <span className="text-sm text-muted-foreground">
-                            ({professional.totalReviews} avis)
+                            ({prof.totalReviews} avis)
                           </span>
                         )}
                       </div>
                     )}
 
-                    {/* Description */}
-                    {professional.description && (
+                    {prof.description && (
                       <p className="text-sm text-muted-foreground line-clamp-2">
-                        {professional.description}
+                        {prof.description}
                       </p>
                     )}
 
-                    {/* Services */}
-                    {professional.services &&
-                      professional.services.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">Services :</p>
-                          <div className="flex flex-wrap gap-1">
-                            {professional.services
-                              .slice(0, 3)
-                              .map((service, index) => (
-                                <Badge
-                                  key={index}
-                                  variant="outline"
-                                  className="text-xs"
-                                >
-                                  {service}
-                                </Badge>
-                              ))}
-                            {professional.services.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{professional.services.length - 3} autres
-                              </Badge>
-                            )}
-                          </div>
+                    {prof.services?.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Services :</p>
+                        <div className="flex flex-wrap gap-1">
+                          {prof.services.slice(0, 3).map((service, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {service}
+                            </Badge>
+                          ))}
+                          {prof.services.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{prof.services.length - 3} autres
+                            </Badge>
+                          )}
                         </div>
-                      )}
-
-                    {/* Location */}
-                    {professional.address && (
-                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
-                        <span className="truncate">{professional.address}</span>
                       </div>
                     )}
 
-                    {/* Contact */}
+                    {prof.address && (
+                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4" />
+                        <span className="truncate">{prof.address}</span>
+                      </div>
+                    )}
+
                     <div className="flex items-center justify-between pt-4 border-t">
                       <div className="flex space-x-2">
-                        {professional.phone && (
+                        {prof.phone && (
                           <Button size="sm" variant="outline">
                             <Phone className="h-4 w-4" />
                           </Button>
@@ -469,7 +440,7 @@ export default function ProfessionalsList() {
                         </Button>
                       </div>
                       <Button size="sm" asChild>
-                        <Link to={`/professionnel/${professional.uid}`}>
+                          <Link to={`/professionnel/${prof.uid}`}>
                           Voir le profil
                         </Link>
                       </Button>

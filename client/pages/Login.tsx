@@ -24,7 +24,7 @@ export default function Login() {
   const { login, currentUser, userProfile } = useAuth();
   const navigate = useNavigate();
 
-  // Rediriger si déjà connecté
+  // 🔁 Redirection automatique si déjà connecté
   useEffect(() => {
     if (currentUser && userProfile) {
       const redirectPath =
@@ -35,9 +35,7 @@ export default function Login() {
     }
   }, [currentUser, userProfile, navigate]);
 
-  const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +46,6 @@ export default function Login() {
       setError("Veuillez remplir tous les champs");
       return;
     }
-
     if (!validateEmail(email)) {
       setError("Veuillez entrer une adresse email valide");
       return;
@@ -58,15 +55,36 @@ export default function Login() {
 
     try {
       await login(email, password);
-      // La redirection se fera via useEffect quand currentUser sera mis à jour
+      // ✅ Redirection automatique via useEffect
     } catch (error: any) {
       console.error("Erreur de connexion:", error);
 
+<<<<<<< HEAD
       // Messages d'erreur API
       if (error.message) {
         setError(error.message);
       } else {
         setError("Erreur de connexion. Veuillez réessayer");
+=======
+      switch (error.code) {
+        case "auth/user-not-found":
+          setError("Aucun compte trouvé avec cette adresse email");
+          break;
+        case "auth/wrong-password":
+          setError("Mot de passe incorrect");
+          break;
+        case "auth/invalid-email":
+          setError("Adresse email invalide");
+          break;
+        case "auth/user-disabled":
+          setError("Ce compte a été désactivé");
+          break;
+        case "auth/too-many-requests":
+          setError("Trop de tentatives. Veuillez réessayer plus tard");
+          break;
+        default:
+          setError("Une erreur est survenue lors de la connexion");
+>>>>>>> 0d881a0800230b4644cf4abc1a9f3314ee9e0aa0
       }
     } finally {
       setIsLoading(false);
@@ -74,7 +92,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-muted/20">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-foreground">Connexion</h1>
@@ -133,7 +151,7 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
                     disabled={isLoading}
                   >
                     {showPassword ? (

@@ -34,6 +34,9 @@ import { useAuth } from "../contexts/AuthContext";
 type AccountType = "client" | "professionnel" | "";
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const { register, currentUser, userProfile } = useAuth();
+
   const [accountType, setAccountType] = useState<AccountType>("");
   const [formData, setFormData] = useState({
     // Client fields
@@ -48,15 +51,13 @@ export default function Signup() {
     password: "",
     confirmPassword: "",
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { register, currentUser, userProfile } = useAuth();
-  const navigate = useNavigate();
-
-  // Rediriger si déjà connecté
+  // Redirection si déjà connecté
   useEffect(() => {
     if (currentUser && userProfile) {
       const redirectPath =
@@ -67,13 +68,26 @@ export default function Signup() {
     }
   }, [currentUser, userProfile, navigate]);
 
-  const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  // ------------------ VALIDATIONS ------------------
+  const validateEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const validateSiret = (siret: string) => {
-    return /^\d{14}$/.test(siret);
+  const validateSiret = (siret: string) => /^\d{14}$/.test(siret);
+
+  // Si tu veux une validation SIRET plus poussée, remplace par cette fonction :
+  /*
+  const validateSiretLuhn = (siret: string) => {
+    if (!/^\d{14}$/.test(siret)) return false;
+    let sum = 0;
+    for (let i = 0; i < 14; i++) {
+      let digit = parseInt(siret.charAt(i), 10);
+      if (i % 2 === 0) digit *= 2;
+      if (digit > 9) digit -= 9;
+      sum += digit;
+    }
+    return sum % 10 === 0;
   };
+  */
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -83,63 +97,48 @@ export default function Signup() {
     e.preventDefault();
     setError("");
 
-    // Validation du type de compte
-    if (!accountType) {
-      setError("Veuillez sélectionner un type de compte");
-      return;
-    }
+    if (!accountType) return setError("Veuillez sélectionner un type de compte");
 
-    // Validation des champs communs
-    if (!formData.email || !formData.password || !formData.confirmPassword) {
-      setError("Veuillez remplir tous les champs obligatoires");
-      return;
+    // Champs communs
+    const { email, password, confirmPassword } = formData;
+    if (!email || !password || !confirmPassword) {
+      return setError("Veuillez remplir tous les champs obligatoires");
     }
+    if (!validateEmail(email)) return setError("Adresse email invalide");
+    if (password.length < 6) return setError("Mot de passe trop court");
+    if (password !== confirmPassword) return setError("Les mots de passe ne correspondent pas");
 
-    if (!validateEmail(formData.email)) {
-      setError("Veuillez entrer une adresse email valide");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Les mots de passe ne correspondent pas");
-      return;
-    }
-
-    // Validation spécifique selon le type de compte
+    // Champs spécifiques
     let additionalData = {};
 
     if (accountType === "client") {
-      if (!formData.firstName || !formData.lastName) {
-        setError("Veuillez remplir votre prénom et nom");
-        return;
+      const { firstName, lastName } = formData;
+      if (!firstName || !lastName) {
+        return setError("Veuillez remplir votre prénom et nom");
       }
       additionalData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        firstName,
+        lastName,
         preferences: {
           notifications: true,
           smsAlerts: false,
           emailAlerts: true,
         },
       };
-    } else if (accountType === "professionnel") {
-      if (!formData.companyName || !formData.profession || !formData.siret) {
-        setError("Veuillez remplir tous les champs professionnels");
-        return;
+    }
+
+    if (accountType === "professionnel") {
+      const { companyName, profession, siret } = formData;
+      if (!companyName || !profession || !siret) {
+        return setError("Veuillez remplir tous les champs professionnels");
       }
-      if (!validateSiret(formData.siret)) {
-        setError("Le SIRET doit contenir exactement 14 chiffres");
-        return;
+      if (!validateSiret(siret)) {
+        return setError("Le numéro SIRET doit contenir 14 chiffres valides");
       }
       additionalData = {
-        companyName: formData.companyName,
-        profession: formData.profession,
-        siret: formData.siret,
+        companyName,
+        profession,
+        siret,
         rating: 0,
         totalReviews: 0,
         isVerified: false,
@@ -159,21 +158,36 @@ export default function Signup() {
     setIsLoading(true);
 
     try {
-      await register(
-        formData.email,
-        formData.password,
-        accountType,
-        additionalData,
-      );
-      // La redirection se fera via useEffect quand currentUser sera mis à jour
+      await register(email, password, accountType, additionalData);
     } catch (error: any) {
       console.error("Erreur d'inscription:", error);
 
+<<<<<<< HEAD
       // Messages d'erreur API
       if (error.message) {
         setError(error.message);
       } else {
         setError("Erreur d'inscription. Veuillez réessayer");
+=======
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          setError("Cette adresse email est déjà utilisée");
+          break;
+        case "auth/invalid-email":
+          setError("Adresse email invalide");
+          break;
+        case "auth/weak-password":
+          setError("Le mot de passe est trop faible");
+          break;
+        case "auth/operation-not-allowed":
+          setError("L'inscription n'est pas autorisée");
+          break;
+        case "auth/too-many-requests":
+          setError("Trop de tentatives. Réessayez plus tard.");
+          break;
+        default:
+          setError("Une erreur est survenue lors de l'inscription");
+>>>>>>> 0d881a0800230b4644cf4abc1a9f3314ee9e0aa0
       }
     } finally {
       setIsLoading(false);
