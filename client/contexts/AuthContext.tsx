@@ -61,6 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, password: string) => {
     try {
+      setError(null);
       const response = await api.post<{ user: AuthUser; token: string }>(
         "/auth/login",
         {
@@ -74,6 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await loadUserProfile(response.user);
     } catch (error) {
       console.error("Erreur de connexion:", error);
+      setError("Erreur de connexion");
       throw error;
     }
   };
