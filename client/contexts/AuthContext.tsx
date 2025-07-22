@@ -1,151 +1,142 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { BaseUser, ClientProfile, ProfessionalProfile } from "../types";
+import api from "../lib/api";
+import { ClientProfile, ProfessionalProfile } from "../types";
+
+interface AuthUser {
+  uid: string;
+  email: string;
+  userType: "client" | "professionnel";
+}
 
 interface AuthContextType {
   token: string | null;
+  currentUser: AuthUser | null;
   userProfile: ClientProfile | ProfessionalProfile | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (
     email: string,
     password: string,
-    userType: "client" | "professionnel",
-    additionalData?: any
+    userType: "client" | "professionnel"
   ) => Promise<void>;
   logout: () => void;
   updateUserProfile: (
     data: Partial<ClientProfile | ProfessionalProfile>
   ) => Promise<void>;
-  refreshUserProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
-  );
+  const [token, setToken] = useState<string | null>(localStorage.getItem("auth_token"));
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [userProfile, setUserProfile] = useState<ClientProfile | ProfessionalProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = "http://localhost:5000/api"; // adapte à ton environnement
-
-  const refreshUserProfile = async () => {
-    if (!token) return;
+  const loadUserProfile = async (uid: string) => {
     try {
-      const res = await fetch(`${API_URL}/users/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUserProfile(data);
-      } else {
-        logout();
-      }
+      const profile = await api.get<ClientProfile | ProfessionalProfile>(`/users/${uid}`);
+      setUserProfile(profile);
     } catch (err) {
-      console.error("Erreur lors du chargement du profil", err);
+      console.error("Erreur chargement profil :", err);
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      const { token, user } = await api.post<{ token: string; user: AuthUser }>(
+        "/auth/login",
+        { email, password }
+      );
+
+      localStorage.setItem("auth_token", token);
+      setToken(token);
+      setCurrentUser(user);
+      await loadUserProfile(user.uid);
+    } catch (error) {
+      console.error("Erreur de connexion :", error);
+      throw error;
+    }
+  };
+
+  const register = async (email: string, password: string, userType: "client" | "professionnel") => {
+    try {
+      const { token, user } = await api.post<{ token: string; user: AuthUser }>(
+        "/auth/register",
+        { email, password, role: userType }
+      );
+
+      localStorage.setItem("auth_token", token);
+      setToken(token);
+      setCurrentUser(user);
+      await loadUserProfile(user.uid);
+    } catch (error) {
+      console.error("Erreur d'inscription :", error);
+      throw error;
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("auth_token");
+    setToken(null);
+    setCurrentUser(null);
+    setUserProfile(null);
+  };
+
+  const updateUserProfile = async (data: Partial<ClientProfile | ProfessionalProfile>) => {
+    if (!currentUser) throw new Error("Non connecté");
+
+    try {
+      const updatedProfile = await api.put<ClientProfile | ProfessionalProfile>(
+        `/users/${currentUser.uid}`,
+        data
+      );
+      setUserProfile(updatedProfile);
+    } catch (error) {
+      console.error("Erreur mise à jour du profil :", error);
+      throw error;
     }
   };
 
   useEffect(() => {
-    if (token) {
-      refreshUserProfile().finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
+    const checkAuth = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const user = await api.get<AuthUser>("/auth/me");
+        setCurrentUser(user);
+        await loadUserProfile(user.uid);
+      } catch (err) {
+        console.error("Token invalide ou expiré :", err);
+        logout();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
   }, [token]);
 
-  const register = async (
-    email: string,
-    password: string,
-    userType: "client" | "professionnel",
-    additionalData: any = {}
-  ) => {
-    const res = await fetch(`${API_URL}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        role: userType,
-        email,
-        password,
-        ...additionalData,
-      }),
-    });
-
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || "Erreur d’inscription");
-    }
-
-    const data = await res.json();
-    localStorage.setItem("token", data.token);
-    setToken(data.token);
-    await refreshUserProfile();
-  };
-
-  const login = async (email: string, password: string) => {
-    const res = await fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || "Erreur de connexion");
-    }
-
-    const data = await res.json();
-    localStorage.setItem("token", data.token);
-    setToken(data.token);
-    await refreshUserProfile();
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
-    setUserProfile(null);
-  };
-
-  const updateUserProfile = async (
-    data: Partial<ClientProfile | ProfessionalProfile>
-  ) => {
-    if (!token) throw new Error("Utilisateur non connecté");
-
-    const res = await fetch(`${API_URL}/users/update`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || "Erreur lors de la mise à jour");
-    }
-
-    await refreshUserProfile();
-  };
-
-  const value = {
+  const value: AuthContextType = {
     token,
+    currentUser,
     userProfile,
     loading,
     login,
     register,
     logout,
     updateUserProfile,
-    refreshUserProfile,
   };
 
   return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;

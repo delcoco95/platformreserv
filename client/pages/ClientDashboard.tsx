@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Timestamp } from "firebase/firestore";
+import { formatDate, formatTime } from "../lib/dateUtils";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
@@ -41,7 +41,6 @@ import { appointmentService } from "../services/appointmentService";
 import { professionalService } from "../services/professionalService";
 import { EditProfileDialog } from "../components/EditProfileDialog";
 import { Appointment, ClientProfile, ProfessionalProfile } from "../types";
-import { parseDate, formatDate, formatTime } from "../lib/dateUtils";
 
 export default function ClientDashboard() {
   const { currentUser, userProfile, loading: authLoading } = useAuth();

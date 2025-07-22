@@ -9,7 +9,6 @@ import {
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { useAuth } from "../contexts/AuthContext";
 import { appointmentService } from "../services/appointmentService";
-import { Timestamp } from "firebase/firestore";
 import { Plus, Trash2, AlertCircle } from "lucide-react";
 
 export default function TestData() {
@@ -28,16 +27,17 @@ export default function TestData() {
 
     try {
       const now = new Date();
+
       const tomorrow = new Date(now);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setDate(now.getDate() + 1);
       tomorrow.setHours(14, 0, 0, 0);
 
       const nextWeek = new Date(now);
-      nextWeek.setDate(nextWeek.getDate() + 7);
+      nextWeek.setDate(now.getDate() + 7);
       nextWeek.setHours(10, 30, 0, 0);
 
       const pastDate = new Date(now);
-      pastDate.setDate(pastDate.getDate() - 3);
+      pastDate.setDate(now.getDate() - 3);
       pastDate.setHours(16, 0, 0, 0);
 
       const appointments =
@@ -47,7 +47,7 @@ export default function TestData() {
                 clientId: currentUser.uid,
                 professionalId: "prof_demo_1",
                 service: "Vidange moteur",
-                date: Timestamp.fromDate(tomorrow),
+                date: tomorrow,
                 duration: 45,
                 status: "confirmed" as const,
                 price: 65,
@@ -58,7 +58,7 @@ export default function TestData() {
                 clientId: currentUser.uid,
                 professionalId: "prof_demo_2",
                 service: "Réparation fuite",
-                date: Timestamp.fromDate(nextWeek),
+                date: nextWeek,
                 duration: 90,
                 status: "pending" as const,
                 price: 120,
@@ -69,7 +69,7 @@ export default function TestData() {
                 clientId: currentUser.uid,
                 professionalId: "prof_demo_3",
                 service: "Installation serrure",
-                date: Timestamp.fromDate(pastDate),
+                date: pastDate,
                 duration: 60,
                 status: "completed" as const,
                 price: 180,
@@ -81,7 +81,7 @@ export default function TestData() {
                 clientId: "client_demo_1",
                 professionalId: currentUser.uid,
                 service: "Révision complète",
-                date: Timestamp.fromDate(tomorrow),
+                date: tomorrow,
                 duration: 120,
                 status: "confirmed" as const,
                 price: 200,
@@ -93,7 +93,7 @@ export default function TestData() {
                 clientId: "client_demo_2",
                 professionalId: currentUser.uid,
                 service: "Freinage",
-                date: Timestamp.fromDate(nextWeek),
+                date: nextWeek,
                 duration: 60,
                 status: "pending" as const,
                 price: 120,
@@ -107,7 +107,7 @@ export default function TestData() {
       }
 
       setMessage(
-        `${appointments.length} rendez-vous de démonstration créés avec succès !`,
+        `${appointments.length} rendez-vous de démonstration créés avec succès !`
       );
     } catch (error) {
       console.error("Erreur lors de la création des données:", error);
@@ -138,13 +138,13 @@ export default function TestData() {
       <div className="container max-w-2xl mx-auto px-4">
         <Card>
           <CardHeader>
-            <CardTitle>Données de test Firebase</CardTitle>
+            <CardTitle>Données de test</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
               <p className="text-muted-foreground mb-4">
                 Utilisez cette page pour créer des données de démonstration dans
-                votre base Firebase. Cela vous permettra de tester les
+                votre base MongoDB. Cela vous permettra de tester les
                 dashboards avec des données réelles.
               </p>
 

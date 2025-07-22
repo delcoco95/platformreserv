@@ -1,10 +1,11 @@
-import { Timestamp } from "firebase/firestore";
+// Types sans dépendance Firebase
 
 export interface BaseUser {
   uid: string;
   email: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  userType: "client" | "professionnel";
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
 }
 
 export interface ClientProfile extends BaseUser {
@@ -46,7 +47,7 @@ export interface Appointment {
   clientId: string;
   professionalId: string;
   service: string;
-  date: Timestamp;
+  date: string; // ISO date string
   duration: number; // en minutes
   status: "pending" | "confirmed" | "completed" | "cancelled";
   price?: number;
@@ -56,8 +57,8 @@ export interface Appointment {
     lng: number;
   };
   notes?: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
 }
 
 export interface Review {
@@ -67,5 +68,5 @@ export interface Review {
   professionalId: string;
   rating: number;
   comment?: string;
-  createdAt: Timestamp;
+  createdAt: string; // ISO date string
 }

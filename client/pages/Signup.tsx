@@ -162,24 +162,11 @@ export default function Signup() {
     } catch (error: any) {
       console.error("Erreur d'inscription:", error);
 
-      switch (error.code) {
-        case "auth/email-already-in-use":
-          setError("Cette adresse email est déjà utilisée");
-          break;
-        case "auth/invalid-email":
-          setError("Adresse email invalide");
-          break;
-        case "auth/weak-password":
-          setError("Le mot de passe est trop faible");
-          break;
-        case "auth/operation-not-allowed":
-          setError("L'inscription n'est pas autorisée");
-          break;
-        case "auth/too-many-requests":
-          setError("Trop de tentatives. Réessayez plus tard.");
-          break;
-        default:
-          setError("Une erreur est survenue lors de l'inscription");
+      // Messages d'erreur API
+      if (error.message) {
+        setError(error.message);
+      } else {
+        setError("Erreur d'inscription. Veuillez réessayer");
       }
     } finally {
       setIsLoading(false);
