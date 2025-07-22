@@ -9,7 +9,7 @@ import {
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { useAuth } from "../contexts/AuthContext";
 import { appointmentService } from "../services/appointmentService";
-import { now } from "../lib/dateUtils";
+import { now, fromDate } from "../lib/dateUtils";
 import { Plus, Trash2, AlertCircle } from "lucide-react";
 
 export default function TestData() {
@@ -47,7 +47,7 @@ export default function TestData() {
                 clientId: currentUser.uid,
                 professionalId: "prof_demo_1",
                 service: "Vidange moteur",
-                date: Timestamp.fromDate(tomorrow),
+                date: fromDate(tomorrow),
                 duration: 45,
                 status: "confirmed" as const,
                 price: 65,
@@ -58,7 +58,7 @@ export default function TestData() {
                 clientId: currentUser.uid,
                 professionalId: "prof_demo_2",
                 service: "Réparation fuite",
-                date: Timestamp.fromDate(nextWeek),
+                date: fromDate(nextWeek),
                 duration: 90,
                 status: "pending" as const,
                 price: 120,
@@ -69,7 +69,7 @@ export default function TestData() {
                 clientId: currentUser.uid,
                 professionalId: "prof_demo_3",
                 service: "Installation serrure",
-                date: Timestamp.fromDate(pastDate),
+                date: fromDate(pastDate),
                 duration: 60,
                 status: "completed" as const,
                 price: 180,
@@ -81,7 +81,7 @@ export default function TestData() {
                 clientId: "client_demo_1",
                 professionalId: currentUser.uid,
                 service: "Révision complète",
-                date: Timestamp.fromDate(tomorrow),
+                date: fromDate(tomorrow),
                 duration: 120,
                 status: "confirmed" as const,
                 price: 200,
@@ -93,7 +93,7 @@ export default function TestData() {
                 clientId: "client_demo_2",
                 professionalId: currentUser.uid,
                 service: "Freinage",
-                date: Timestamp.fromDate(nextWeek),
+                date: fromDate(nextWeek),
                 duration: 60,
                 status: "pending" as const,
                 price: 120,
