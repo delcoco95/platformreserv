@@ -1,12 +1,6 @@
-<<<<<<< HEAD
 import React, { createContext, useContext, useState, useEffect } from "react";
 import api from "../lib/api";
 import { User, ClientProfile, ProfessionalProfile } from "../types";
-=======
-import React, { createContext, useContext, useEffect, useState } from "react";
-import api from "../lib/api";
-import { ClientProfile, ProfessionalProfile } from "../types";
->>>>>>> ca4d23a693dc66045048cf272f5860e467ffbf21
 
 interface AuthUser {
   uid: string;
@@ -16,27 +10,13 @@ interface AuthUser {
 }
 
 interface AuthContextType {
-<<<<<<< HEAD
-=======
-  token: string | null;
->>>>>>> ca4d23a693dc66045048cf272f5860e467ffbf21
   currentUser: AuthUser | null;
   userProfile: ClientProfile | ProfessionalProfile | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (
-    email: string,
-    password: string,
-<<<<<<< HEAD
-    userType: "client" | "professionnel",
-=======
-    userType: "client" | "professionnel"
->>>>>>> ca4d23a693dc66045048cf272f5860e467ffbf21
-  ) => Promise<void>;
+  register: (email: string, password: string, userType: "client" | "professionnel") => Promise<void>;
   logout: () => Promise<void>;
-  updateUserProfile: (
-    data: Partial<ClientProfile | ProfessionalProfile>,
-  ) => Promise<void>;
+  updateUserProfile: (data: Partial<ClientProfile | ProfessionalProfile>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -49,7 +29,6 @@ export const useAuth = () => {
   return context;
 };
 
-<<<<<<< HEAD
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -61,59 +40,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const loadUserProfile = async (user: AuthUser) => {
     try {
-      const profile = await api.get<ClientProfile | ProfessionalProfile>(
-        `/users/${user.uid}`,
-      );
-=======
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(localStorage.getItem("auth_token"));
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
-  const [userProfile, setUserProfile] = useState<ClientProfile | ProfessionalProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const loadUserProfile = async (uid: string) => {
-    try {
-      const profile = await api.get<ClientProfile | ProfessionalProfile>(`/users/${uid}`);
->>>>>>> ca4d23a693dc66045048cf272f5860e467ffbf21
+      const profile = await api.get<ClientProfile | ProfessionalProfile>(`/users/${user.uid}`);
       setUserProfile(profile);
-    } catch (err) {
-      console.error("Erreur chargement profil :", err);
+    } catch (error) {
+      console.error("Erreur lors du chargement du profil:", error);
     }
   };
 
   const login = async (email: string, password: string) => {
     try {
-      const { token, user } = await api.post<{ token: string; user: AuthUser }>(
-        "/auth/login",
-        { email, password }
-      );
-
-      localStorage.setItem("auth_token", token);
-      setToken(token);
-      setCurrentUser(user);
-      await loadUserProfile(user.uid);
+      const response = await api.post<{ user: AuthUser; token: string }>("/auth/login", {
+        email,
+        password,
+      });
+      
+      localStorage.setItem("auth_token", response.token);
+      setCurrentUser(response.user);
+      await loadUserProfile(response.user);
     } catch (error) {
-      console.error("Erreur de connexion :", error);
+      console.error("Erreur de connexion:", error);
       throw error;
     }
   };
 
-<<<<<<< HEAD
-  const register = async (
-    email: string,
-    password: string,
-    userType: "client" | "professionnel",
-  ) => {
+  const register = async (email: string, password: string, userType: "client" | "professionnel") => {
     try {
-      const response = await api.post<{ user: AuthUser; token: string }>(
-        "/auth/register",
-        {
-          email,
-          password,
-          userType,
-        },
-      );
-
+      const response = await api.post<{ user: AuthUser; token: string }>("/auth/register", {
+        email,
+        password,
+        userType,
+      });
+      
       localStorage.setItem("auth_token", response.token);
       setCurrentUser(response.user);
       await loadUserProfile(response.user);
@@ -135,39 +92,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateUserProfile = async (
-    data: Partial<ClientProfile | ProfessionalProfile>,
-  ) => {
-    if (!currentUser) throw new Error("Utilisateur non connecté");
-=======
-  const register = async (email: string, password: string, userType: "client" | "professionnel") => {
-    try {
-      const { token, user } = await api.post<{ token: string; user: AuthUser }>(
-        "/auth/register",
-        { email, password, role: userType }
-      );
-
-      localStorage.setItem("auth_token", token);
-      setToken(token);
-      setCurrentUser(user);
-      await loadUserProfile(user.uid);
-    } catch (error) {
-      console.error("Erreur d'inscription :", error);
-      throw error;
-    }
-  };
-
-  const logout = () => {
-    localStorage.removeItem("auth_token");
-    setToken(null);
-    setCurrentUser(null);
-    setUserProfile(null);
-  };
-
   const updateUserProfile = async (data: Partial<ClientProfile | ProfessionalProfile>) => {
-    if (!currentUser) throw new Error("Non connecté");
->>>>>>> ca4d23a693dc66045048cf272f5860e467ffbf21
-
+    if (!currentUser) throw new Error("Utilisateur non connecté");
+    
     try {
       const updatedProfile = await api.put<ClientProfile | ProfessionalProfile>(
         `/users/${currentUser.uid}`,
@@ -175,39 +102,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
       setUserProfile(updatedProfile);
     } catch (error) {
-      console.error("Erreur mise à jour du profil :", error);
+      console.error("Erreur lors de la mise à jour:", error);
       throw error;
     }
   };
 
+  // Vérifier l'authentification au chargement
   useEffect(() => {
     const checkAuth = async () => {
-      if (!token) {
-        setLoading(false);
-        return;
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        try {
+          const user = await api.get<AuthUser>("/auth/me");
+          setCurrentUser(user);
+          await loadUserProfile(user);
+        } catch (error) {
+          console.error("Token invalide:", error);
+          localStorage.removeItem("auth_token");
+        }
       }
-
-      try {
-        const user = await api.get<AuthUser>("/auth/me");
-        setCurrentUser(user);
-        await loadUserProfile(user.uid);
-      } catch (err) {
-        console.error("Token invalide ou expiré :", err);
-        logout();
-      } finally {
-        setLoading(false);
-      }
+      setLoading(false);
     };
 
     checkAuth();
-  }, [token]);
+  }, []);
 
-<<<<<<< HEAD
   const value = {
-=======
-  const value: AuthContextType = {
-    token,
->>>>>>> ca4d23a693dc66045048cf272f5860e467ffbf21
     currentUser,
     userProfile,
     loading,
