@@ -93,7 +93,7 @@ const register = async (
       {
         email,
         password,
-        role: userType,
+        userType,
         ...additionalData,
       }
     );
