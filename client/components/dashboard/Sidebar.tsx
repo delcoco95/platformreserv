@@ -40,8 +40,7 @@ export const Sidebar = ({
             <div className="flex items-center gap-2 text-sm">
               <User className="h-4 w-4 text-muted-foreground" />
               <span>
-                {clientProfile?.firstName || ""}{" "}
-                {clientProfile?.lastName || ""}
+                {clientProfile?.firstName || ""} {clientProfile?.lastName || ""}
               </span>
             </div>
             <div className="flex items-center gap-2 text-sm">
@@ -114,9 +113,7 @@ export const Sidebar = ({
               {lastProfessional.address && (
                 <div className="flex items-center gap-2 text-sm">
                   <Building className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-xs">
-                    {lastProfessional.address}
-                  </span>
+                  <span className="text-xs">{lastProfessional.address}</span>
                 </div>
               )}
             </div>
@@ -191,9 +188,7 @@ export const Sidebar = ({
               </div>
               <Badge
                 variant={
-                  clientProfile.preferences.smsAlerts
-                    ? "default"
-                    : "secondary"
+                  clientProfile.preferences.smsAlerts ? "default" : "secondary"
                 }
               >
                 {clientProfile.preferences.smsAlerts

@@ -17,7 +17,10 @@ export function AutoRedirect() {
     userProfile = authContext.userProfile;
     loading = authContext.loading;
   } catch (error) {
-    console.error("Erreur lors de l'accès au contexte d'authentification:", error);
+    console.error(
+      "Erreur lors de l'accès au contexte d'authentification:",
+      error,
+    );
     // En cas d'erreur, on considère que l'utilisateur n'est pas connecté
     loading = false;
   }

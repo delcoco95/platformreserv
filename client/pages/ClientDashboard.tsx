@@ -7,7 +7,7 @@ import {
   HeaderSection,
   StatsCards,
   AppointmentsTabs,
-  Sidebar
+  Sidebar,
 } from "../components/dashboard";
 import { useClientDashboardLogic } from "../hooks/useClientDashboardLogic";
 

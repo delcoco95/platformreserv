@@ -1,19 +1,14 @@
 import { Link } from "react-router-dom";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "../ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import {
   Calendar,
   Clock,
@@ -43,7 +38,10 @@ export const AppointmentsTabs = ({
   formatTime,
   onCancelAppointment,
 }: AppointmentsTabsProps) => {
-  const renderAppointmentCard = (appointment: Appointment, isUpcoming = true) => (
+  const renderAppointmentCard = (
+    appointment: Appointment,
+    isUpcoming = true,
+  ) => (
     <Card
       key={appointment.id}
       className={`${isUpcoming ? "border-l-4 border-l-primary" : "opacity-75"}`}
@@ -78,7 +76,9 @@ export const AppointmentsTabs = ({
             </div>
 
             {appointment.price && (
-              <div className={`font-semibold ${isUpcoming ? "text-lg text-primary" : "text-lg"}`}>
+              <div
+                className={`font-semibold ${isUpcoming ? "text-lg text-primary" : "text-lg"}`}
+              >
                 {appointment.price}€
               </div>
             )}
@@ -123,9 +123,7 @@ export const AppointmentsTabs = ({
     <Card>
       <CardHeader>
         <CardTitle>Mes rendez-vous</CardTitle>
-        <CardDescription>
-          Consultez et gérez vos rendez-vous
-        </CardDescription>
+        <CardDescription>Consultez et gérez vos rendez-vous</CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="upcoming" className="w-full">
@@ -152,8 +150,8 @@ export const AppointmentsTabs = ({
                 </Button>
               </div>
             ) : (
-              upcomingAppointments.map((appointment) => 
-                renderAppointmentCard(appointment, true)
+              upcomingAppointments.map((appointment) =>
+                renderAppointmentCard(appointment, true),
               )
             )}
           </TabsContent>
@@ -162,16 +160,14 @@ export const AppointmentsTabs = ({
             {pastAppointments.length === 0 ? (
               <div className="text-center py-8">
                 <CalendarCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  Aucun historique
-                </h3>
+                <h3 className="text-lg font-semibold mb-2">Aucun historique</h3>
                 <p className="text-muted-foreground">
                   Vos services passés apparaîtront ici
                 </p>
               </div>
             ) : (
-              pastAppointments.map((appointment) => 
-                renderAppointmentCard(appointment, false)
+              pastAppointments.map((appointment) =>
+                renderAppointmentCard(appointment, false),
               )
             )}
           </TabsContent>

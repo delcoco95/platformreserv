@@ -151,7 +151,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           }
         }
       } catch (error) {
-        console.error("Erreur lors de la vérification de l'authentification:", error);
+        console.error(
+          "Erreur lors de la vérification de l'authentification:",
+          error,
+        );
       } finally {
         setLoading(false);
       }
@@ -171,9 +174,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   // Toujours retourner le provider, même en cas d'erreur
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

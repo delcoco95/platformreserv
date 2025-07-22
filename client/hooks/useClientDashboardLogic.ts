@@ -8,7 +8,8 @@ import { formatDate, formatTime } from "../lib/dateUtils";
 export const useClientDashboardLogic = () => {
   const { currentUser, userProfile, loading: authLoading } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [lastProfessional, setLastProfessional] = useState<ProfessionalProfile | null>(null);
+  const [lastProfessional, setLastProfessional] =
+    useState<ProfessionalProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showEditProfile, setShowEditProfile] = useState(false);
@@ -43,7 +44,8 @@ export const useClientDashboardLogic = () => {
 
           if (lastAppointment.professionalId) {
             try {
-              const professionals = await professionalService.getAllProfessionals();
+              const professionals =
+                await professionalService.getAllProfessionals();
               const professional = professionals.find(
                 (p) => p.uid === lastAppointment.professionalId,
               );
@@ -72,16 +74,24 @@ export const useClientDashboardLogic = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      confirmed: { className: "bg-green-100 text-green-800", label: "Confirmé" },
-      pending: { className: "bg-yellow-100 text-yellow-800", label: "En attente" },
+      confirmed: {
+        className: "bg-green-100 text-green-800",
+        label: "Confirmé",
+      },
+      pending: {
+        className: "bg-yellow-100 text-yellow-800",
+        label: "En attente",
+      },
       completed: { className: "bg-blue-100 text-blue-800", label: "Terminé" },
       cancelled: { className: "bg-red-100 text-red-800", label: "Annulé" },
     };
 
-    return statusConfig[status as keyof typeof statusConfig] || { 
-      className: "bg-gray-100 text-gray-800", 
-      label: status 
-    };
+    return (
+      statusConfig[status as keyof typeof statusConfig] || {
+        className: "bg-gray-100 text-gray-800",
+        label: status,
+      }
+    );
   };
 
   const upcomingAppointments = appointments.filter((apt) => {
@@ -97,7 +107,7 @@ export const useClientDashboardLogic = () => {
   });
 
   const completedAppointmentsCount = pastAppointments.filter(
-    (apt) => apt.status === "completed"
+    (apt) => apt.status === "completed",
   ).length;
 
   return {
@@ -113,13 +123,13 @@ export const useClientDashboardLogic = () => {
     upcomingAppointments,
     pastAppointments,
     completedAppointmentsCount,
-    
+
     // Actions
     setError,
     setShowEditProfile,
     handleCancelAppointment,
     getStatusBadge,
-    
+
     // Utilitaires
     parseDate,
     formatDate,

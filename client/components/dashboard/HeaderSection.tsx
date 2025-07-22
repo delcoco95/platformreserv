@@ -10,10 +10,10 @@ interface HeaderSectionProps {
   onEditProfile: () => void;
 }
 
-export const HeaderSection = ({ 
-  currentUser, 
-  clientProfile, 
-  onEditProfile 
+export const HeaderSection = ({
+  currentUser,
+  clientProfile,
+  onEditProfile,
 }: HeaderSectionProps) => {
   return (
     <div className="mb-8">
