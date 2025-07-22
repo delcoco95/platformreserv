@@ -193,7 +193,9 @@ export default function ProfessionalProfile() {
         clientId: currentUser.uid,
         professionalId: professional.uid,
         service: selectedService.name,
-        date: new Date(`${selectedSlot.date}T${selectedSlot.start}:00`).toISOString(),
+        date: new Date(
+          `${selectedSlot.date}T${selectedSlot.start}:00`,
+        ).toISOString(),
         duration: selectedService.duration,
         status: "pending" as const,
         price: selectedService.price,

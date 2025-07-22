@@ -7,7 +7,10 @@ class ProfessionalService {
     try {
       return await api.get<ProfessionalProfile[]>("/professionals");
     } catch (error) {
-      console.error("Erreur lors de la récupération des professionnels:", error);
+      console.error(
+        "Erreur lors de la récupération des professionnels:",
+        error,
+      );
       throw error;
     }
   }
@@ -35,7 +38,7 @@ class ProfessionalService {
   // Mettre à jour un profil professionnel
   async updateProfessional(
     id: string,
-    data: Partial<ProfessionalProfile>
+    data: Partial<ProfessionalProfile>,
   ): Promise<void> {
     try {
       await api.put(`/professionals/${id}`, data);
@@ -56,15 +59,20 @@ class ProfessionalService {
   }
 
   // Simuler un listener temps réel (à remplacer par WebSocket si nécessaire)
-  onProfessionalsChange(callback: (professionals: ProfessionalProfile[]) => void): () => void {
+  onProfessionalsChange(
+    callback: (professionals: ProfessionalProfile[]) => void,
+  ): () => void {
     let intervalId: NodeJS.Timeout;
-    
+
     const fetchData = async () => {
       try {
         const professionals = await this.getAllProfessionals();
         callback(professionals);
       } catch (error) {
-        console.error("Erreur lors de la mise à jour des professionnels:", error);
+        console.error(
+          "Erreur lors de la mise à jour des professionnels:",
+          error,
+        );
       }
     };
 
