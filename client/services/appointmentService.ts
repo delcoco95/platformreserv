@@ -1,279 +1,175 @@
-import {
-  collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  Timestamp,
-} from "firebase/firestore";
-import { auth, db } from "../firebase";
+import api from "../lib/api";
 import { Appointment } from "../types";
 
-// Données démo pour les rendez-vous
-const demoAppointments: Appointment[] = [
-  {
-    id: "demo-apt-1",
-    clientId: "demo-client-1",
-    professionalId: "demo-1",
-    service: "Révision complète",
-    date: Timestamp.fromDate(new Date(Date.now() + 86400000)), // Demain
-    duration: 120,
-    status: "confirmed",
-    price: 150,
-    address: "123 Rue de la République, 75001 Paris",
-    coordinates: { lat: 48.8566, lng: 2.3522 },
-    notes: "Véhicule: Renault Clio 2018",
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
-  },
-  {
-    id: "demo-apt-2",
-    clientId: "demo-client-1",
-    professionalId: "demo-2",
-    service: "Réparation fuite",
-    date: Timestamp.fromDate(new Date(Date.now() - 86400000)), // Hier
-    duration: 60,
-    status: "completed",
-    price: 85,
-    address: "456 Avenue des Champs, 75008 Paris",
-    coordinates: { lat: 48.8566, lng: 2.3522 },
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
-  },
-];
+interface CreateAppointmentData {
+  clientId: string;
+  professionalId: string;
+  service: string;
+  date: string; // ISO date string
+  duration: number;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  price?: number;
+  address?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  notes?: string;
+}
 
-export const appointmentService = {
-  // Créer un nouveau rendez-vous
-  async createAppointment(
-    appointmentData: Omit<Appointment, "id" | "createdAt" | "updatedAt">,
-  ) {
-    const docRef = await addDoc(collection(db, "appointments"), {
-      ...appointmentData,
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
-    });
-    return docRef.id;
-  },
-
-  // Récupérer les rendez-vous d'un client
-  async getClientAppointments(clientId: string) {
+class AppointmentService {
+  // Créer un rendez-vous
+  async createAppointment(data: CreateAppointmentData): Promise<Appointment> {
     try {
-      if (!auth.currentUser) {
-        return demoAppointments.filter((apt) => apt.clientId === clientId);
-      }
-
-      const q = query(
-        collection(db, "appointments"),
-        where("clientId", "==", clientId),
-        orderBy("date", "desc"),
-      );
-      const snapshot = await getDocs(q);
-      const appointments = snapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() }) as Appointment,
-      );
-
-      return appointments.length > 0
-        ? appointments
-        : demoAppointments.filter((apt) => apt.clientId === clientId);
+      return await api.post<Appointment>("/appointments", data);
     } catch (error) {
-      console.warn(
-        "Erreur Firebase pour les rendez-vous client, utilisation des données démo:",
-        error,
-      );
-      return demoAppointments.filter((apt) => apt.clientId === clientId);
+      console.error("Erreur lors de la création du rendez-vous:", error);
+      throw error;
     }
-  },
+  }
 
-  // Récupérer les rendez-vous d'un professionnel
-  async getProfessionalAppointments(professionalId: string) {
+  // Récupérer tous les rendez-vous d'un utilisateur
+  async getUserAppointments(userId: string): Promise<Appointment[]> {
     try {
-      if (!auth.currentUser) {
-        return demoAppointments.filter(
-          (apt) => apt.professionalId === professionalId,
-        );
-      }
-
-      const q = query(
-        collection(db, "appointments"),
-        where("professionalId", "==", professionalId),
-        orderBy("date", "desc"),
-      );
-      const snapshot = await getDocs(q);
-      const appointments = snapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() }) as Appointment,
-      );
-
-      return appointments.length > 0
-        ? appointments
-        : demoAppointments.filter(
-            (apt) => apt.professionalId === professionalId,
-          );
+      return await api.get<Appointment[]>(`/appointments/user/${userId}`);
     } catch (error) {
-      console.warn(
-        "Erreur Firebase pour les rendez-vous professionnel, utilisation des données démo:",
-        error,
-      );
-      return demoAppointments.filter(
-        (apt) => apt.professionalId === professionalId,
-      );
+      console.error("Erreur lors de la récupération des rendez-vous:", error);
+      throw error;
     }
-  },
+  }
 
-  // Écouter les changements en temps réel pour un client
-  onClientAppointmentsChange(
-    clientId: string,
-    callback: (appointments: Appointment[]) => void,
-  ) {
+  // Récupérer tous les rendez-vous d'un professionnel
+  async getProfessionalAppointments(professionalId: string): Promise<Appointment[]> {
     try {
-      if (!auth.currentUser) {
-        const filtered = demoAppointments.filter(
-          (apt) => apt.clientId === clientId,
-        );
-        setTimeout(() => callback(filtered), 100);
-        return () => {};
-      }
-
-      const q = query(
-        collection(db, "appointments"),
-        where("clientId", "==", clientId),
-        orderBy("date", "desc"),
-      );
-
-      return onSnapshot(
-        q,
-        (snapshot) => {
-          const appointments = snapshot.docs.map(
-            (doc) =>
-              ({
-                id: doc.id,
-                ...doc.data(),
-              }) as Appointment,
-          );
-          const filtered = demoAppointments.filter(
-            (apt) => apt.clientId === clientId,
-          );
-          callback(appointments.length > 0 ? appointments : filtered);
-        },
-        (error) => {
-          console.warn(
-            "Erreur dans l'écoute Firebase des rendez-vous client:",
-            error,
-          );
-          const filtered = demoAppointments.filter(
-            (apt) => apt.clientId === clientId,
-          );
-          callback(filtered);
-        },
-      );
+      return await api.get<Appointment[]>(`/appointments/professional/${professionalId}`);
     } catch (error) {
-      console.warn("Erreur Firebase, utilisation des données démo:", error);
-      const filtered = demoAppointments.filter(
-        (apt) => apt.clientId === clientId,
-      );
-      setTimeout(() => callback(filtered), 100);
-      return () => {};
+      console.error("Erreur lors de la récupération des rendez-vous:", error);
+      throw error;
     }
-  },
+  }
 
-  // Écouter les changements en temps réel pour un professionnel
-  onProfessionalAppointmentsChange(
-    professionalId: string,
-    callback: (appointments: Appointment[]) => void,
-  ) {
+  // Récupérer un rendez-vous par ID
+  async getAppointmentById(id: string): Promise<Appointment | null> {
     try {
-      if (!auth.currentUser) {
-        const filtered = demoAppointments.filter(
-          (apt) => apt.professionalId === professionalId,
-        );
-        setTimeout(() => callback(filtered), 100);
-        return () => {};
-      }
-
-      const q = query(
-        collection(db, "appointments"),
-        where("professionalId", "==", professionalId),
-        orderBy("date", "desc"),
-      );
-
-      return onSnapshot(
-        q,
-        (snapshot) => {
-          const appointments = snapshot.docs.map(
-            (doc) =>
-              ({
-                id: doc.id,
-                ...doc.data(),
-              }) as Appointment,
-          );
-          const filtered = demoAppointments.filter(
-            (apt) => apt.professionalId === professionalId,
-          );
-          callback(appointments.length > 0 ? appointments : filtered);
-        },
-        (error) => {
-          console.warn(
-            "Erreur dans l'écoute Firebase des rendez-vous professionnel:",
-            error,
-          );
-          const filtered = demoAppointments.filter(
-            (apt) => apt.professionalId === professionalId,
-          );
-          callback(filtered);
-        },
-      );
+      return await api.get<Appointment>(`/appointments/${id}`);
     } catch (error) {
-      console.warn("Erreur Firebase, utilisation des données démo:", error);
-      const filtered = demoAppointments.filter(
-        (apt) => apt.professionalId === professionalId,
-      );
-      setTimeout(() => callback(filtered), 100);
-      return () => {};
+      console.error("Erreur lors de la récupération du rendez-vous:", error);
+      return null;
     }
-  },
+  }
 
   // Mettre à jour un rendez-vous
   async updateAppointment(
-    appointmentId: string,
-    updates: Partial<Appointment>,
-  ) {
-    const appointmentRef = doc(db, "appointments", appointmentId);
-    await updateDoc(appointmentRef, {
-      ...updates,
-      updatedAt: Timestamp.now(),
-    });
-  },
-
-  // Annuler un rendez-vous
-  async cancelAppointment(appointmentId: string) {
-    await this.updateAppointment(appointmentId, { status: "cancelled" });
-  },
-
-  // Confirmer un rendez-vous (pour les professionnels)
-  async confirmAppointment(appointmentId: string) {
-    await this.updateAppointment(appointmentId, { status: "confirmed" });
-  },
-
-  // Marquer un rendez-vous comme terminé
-  async completeAppointment(appointmentId: string) {
-    await this.updateAppointment(appointmentId, { status: "completed" });
-  },
-
-  // Changer le statut d'un rendez-vous
-  async updateAppointmentStatus(
-    appointmentId: string,
-    status: "pending" | "confirmed" | "completed" | "cancelled",
-  ) {
-    await this.updateAppointment(appointmentId, { status });
-  },
+    id: string,
+    data: Partial<Appointment>
+  ): Promise<void> {
+    try {
+      await api.put(`/appointments/${id}`, data);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du rendez-vous:", error);
+      throw error;
+    }
+  }
 
   // Supprimer un rendez-vous
-  async deleteAppointment(appointmentId: string) {
-    const appointmentRef = doc(db, "appointments", appointmentId);
-    await deleteDoc(appointmentRef);
-  },
-};
+  async deleteAppointment(id: string): Promise<void> {
+    try {
+      await api.delete(`/appointments/${id}`);
+    } catch (error) {
+      console.error("Erreur lors de la suppression du rendez-vous:", error);
+      throw error;
+    }
+  }
+
+  // Confirmer un rendez-vous
+  async confirmAppointment(id: string): Promise<void> {
+    try {
+      await api.put(`/appointments/${id}/confirm`, {});
+    } catch (error) {
+      console.error("Erreur lors de la confirmation du rendez-vous:", error);
+      throw error;
+    }
+  }
+
+  // Annuler un rendez-vous
+  async cancelAppointment(id: string, reason?: string): Promise<void> {
+    try {
+      await api.put(`/appointments/${id}/cancel`, { reason });
+    } catch (error) {
+      console.error("Erreur lors de l'annulation du rendez-vous:", error);
+      throw error;
+    }
+  }
+
+  // Marquer un rendez-vous comme terminé
+  async completeAppointment(id: string): Promise<void> {
+    try {
+      await api.put(`/appointments/${id}/complete`, {});
+    } catch (error) {
+      console.error("Erreur lors de la finalisation du rendez-vous:", error);
+      throw error;
+    }
+  }
+
+  // Simuler un listener temps réel pour les rendez-vous d'un utilisateur
+  onUserAppointmentsChange(
+    userId: string,
+    callback: (appointments: Appointment[]) => void
+  ): () => void {
+    let intervalId: NodeJS.Timeout;
+    
+    const fetchData = async () => {
+      try {
+        const appointments = await this.getUserAppointments(userId);
+        callback(appointments);
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour des rendez-vous:", error);
+      }
+    };
+
+    // Récupération initiale
+    fetchData();
+
+    // Polling toutes les 30 secondes
+    intervalId = setInterval(fetchData, 30000);
+
+    // Fonction de nettoyage
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }
+
+  // Simuler un listener temps réel pour les rendez-vous d'un professionnel
+  onProfessionalAppointmentsChange(
+    professionalId: string,
+    callback: (appointments: Appointment[]) => void
+  ): () => void {
+    let intervalId: NodeJS.Timeout;
+    
+    const fetchData = async () => {
+      try {
+        const appointments = await this.getProfessionalAppointments(professionalId);
+        callback(appointments);
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour des rendez-vous:", error);
+      }
+    };
+
+    // Récupération initiale
+    fetchData();
+
+    // Polling toutes les 30 secondes
+    intervalId = setInterval(fetchData, 30000);
+
+    // Fonction de nettoyage
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }
+}
+
+export const appointmentService = new AppointmentService();
