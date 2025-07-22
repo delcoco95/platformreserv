@@ -3,10 +3,12 @@ import { Button } from "../components/ui/button";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { EditProfileDialog } from "../components/EditProfileDialog";
-import { HeaderSection } from "../components/dashboard/HeaderSection";
-import { StatsCards } from "../components/dashboard/StatsCards";
-import { AppointmentsTabs } from "../components/dashboard/AppointmentsTabs";
-import { Sidebar } from "../components/dashboard/Sidebar";
+import {
+  HeaderSection,
+  StatsCards,
+  AppointmentsTabs,
+  Sidebar
+} from "../components/dashboard";
 import { useClientDashboardLogic } from "../hooks/useClientDashboardLogic";
 
 export default function ClientDashboard() {
