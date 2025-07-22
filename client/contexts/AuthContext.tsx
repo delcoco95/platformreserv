@@ -130,18 +130,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Vérifier l'authentification au chargement
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        try {
-          const user = await api.get<AuthUser>("/auth/me");
-          setCurrentUser(user);
-          await loadUserProfile(user);
-        } catch (error) {
-          console.error("Token invalide:", error);
-          localStorage.removeItem("auth_token");
+      try {
+        const token = localStorage.getItem("auth_token");
+        if (token) {
+          try {
+            const user = await api.get<AuthUser>("/auth/me");
+            setCurrentUser(user);
+            await loadUserProfile(user);
+          } catch (error) {
+            console.error("Token invalide:", error);
+            localStorage.removeItem("auth_token");
+          }
         }
+      } catch (error) {
+        console.error("Erreur lors de la vérification de l'authentification:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkAuth();
