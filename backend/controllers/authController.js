@@ -22,7 +22,7 @@ exports.register = async (req, res) => {
     if (!email || !password || !userType) {
       return res.status(400).json({
         success: false,
-        message: "Champs requis manquants (email, password ou userType)"
+        message: "Champs requis manquants (email, password ou userType)",
       });
     }
 

@@ -120,26 +120,27 @@ export default function Signup() {
 
     try {
       // Préparer les données additionnelles selon le type de compte
-      const additionalData = accountType === "client"
-        ? {
-            nom: formData.lastName,
-            prenom: formData.firstName,
-            telephone: formData.phone,
-            adresse: formData.address,
-          }
-        : {
-            nom: formData.companyName,
-            metier: formData.profession,
-            siret: formData.siret,
-            telephone: formData.phone,
-            adresse: formData.address,
-          };
+      const additionalData =
+        accountType === "client"
+          ? {
+              nom: formData.lastName,
+              prenom: formData.firstName,
+              telephone: formData.phone,
+              adresse: formData.address,
+            }
+          : {
+              nom: formData.companyName,
+              metier: formData.profession,
+              siret: formData.siret,
+              telephone: formData.phone,
+              adresse: formData.address,
+            };
 
       await register(
         formData.email,
         formData.password,
         accountType,
-        additionalData
+        additionalData,
       );
     } catch (error: any) {
       console.error("Erreur d'inscription:", error);
