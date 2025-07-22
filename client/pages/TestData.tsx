@@ -28,14 +28,13 @@ export default function TestData() {
 
     try {
       const now = new Date();
-
       const tomorrow = new Date(now);
       tomorrow.setDate(now.getDate() + 1);
-      tomorrow.setHours(14, 0, 0, 0);
+      tomorrow.setHours(10, 0, 0, 0);
 
       const nextWeek = new Date(now);
       nextWeek.setDate(now.getDate() + 7);
-      nextWeek.setHours(10, 30, 0, 0);
+      nextWeek.setHours(14, 30, 0, 0);
 
       const pastDate = new Date(now);
       pastDate.setDate(now.getDate() - 3);
@@ -63,8 +62,8 @@ export default function TestData() {
                 duration: 90,
                 status: "pending" as const,
                 price: 120,
-                address: "456 Avenue Victor Hugo, 75016 Paris",
-                notes: "Urgence - fuite dans la salle de bain",
+                address: "456 Avenue des Champs, 75008 Paris",
+                notes: "Urgence plomberie",
               },
               {
                 clientId: currentUser.uid,
@@ -73,8 +72,9 @@ export default function TestData() {
                 date: fromDate(pastDate),
                 duration: 60,
                 status: "completed" as const,
-                price: 180,
-                address: "789 Boulevard Saint-Germain, 75005 Paris",
+                price: 80,
+                address: "789 Rue de la Paix, 75009 Paris",
+                notes: "Serrure 3 points",
               },
             ]
           : [
@@ -85,10 +85,9 @@ export default function TestData() {
                 date: fromDate(tomorrow),
                 duration: 120,
                 status: "confirmed" as const,
-                price: 200,
-                address: "15 Rue Victor Hugo, 75001 Paris",
-                coordinates: { lat: 48.8566, lng: 2.3522 },
-                notes: "Véhicule ancien, contrôle approfondi",
+                price: 150,
+                address: "321 Boulevard Saint-Germain, 75006 Paris",
+                notes: "Révision 20 000 km",
               },
               {
                 clientId: "client_demo_2",
@@ -97,113 +96,103 @@ export default function TestData() {
                 date: fromDate(nextWeek),
                 duration: 60,
                 status: "pending" as const,
-                price: 120,
-                address: "42 Avenue des Champs, 75008 Paris",
-                coordinates: { lat: 48.8698, lng: 2.3077 },
+                price: 90,
+                address: "654 Rue de Rivoli, 75001 Paris",
+                notes: "Changement plaquettes",
               },
             ];
 
+      // Créer les rendez-vous
       for (const appointment of appointments) {
         await appointmentService.createAppointment(appointment);
       }
 
       setMessage(
-        `${appointments.length} rendez-vous de démonstration créés avec succès !`
+        `${appointments.length} rendez-vous de démonstration créés avec succès !`,
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erreur lors de la création des données:", error);
-      setMessage("Erreur lors de la création des données de test");
+      setMessage(`Erreur: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!currentUser || !userProfile) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto" />
-          <div>
-            <h3 className="text-lg font-semibold">Connectez-vous</h3>
-            <p className="text-muted-foreground">
-              Vous devez être connecté pour utiliser cette fonctionnalité.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const clearData = async () => {
+    setLoading(true);
+    setMessage("");
+
+    try {
+      // Note: Cette fonctionnalité nécessiterait un endpoint API pour supprimer
+      setMessage("Fonctionnalité de suppression à implémenter côté API");
+    } catch (error: any) {
+      setMessage(`Erreur: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-8">
-      <div className="container max-w-2xl mx-auto px-4">
+    <div className="container max-w-4xl mx-auto py-8 px-4">
+      <div className="space-y-6">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            Données de test
+          </h1>
+          <p className="text-gray-600">
+            Générez des données de démonstration pour tester l'application
+          </p>
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle>Données de test</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div>
-              <p className="text-muted-foreground mb-4">
-                Utilisez cette page pour créer des données de démonstration dans
-                votre base MongoDB. Cela vous permettra de tester les
-                dashboards avec des données réelles.
-              </p>
-
-              <Alert className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Compte actuel :</strong>{" "}
-                  {userProfile.userType === "client"
-                    ? "Client"
-                    : "Professionnel"}
-                  <br />
-                  <strong>Email :</strong> {currentUser.email}
-                </AlertDescription>
-              </Alert>
-            </div>
+            <p className="text-muted-foreground">
+              Utilisez cette page pour créer des données de démonstration dans
+              votre base MongoDB. Cela vous permettra de tester les dashboards
+              avec des données réelles.
+            </p>
 
             {message && (
               <Alert
-                className={
-                  message.includes("succès")
-                    ? "border-green-200 bg-green-50"
-                    : "border-red-200 bg-red-50"
-                }
+                variant={message.includes("Erreur") ? "destructive" : "default"}
               >
+                <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{message}</AlertDescription>
               </Alert>
             )}
 
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">
-                  Créer des rendez-vous de démonstration
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {userProfile.userType === "client"
-                    ? "Cela créera 3 rendez-vous (1 passé, 2 à venir) pour tester votre dashboard client."
-                    : "Cela créera 2 rendez-vous clients pour tester votre dashboard professionnel."}
-                </p>
-                <Button
-                  onClick={createSampleAppointments}
-                  disabled={loading}
-                  className="w-full"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  {loading
-                    ? "Création en cours..."
-                    : "Créer des données de test"}
-                </Button>
-              </div>
+            <div className="flex gap-4 justify-center">
+              <Button
+                onClick={createSampleAppointments}
+                disabled={loading || !currentUser}
+                size="lg"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {loading ? "Création..." : "Créer des rendez-vous"}
+              </Button>
+
+              <Button
+                onClick={clearData}
+                variant="outline"
+                disabled={loading || !currentUser}
+                size="lg"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Vider les données
+              </Button>
             </div>
 
-            <div className="pt-4 border-t">
-              <p className="text-xs text-muted-foreground">
-                <strong>Note :</strong> Cette page est uniquement à des fins de
-                test. En production, les rendez-vous sont créés par les clients
-                via l'interface de réservation.
-              </p>
-            </div>
+            {!currentUser && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Veuillez vous connecter pour créer des données de test.
+                </AlertDescription>
+              </Alert>
+            )}
           </CardContent>
         </Card>
       </div>

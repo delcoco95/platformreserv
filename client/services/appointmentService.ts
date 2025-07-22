@@ -1,20 +1,20 @@
-// client/services/appointmentService.ts
 import api from "../lib/api";
+import { Appointment } from "../types";
 
-export interface Appointment {
+interface CreateAppointmentData {
   clientId: string;
   professionalId: string;
   service: string;
-  date: Date;
+  date: string; // ISO date string
   duration: number;
-  status: "pending" | "confirmed" | "completed";
-  price: number;
-  address: string;
-  notes?: string;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  price?: number;
+  address?: string;
   coordinates?: {
     lat: number;
     lng: number;
   };
+  notes?: string;
 }
 
 class AppointmentService {

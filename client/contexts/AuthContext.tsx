@@ -50,24 +50,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         `/users/${user.uid}`,
       );
       setUserProfile(profile);
-    } catch (err) {
-      console.error("Erreur chargement profil :", err);
+    } catch (error) {
+      console.error("Erreur lors du chargement du profil:", error);
     }
   };
 
   const login = async (email: string, password: string) => {
     try {
-      const { token, user } = await api.post<{ token: string; user: AuthUser }>(
+      const response = await api.post<{ user: AuthUser; token: string }>(
         "/auth/login",
-        { email, password }
+        {
+          email,
+          password,
+        },
       );
 
-      localStorage.setItem("auth_token", token);
-      setToken(token);
-      setCurrentUser(user);
-      await loadUserProfile(user.uid);
+      localStorage.setItem("auth_token", response.token);
+      setCurrentUser(response.user);
+      await loadUserProfile(response.user);
     } catch (error) {
-      console.error("Erreur de connexion :", error);
+      console.error("Erreur de connexion:", error);
       throw error;
     }
   };
@@ -80,15 +82,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const response = await api.post<{ user: AuthUser; token: string }>(
         "/auth/register",
-        { email, password, role: userType }
+        {
+          email,
+          password,
+          userType,
+        },
       );
 
-      localStorage.setItem("auth_token", token);
-      setToken(token);
-      setCurrentUser(user);
-      await loadUserProfile(user.uid);
+      localStorage.setItem("auth_token", response.token);
+      setCurrentUser(response.user);
+      await loadUserProfile(response.user);
     } catch (error) {
-      console.error("Erreur d'inscription :", error);
+      console.error("Erreur d'inscription:", error);
       throw error;
     }
   };
@@ -113,36 +118,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const updatedProfile = await api.put<ClientProfile | ProfessionalProfile>(
         `/users/${currentUser.uid}`,
-        data
+        data,
       );
       setUserProfile(updatedProfile);
     } catch (error) {
-      console.error("Erreur mise à jour du profil :", error);
+      console.error("Erreur lors de la mise à jour:", error);
       throw error;
     }
   };
 
+  // Vérifier l'authentification au chargement
   useEffect(() => {
     const checkAuth = async () => {
-      if (!token) {
-        setLoading(false);
-        return;
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        try {
+          const user = await api.get<AuthUser>("/auth/me");
+          setCurrentUser(user);
+          await loadUserProfile(user);
+        } catch (error) {
+          console.error("Token invalide:", error);
+          localStorage.removeItem("auth_token");
+        }
       }
-
-      try {
-        const user = await api.get<AuthUser>("/auth/me");
-        setCurrentUser(user);
-        await loadUserProfile(user.uid);
-      } catch (err) {
-        console.error("Token invalide ou expiré :", err);
-        logout();
-      } finally {
-        setLoading(false);
-      }
+      setLoading(false);
     };
 
     checkAuth();
-  }, [token]);
+  }, []);
 
   const value = {
     currentUser,
