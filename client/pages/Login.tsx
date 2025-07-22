@@ -62,25 +62,11 @@ export default function Login() {
     } catch (error: any) {
       console.error("Erreur de connexion:", error);
 
-      // Messages d'erreur Firebase traduits
-      switch (error.code) {
-        case "auth/user-not-found":
-          setError("Aucun compte trouvé avec cette adresse email");
-          break;
-        case "auth/wrong-password":
-          setError("Mot de passe incorrect");
-          break;
-        case "auth/invalid-email":
-          setError("Adresse email invalide");
-          break;
-        case "auth/user-disabled":
-          setError("Ce compte a été désactivé");
-          break;
-        case "auth/too-many-requests":
-          setError("Trop de tentatives. Veuillez réessayer plus tard");
-          break;
-        default:
-          setError("Une erreur est survenue lors de la connexion");
+      // Messages d'erreur API
+      if (error.message) {
+        setError(error.message);
+      } else {
+        setError("Erreur de connexion. Veuillez réessayer");
       }
     } finally {
       setIsLoading(false);
