@@ -67,3 +67,7 @@ export const now = () => {
 export const fromDate = (date: Date) => {
   return date.toISOString();
 };
+
+export const parseDate = (dateString: string) => {
+  return new Date(dateString);
+};
