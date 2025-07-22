@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
 import {
   Card,
   CardContent,
@@ -10,51 +8,48 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/select";
 import { Alert, AlertDescription } from "../components/ui/alert";
-import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
-import {
-  User,
-  Building,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  UserCheck,
-} from "lucide-react";
+import { AlertCircle, UserCheck } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import {
+  AccountTypeSelector,
+  ClientForm,
+  ProfessionalForm,
+  CommonFields,
+} from "../components/auth";
 
 type AccountType = "client" | "professionnel" | "";
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  companyName: string;
+  profession: string;
+  siret: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  phone: string;
+  address: string;
+}
 
 export default function Signup() {
   const navigate = useNavigate();
   const { register, currentUser, userProfile } = useAuth();
 
   const [accountType, setAccountType] = useState<AccountType>("");
-  const [formData, setFormData] = useState({
-    // Client fields
+  const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
-    // Professional fields
     companyName: "",
     profession: "",
     siret: "",
-    // Common fields
     email: "",
     password: "",
     confirmPassword: "",
     phone: "",
     address: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -124,28 +119,9 @@ export default function Signup() {
     setIsLoading(true);
 
     try {
-      // Préparer les données additionnelles selon le type de compte
-      const additionalData =
-        accountType === "client"
-          ? {
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-              phone: formData.phone,
-              address: formData.address,
-            }
-          : {
-              companyName: formData.companyName,
-              profession: formData.profession,
-              siret: formData.siret,
-              phone: formData.phone,
-              address: formData.address,
-            };
-
       await register(formData.email, formData.password, accountType);
     } catch (error: any) {
       console.error("Erreur d'inscription:", error);
-
-      // Messages d'erreur API
       if (error.message) {
         setError(error.message);
       } else {
@@ -187,254 +163,33 @@ export default function Signup() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Sélection du type de compte */}
-              <div>
-                <Label className="text-base font-semibold">
-                  Type de compte *
-                </Label>
-                <RadioGroup
-                  value={accountType}
-                  onValueChange={(value) =>
-                    setAccountType(value as AccountType)
-                  }
-                  className="mt-3"
-                >
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <RadioGroupItem value="client" id="client" />
-                    <Label
-                      htmlFor="client"
-                      className="flex items-center space-x-3 cursor-pointer flex-1"
-                    >
-                      <User className="h-5 w-5 text-blue-600" />
-                      <div>
-                        <div className="font-medium">Client</div>
-                        <div className="text-sm text-gray-600">
-                          Je recherche des services
-                        </div>
-                      </div>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <RadioGroupItem value="professionnel" id="professionnel" />
-                    <Label
-                      htmlFor="professionnel"
-                      className="flex items-center space-x-3 cursor-pointer flex-1"
-                    >
-                      <Building className="h-5 w-5 text-green-600" />
-                      <div>
-                        <div className="font-medium">Professionnel</div>
-                        <div className="text-sm text-gray-600">
-                          Je propose mes services
-                        </div>
-                      </div>
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
+              <AccountTypeSelector
+                value={accountType}
+                onChange={setAccountType}
+              />
 
-              {/* Champs spécifiques au client */}
               {accountType === "client" && (
-                <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h3 className="font-semibold text-blue-900">
-                    Informations personnelles
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">Prénom *</Label>
-                      <Input
-                        id="firstName"
-                        value={formData.firstName}
-                        onChange={(e) =>
-                          handleInputChange("firstName", e.target.value)
-                        }
-                        placeholder="Votre prénom"
-                        disabled={isLoading}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Nom *</Label>
-                      <Input
-                        id="lastName"
-                        value={formData.lastName}
-                        onChange={(e) =>
-                          handleInputChange("lastName", e.target.value)
-                        }
-                        placeholder="Votre nom"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <ClientForm
+                  formData={formData}
+                  onInputChange={handleInputChange}
+                  isLoading={isLoading}
+                />
               )}
 
-              {/* Champs spécifiques au professionnel */}
               {accountType === "professionnel" && (
-                <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <h3 className="font-semibold text-green-900">
-                    Informations professionnelles
-                  </h3>
-                  <div>
-                    <Label htmlFor="companyName">Nom de l'entreprise *</Label>
-                    <Input
-                      id="companyName"
-                      value={formData.companyName}
-                      onChange={(e) =>
-                        handleInputChange("companyName", e.target.value)
-                      }
-                      placeholder="Nom de votre entreprise"
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="profession">Profession *</Label>
-                      <Select
-                        value={formData.profession}
-                        onValueChange={(value) =>
-                          handleInputChange("profession", value)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Choisir..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="automobile">Automobile</SelectItem>
-                          <SelectItem value="plomberie">Plomberie</SelectItem>
-                          <SelectItem value="serrurerie">Serrurerie</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="siret">SIRET (optionnel)</Label>
-                      <Input
-                        id="siret"
-                        value={formData.siret}
-                        onChange={(e) =>
-                          handleInputChange("siret", e.target.value)
-                        }
-                        placeholder="Numéro SIRET"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <ProfessionalForm
+                  formData={formData}
+                  onInputChange={handleInputChange}
+                  isLoading={isLoading}
+                />
               )}
 
-              {/* Champs communs */}
               {accountType && (
-                <div className="space-y-4">
-                  <h3 className="font-semibold">Informations de contact</h3>
-
-                  <div>
-                    <Label htmlFor="email">Adresse email *</Label>
-                    <div className="relative mt-1">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) =>
-                          handleInputChange("email", e.target.value)
-                        }
-                        className="pl-10"
-                        placeholder="votre@email.com"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="password">Mot de passe *</Label>
-                      <div className="relative mt-1">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="password"
-                          type={showPassword ? "text" : "password"}
-                          value={formData.password}
-                          onChange={(e) =>
-                            handleInputChange("password", e.target.value)
-                          }
-                          className="pl-10 pr-10"
-                          placeholder="••••••••"
-                          disabled={isLoading}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        >
-                          {showPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="confirmPassword">
-                        Confirmer le mot de passe *
-                      </Label>
-                      <div className="relative mt-1">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="confirmPassword"
-                          type={showConfirmPassword ? "text" : "password"}
-                          value={formData.confirmPassword}
-                          onChange={(e) =>
-                            handleInputChange("confirmPassword", e.target.value)
-                          }
-                          className="pl-10 pr-10"
-                          placeholder="••••••••"
-                          disabled={isLoading}
-                        />
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="phone">Téléphone (optionnel)</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) =>
-                          handleInputChange("phone", e.target.value)
-                        }
-                        placeholder="06 12 34 56 78"
-                        disabled={isLoading}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="address">Adresse (optionnel)</Label>
-                      <Input
-                        id="address"
-                        value={formData.address}
-                        onChange={(e) =>
-                          handleInputChange("address", e.target.value)
-                        }
-                        placeholder="Votre adresse"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <CommonFields
+                  formData={formData}
+                  onInputChange={handleInputChange}
+                  isLoading={isLoading}
+                />
               )}
 
               {accountType && (
@@ -463,7 +218,6 @@ export default function Signup() {
           </CardContent>
         </Card>
 
-        {/* Lien de retour */}
         <div className="text-center">
           <Link
             to="/"
