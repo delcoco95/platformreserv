@@ -108,7 +108,7 @@ export default function TestData() {
       }
 
       setMessage(
-        `${appointments.length} rendez-vous de démonstration créés avec succès !`
+        `${appointments.length} rendez-vous de démonstration créés avec succès !`,
       );
     } catch (error: any) {
       console.error("Erreur lors de la création des données:", error);
@@ -151,12 +151,14 @@ export default function TestData() {
           <CardContent className="space-y-6">
             <p className="text-muted-foreground">
               Utilisez cette page pour créer des données de démonstration dans
-              votre base MongoDB. Cela vous permettra de tester les
-              dashboards avec des données réelles.
+              votre base MongoDB. Cela vous permettra de tester les dashboards
+              avec des données réelles.
             </p>
 
             {message && (
-              <Alert variant={message.includes("Erreur") ? "destructive" : "default"}>
+              <Alert
+                variant={message.includes("Erreur") ? "destructive" : "default"}
+              >
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{message}</AlertDescription>
               </Alert>

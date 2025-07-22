@@ -39,9 +39,13 @@ class AppointmentService {
   }
 
   // Récupérer tous les rendez-vous d'un professionnel
-  async getProfessionalAppointments(professionalId: string): Promise<Appointment[]> {
+  async getProfessionalAppointments(
+    professionalId: string,
+  ): Promise<Appointment[]> {
     try {
-      return await api.get<Appointment[]>(`/appointments/professional/${professionalId}`);
+      return await api.get<Appointment[]>(
+        `/appointments/professional/${professionalId}`,
+      );
     } catch (error) {
       console.error("Erreur lors de la récupération des rendez-vous:", error);
       throw error;
@@ -61,7 +65,7 @@ class AppointmentService {
   // Mettre à jour un rendez-vous
   async updateAppointment(
     id: string,
-    data: Partial<Appointment>
+    data: Partial<Appointment>,
   ): Promise<void> {
     try {
       await api.put(`/appointments/${id}`, data);
@@ -114,10 +118,10 @@ class AppointmentService {
   // Simuler un listener temps réel pour les rendez-vous d'un utilisateur
   onUserAppointmentsChange(
     userId: string,
-    callback: (appointments: Appointment[]) => void
+    callback: (appointments: Appointment[]) => void,
   ): () => void {
     let intervalId: NodeJS.Timeout;
-    
+
     const fetchData = async () => {
       try {
         const appointments = await this.getUserAppointments(userId);
@@ -144,13 +148,14 @@ class AppointmentService {
   // Simuler un listener temps réel pour les rendez-vous d'un professionnel
   onProfessionalAppointmentsChange(
     professionalId: string,
-    callback: (appointments: Appointment[]) => void
+    callback: (appointments: Appointment[]) => void,
   ): () => void {
     let intervalId: NodeJS.Timeout;
-    
+
     const fetchData = async () => {
       try {
-        const appointments = await this.getProfessionalAppointments(professionalId);
+        const appointments =
+          await this.getProfessionalAppointments(professionalId);
         callback(appointments);
       } catch (error) {
         console.error("Erreur lors de la mise à jour des rendez-vous:", error);
