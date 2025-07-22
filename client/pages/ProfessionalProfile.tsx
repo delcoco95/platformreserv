@@ -53,7 +53,7 @@ import {
   ProfessionalProfile as ProfessionalType,
   ClientProfile,
 } from "../types";
-import { now } from "../lib/dateUtils";
+import { now, formatDate } from "../lib/dateUtils";
 
 interface Service {
   id: string;
