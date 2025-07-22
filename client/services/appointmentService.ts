@@ -1,28 +1,33 @@
-// client/services/appointmentService.ts
 import api from "../lib/api";
+import { Appointment } from "../types";
 
-export interface Appointment {
+interface CreateAppointmentData {
   clientId: string;
   professionalId: string;
   service: string;
-  date: Date;
+  date: string; // ISO date string
   duration: number;
-  status: "pending" | "confirmed" | "completed";
-  price: number;
-  address: string;
-  notes?: string;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  price?: number;
+  address?: string;
   coordinates?: {
     lat: number;
     lng: number;
   };
+  notes?: string;
 }
 
-export const appointmentService = {
-  async createAppointment(data: Appointment) {
-    return await api.post<Appointment>("/appointments", data);
-  },
+class AppointmentService {
+  // Créer un rendez-vous
+  async createAppointment(data: CreateAppointmentData): Promise<Appointment> {
+    try {
+      return await api.post<Appointment>("/appointments", data);
+    } catch (error) {
+      console.error("Erreur lors de la création du rendez-vous:", error);
+      throw error;
+    }
+  }
 
-<<<<<<< HEAD
   // Récupérer tous les rendez-vous d'un utilisateur
   async getUserAppointments(userId: string): Promise<Appointment[]> {
     try {
@@ -34,13 +39,9 @@ export const appointmentService = {
   }
 
   // Récupérer tous les rendez-vous d'un professionnel
-  async getProfessionalAppointments(
-    professionalId: string,
-  ): Promise<Appointment[]> {
+  async getProfessionalAppointments(professionalId: string): Promise<Appointment[]> {
     try {
-      return await api.get<Appointment[]>(
-        `/appointments/professional/${professionalId}`,
-      );
+      return await api.get<Appointment[]>(`/appointments/professional/${professionalId}`);
     } catch (error) {
       console.error("Erreur lors de la récupération des rendez-vous:", error);
       throw error;
@@ -60,7 +61,7 @@ export const appointmentService = {
   // Mettre à jour un rendez-vous
   async updateAppointment(
     id: string,
-    data: Partial<Appointment>,
+    data: Partial<Appointment>
   ): Promise<void> {
     try {
       await api.put(`/appointments/${id}`, data);
@@ -113,10 +114,10 @@ export const appointmentService = {
   // Simuler un listener temps réel pour les rendez-vous d'un utilisateur
   onUserAppointmentsChange(
     userId: string,
-    callback: (appointments: Appointment[]) => void,
+    callback: (appointments: Appointment[]) => void
   ): () => void {
     let intervalId: NodeJS.Timeout;
-
+    
     const fetchData = async () => {
       try {
         const appointments = await this.getUserAppointments(userId);
@@ -143,14 +144,13 @@ export const appointmentService = {
   // Simuler un listener temps réel pour les rendez-vous d'un professionnel
   onProfessionalAppointmentsChange(
     professionalId: string,
-    callback: (appointments: Appointment[]) => void,
+    callback: (appointments: Appointment[]) => void
   ): () => void {
     let intervalId: NodeJS.Timeout;
-
+    
     const fetchData = async () => {
       try {
-        const appointments =
-          await this.getProfessionalAppointments(professionalId);
+        const appointments = await this.getProfessionalAppointments(professionalId);
         callback(appointments);
       } catch (error) {
         console.error("Erreur lors de la mise à jour des rendez-vous:", error);
@@ -176,9 +176,3 @@ export const appointmentService = {
 }
 
 export const appointmentService = new AppointmentService();
-=======
-  async getMyAppointments(): Promise<Appointment[]> {
-    return await api.get<Appointment[]>("/appointments/me");
-  },
-};
->>>>>>> ca4d23a693dc66045048cf272f5860e467ffbf21
