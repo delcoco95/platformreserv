@@ -51,8 +51,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         `/users/${user.uid}`,
       );
       setUserProfile(profile);
+      setError(null);
     } catch (error) {
       console.error("Erreur lors du chargement du profil:", error);
+      setError("Impossible de charger le profil utilisateur");
+      // Ne pas faire échouer complètement, juste log l'erreur
     }
   };
 
