@@ -194,7 +194,9 @@ export default function Signup() {
                 </Label>
                 <RadioGroup
                   value={accountType}
-                  onValueChange={(value) => setAccountType(value as AccountType)}
+                  onValueChange={(value) =>
+                    setAccountType(value as AccountType)
+                  }
                   className="mt-3"
                 >
                   <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-gray-50 transition-colors">

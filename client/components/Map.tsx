@@ -35,8 +35,6 @@ interface MapProps {
   onMarkerClick?: (appointment: Appointment) => void;
 }
 
-
-
 export function Map({
   appointments,
   center,

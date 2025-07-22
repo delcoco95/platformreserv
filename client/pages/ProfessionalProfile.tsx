@@ -251,8 +251,6 @@ export default function ProfessionalProfile() {
     }
   };
 
-
-
   const groupSlotsByDate = () => {
     const grouped: Record<string, TimeSlot[]> = {};
     timeSlots.forEach((slot) => {
