@@ -53,7 +53,7 @@ import {
   ProfessionalProfile as ProfessionalType,
   ClientProfile,
 } from "../types";
-import { Timestamp } from "firebase/firestore";
+import { now } from "../lib/dateUtils";
 
 interface Service {
   id: string;
