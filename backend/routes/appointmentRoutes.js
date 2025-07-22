@@ -1,19 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../Middleware/auth");
-const Appointment = require("../models/Appointment");
+const auth = require("../middleware/auth");
+const {
+  createAppointment,
+  getUserAppointments,
+  getProfessionalAppointments,
+  updateAppointment,
+  cancelAppointment,
+  confirmAppointment,
+  completeAppointment,
+} = require("../controllers/appointmentController");
 
-// POST /api/appointments
-router.post("/", auth, async (req, res) => {
-  try {
-    const appointment = new Appointment({
-      ...req.body,
-    });
-    await appointment.save();
-    res.status(201).json({ success: true, data: appointment });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
-});
+// Routes des rendez-vous
+router.post("/", auth, createAppointment);
+router.get("/user/:userId", auth, getUserAppointments);
+router.get("/professional/:professionalId", auth, getProfessionalAppointments);
+router.put("/:id", auth, updateAppointment);
+router.put("/:id/cancel", auth, cancelAppointment);
+router.put("/:id/confirm", auth, confirmAppointment);
+router.put("/:id/complete", auth, completeAppointment);
 
 module.exports = router;
