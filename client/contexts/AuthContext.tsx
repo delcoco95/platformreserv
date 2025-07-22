@@ -1,18 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import {
-  User as FirebaseUser,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  updateProfile,
-} from "firebase/auth";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { BaseUser, ClientProfile, ProfessionalProfile } from "../types";
 
 interface AuthContextType {
-  currentUser: FirebaseUser | null;
+  token: string | null;
   userProfile: ClientProfile | ProfessionalProfile | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -20,11 +10,11 @@ interface AuthContextType {
     email: string,
     password: string,
     userType: "client" | "professionnel",
-    additionalData?: any,
+    additionalData?: any
   ) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: () => void;
   updateUserProfile: (
-    data: Partial<ClientProfile | ProfessionalProfile>,
+    data: Partial<ClientProfile | ProfessionalProfile>
   ) => Promise<void>;
   refreshUserProfile: () => Promise<void>;
 }
@@ -39,96 +29,116 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
-  const [userProfile, setUserProfile] = useState<
-    ClientProfile | ProfessionalProfile | null
-  >(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("token")
+  );
+  const [userProfile, setUserProfile] = useState<ClientProfile | ProfessionalProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadUserProfile = async (user: FirebaseUser) => {
+  const API_URL = "http://localhost:5000/api"; // adapte à ton environnement
+
+  const refreshUserProfile = async () => {
+    if (!token) return;
     try {
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        const data = userDoc.data() as ClientProfile | ProfessionalProfile;
+      const res = await fetch(`${API_URL}/users/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
         setUserProfile(data);
+      } else {
+        logout();
       }
-    } catch (error) {
-      console.error("Error loading user profile:", error);
+    } catch (err) {
+      console.error("Erreur lors du chargement du profil", err);
     }
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
-      if (user) {
-        await loadUserProfile(user);
-      } else {
-        setUserProfile(null);
-      }
+    if (token) {
+      refreshUserProfile().finally(() => setLoading(false));
+    } else {
       setLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
+    }
+  }, [token]);
 
   const register = async (
     email: string,
     password: string,
     userType: "client" | "professionnel",
-    additionalData: any = {},
+    additionalData: any = {}
   ) => {
-    const { user } = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        role: userType,
+        email,
+        password,
+        ...additionalData,
+      }),
+    });
 
-    const baseUserData = {
-      uid: user.uid,
-      email: user.email!,
-      userType,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      ...additionalData,
-    };
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Erreur d’inscription");
+    }
 
-    await setDoc(doc(db, "users", user.uid), baseUserData);
-    await loadUserProfile(user);
+    const data = await res.json();
+    localStorage.setItem("token", data.token);
+    setToken(data.token);
+    await refreshUserProfile();
   };
 
   const login = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Erreur de connexion");
+    }
+
+    const data = await res.json();
+    localStorage.setItem("token", data.token);
+    setToken(data.token);
+    await refreshUserProfile();
   };
 
-  const logout = async () => {
-    await signOut(auth);
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    setUserProfile(null);
   };
 
   const updateUserProfile = async (
-    data: Partial<ClientProfile | ProfessionalProfile>,
+    data: Partial<ClientProfile | ProfessionalProfile>
   ) => {
-    if (!currentUser) throw new Error("No user logged in");
+    if (!token) throw new Error("Utilisateur non connecté");
 
-    const updatedData = {
-      ...data,
-      updatedAt: new Date(),
-    };
+    const res = await fetch(`${API_URL}/users/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
 
-    await updateDoc(doc(db, "users", currentUser.uid), updatedData);
-    await loadUserProfile(currentUser);
-  };
-
-  const refreshUserProfile = async () => {
-    if (currentUser) {
-      await loadUserProfile(currentUser);
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || "Erreur lors de la mise à jour");
     }
+
+    await refreshUserProfile();
   };
 
   const value = {
-    currentUser,
+    token,
     userProfile,
     loading,
     login,
@@ -138,5 +148,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     refreshUserProfile,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
 };
