@@ -170,5 +170,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     updateUserProfile,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  // Toujours retourner le provider, même en cas d'erreur
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
