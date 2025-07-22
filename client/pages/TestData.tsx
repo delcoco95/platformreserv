@@ -9,7 +9,7 @@ import {
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { useAuth } from "../contexts/AuthContext";
 import { appointmentService } from "../services/appointmentService";
-import { Timestamp } from "firebase/firestore";
+import { now } from "../lib/dateUtils";
 import { Plus, Trash2, AlertCircle } from "lucide-react";
 
 export default function TestData() {
