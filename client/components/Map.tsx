@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import { formatDate } from "../lib/dateUtils";
 
 // Fix Leaflet default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
