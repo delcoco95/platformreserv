@@ -37,6 +37,7 @@ interface FormData {
 export default function Signup() {
   const navigate = useNavigate();
   const { register, currentUser, userProfile } = useAuth();
+  const { error, setError, validateForm, prepareAdditionalData } = useSignupValidation();
 
   const [accountType, setAccountType] = useState<AccountType>("");
   const [formData, setFormData] = useState<FormData>({
@@ -51,7 +52,6 @@ export default function Signup() {
     phone: "",
     address: "",
   });
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   // Redirection automatique si déjà connecté
