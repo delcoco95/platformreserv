@@ -28,7 +28,7 @@ export const StatsCards = ({
   ];
 
   return (
-    <div className="grid md:grid-cols-3 gap-4">
+    <div className="grid md:grid-cols-2 gap-4">
       {stats.map((stat, index) => (
         <Card key={index}>
           <CardContent className="p-6">
