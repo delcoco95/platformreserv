@@ -43,6 +43,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <div className="min-h-screen bg-background flex flex-col">
+          <ScrollToTop />
           <AutoRedirect />
           <Header />
           <main className="flex-1">
