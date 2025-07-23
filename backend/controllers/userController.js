@@ -73,11 +73,7 @@ exports.updateUser = async (req, res) => {
     const user = await User.findByIdAndUpdate(userId, updateData, {
       new: true,
       runValidators: true,
-    });
-
-    if (user && user.password) {
-      delete user.password; // Exclure le password
-    }
+    }).select("-password");
 
     if (!user) {
       return res.status(404).json({
