@@ -248,7 +248,7 @@ export default function ProfessionalProfile() {
       setShowBookingDialog(false);
 
       // Reset form
-      setSelectedService(null);
+      setSelectedServices([]);
       setSelectedSlot(null);
       setBookingNotes("");
       setClientAddress("");
