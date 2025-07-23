@@ -12,9 +12,14 @@ const appointmentSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    services: [{
+      name: { type: String, required: true },
+      price: { type: Number, required: true },
+      duration: { type: Number, default: 60 },
+    }],
+    // Maintenir la compatibilité avec l'ancien champ service
     service: {
       type: String,
-      required: true,
     },
     date: {
       type: Date,
