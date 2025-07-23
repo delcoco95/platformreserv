@@ -434,7 +434,7 @@ export default function ProfessionalProfile() {
             )}
 
             {/* Booking Button */}
-            {selectedService && selectedSlot && (
+            {selectedServices.length > 0 && selectedSlot && (
               <Card>
                 <CardContent className="p-6">
                   <div className="text-center space-y-4">
