@@ -65,77 +65,22 @@ export default function Signup() {
     }
   }, [currentUser, userProfile, navigate]);
 
-  const validateEmail = (email: string) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-  const validatePassword = (password: string) => password.length >= 6;
-
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
-    // Validation
-    if (!accountType) {
-      setError("Veuillez sélectionner un type de compte");
+    // Validation avec le hook
+    if (!validateForm(accountType, formData)) {
       return;
-    }
-
-    if (!formData.email || !formData.password || !formData.confirmPassword) {
-      setError("Veuillez remplir tous les champs obligatoires");
-      return;
-    }
-
-    if (!validateEmail(formData.email)) {
-      setError("Veuillez entrer une adresse email valide");
-      return;
-    }
-
-    if (!validatePassword(formData.password)) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Les mots de passe ne correspondent pas");
-      return;
-    }
-
-    // Validation spécifique au type de compte
-    if (accountType === "client") {
-      if (!formData.firstName || !formData.lastName) {
-        setError("Veuillez remplir votre nom et prénom");
-        return;
-      }
-    } else if (accountType === "professionnel") {
-      if (!formData.companyName || !formData.profession) {
-        setError("Veuillez remplir le nom de l'entreprise et la profession");
-        return;
-      }
     }
 
     setIsLoading(true);
 
     try {
-      // Préparer les données additionnelles selon le type de compte
-      const additionalData =
-        accountType === "client"
-          ? {
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-              phone: formData.phone,
-              address: formData.address,
-            }
-          : {
-              companyName: formData.companyName,
-              profession: formData.profession,
-              siret: formData.siret,
-              phone: formData.phone,
-              address: formData.address,
-            };
+      const additionalData = prepareAdditionalData(accountType, formData);
 
       await register(
         formData.email,
