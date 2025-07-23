@@ -17,7 +17,6 @@ import {
   X,
   Plus,
   CalendarCheck,
-  Star,
 } from "lucide-react";
 import { Appointment } from "../../types";
 
