@@ -27,7 +27,17 @@ export default function ProfessionalsList() {
   useEffect(() => {
     // Utiliser un listener temps réel pour les professionnels
     const unsubscribe = professionalService.onProfessionalsChange((data) => {
-      setProfessionals(data);
+      // Vérification de sécurité pour éviter les erreurs
+      const validProfessionals = data.filter(prof => {
+        // Vérifier que les services sont valides
+        if (prof.services && !Array.isArray(prof.services)) {
+          console.warn('Services invalides pour le professionnel:', prof.uid);
+          return false;
+        }
+        return true;
+      });
+
+      setProfessionals(validProfessionals);
       setLoading(false);
     });
 
