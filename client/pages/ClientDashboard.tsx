@@ -33,6 +33,23 @@ export default function ClientDashboard() {
     formatTime,
   } = useClientDashboardLogic();
 
+  // État pour la messagerie rapide
+  const [quickMessageModal, setQuickMessageModal] = useState({
+    open: false,
+    receiverId: "",
+    receiverName: "",
+    appointmentSubject: "",
+  });
+
+  const handleSendMessage = (professionalId: string, professionalName: string, appointmentSubject: string) => {
+    setQuickMessageModal({
+      open: true,
+      receiverId: professionalId,
+      receiverName: professionalName,
+      appointmentSubject,
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
