@@ -267,21 +267,7 @@ export function EditProfileDialog({
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="services">
-                  Services (séparés par des virgules)
-                </Label>
-                <Textarea
-                  id="services"
-                  value={(formData.services as string) || ""}
-                  onChange={(e) =>
-                    handleInputChange("services", e.target.value)
-                  }
-                  placeholder="Vidange, freinage, lavage auto..."
-                  rows={2}
-                  disabled={loading}
-                />
-              </div>
+              {/* Champ services supprimé - gestion via section dédiée du dashboard */}
             </>
           )}
 
