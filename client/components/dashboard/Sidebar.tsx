@@ -118,9 +118,11 @@ export const Sidebar = ({
                 </div>
               )}
             </div>
-            <Button variant="outline" size="sm" className="w-full">
-              <Plus className="h-4 w-4 mr-2" />
-              Reprendre RDV
+            <Button variant="outline" size="sm" className="w-full" asChild>
+              <Link to={`/professionnel/${lastProfessional.uid}`}>
+                <Plus className="h-4 w-4 mr-2" />
+                Reprendre RDV
+              </Link>
             </Button>
           </CardContent>
         </Card>
