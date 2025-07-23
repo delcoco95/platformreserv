@@ -368,9 +368,7 @@ export default function Index() {
                 className="border-white text-white hover:bg-white/10 hover:border-white/80 backdrop-blur-sm"
                 asChild
               >
-                <Link to="/inscription?type=professionnel">
-                  En savoir plus
-                </Link>
+                <Link to="/inscription?type=professionnel">En savoir plus</Link>
               </Button>
             </div>
             <div className="flex items-center justify-center gap-8 text-sm text-primary-foreground/80 pt-8">

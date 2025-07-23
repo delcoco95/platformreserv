@@ -48,12 +48,14 @@ const userSchema = new mongoose.Schema(
     },
     siret: String,
     description: String,
-    services: [{
-      name: { type: String, required: true },
-      price: { type: Number, required: true },
-      duration: { type: Number, default: 60 }, // en minutes
-      description: String,
-    }],
+    services: [
+      {
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+        duration: { type: Number, default: 60 }, // en minutes
+        description: String,
+      },
+    ],
     rating: { type: Number, default: 0 },
     totalReviews: { type: Number, default: 0 },
     isVerified: { type: Boolean, default: false },

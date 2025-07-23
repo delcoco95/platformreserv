@@ -53,7 +53,9 @@ class MessageService {
   }
 
   // Listener pour les changements de conversations (polling simple)
-  onConversationsChange(callback: (conversations: Conversation[]) => void): () => void {
+  onConversationsChange(
+    callback: (conversations: Conversation[]) => void,
+  ): () => void {
     let intervalId: NodeJS.Timeout;
 
     const fetchConversations = async () => {
@@ -61,7 +63,10 @@ class MessageService {
         const conversations = await this.getConversations();
         callback(conversations);
       } catch (error) {
-        console.error("Erreur lors de la récupération des conversations:", error);
+        console.error(
+          "Erreur lors de la récupération des conversations:",
+          error,
+        );
       }
     };
 
@@ -80,7 +85,10 @@ class MessageService {
   }
 
   // Listener pour les changements de messages (polling simple)
-  onMessagesChange(otherUserId: string, callback: (messages: Message[]) => void): () => void {
+  onMessagesChange(
+    otherUserId: string,
+    callback: (messages: Message[]) => void,
+  ): () => void {
     let intervalId: NodeJS.Timeout;
 
     const fetchMessages = async () => {

@@ -39,8 +39,14 @@ exports.sendMessage = async (req, res) => {
 
     // Populer les informations utilisateur
     await message.populate([
-      { path: "senderId", select: "email userType firstName lastName companyName" },
-      { path: "receiverId", select: "email userType firstName lastName companyName" },
+      {
+        path: "senderId",
+        select: "email userType firstName lastName companyName",
+      },
+      {
+        path: "receiverId",
+        select: "email userType firstName lastName companyName",
+      },
     ]);
 
     res.status(201).json({
@@ -65,7 +71,10 @@ exports.getConversations = async (req, res) => {
     const conversations = await Message.aggregate([
       {
         $match: {
-          $or: [{ senderId: mongoose.Types.ObjectId(userId) }, { receiverId: mongoose.Types.ObjectId(userId) }],
+          $or: [
+            { senderId: mongoose.Types.ObjectId(userId) },
+            { receiverId: mongoose.Types.ObjectId(userId) },
+          ],
         },
       },
       {
@@ -77,7 +86,16 @@ exports.getConversations = async (req, res) => {
           lastMessage: { $first: "$$ROOT" },
           unreadCount: {
             $sum: {
-              $cond: [{ $and: [{ $eq: ["$receiverId", mongoose.Types.ObjectId(userId)] }, { $eq: ["$read", false] }] }, 1, 0],
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ["$receiverId", mongoose.Types.ObjectId(userId)] },
+                    { $eq: ["$read", false] },
+                  ],
+                },
+                1,
+                0,
+              ],
             },
           },
         },
@@ -102,7 +120,9 @@ exports.getConversations = async (req, res) => {
         $addFields: {
           otherUser: {
             $cond: [
-              { $eq: ["$lastMessage.senderId", mongoose.Types.ObjectId(userId)] },
+              {
+                $eq: ["$lastMessage.senderId", mongoose.Types.ObjectId(userId)],
+              },
               { $arrayElemAt: ["$receiver", 0] },
               { $arrayElemAt: ["$sender", 0] },
             ],
@@ -188,7 +208,7 @@ exports.markAsRead = async (req, res) => {
         receiverId: userId,
         read: false,
       },
-      { read: true }
+      { read: true },
     );
 
     res.json({

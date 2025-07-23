@@ -34,7 +34,10 @@ interface ServicesManagerProps {
   onUpdateServices: (services: Service[]) => void;
 }
 
-export const ServicesManager = ({ services, onUpdateServices }: ServicesManagerProps) => {
+export const ServicesManager = ({
+  services,
+  onUpdateServices,
+}: ServicesManagerProps) => {
   const [showAddService, setShowAddService] = useState(false);
   const [editingService, setEditingService] = useState<number | null>(null);
   const [formData, setFormData] = useState<Service>({
@@ -111,7 +114,9 @@ export const ServicesManager = ({ services, onUpdateServices }: ServicesManagerP
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingService !== null ? "Modifier le service" : "Ajouter un service"}
+                  {editingService !== null
+                    ? "Modifier le service"
+                    : "Ajouter un service"}
                 </DialogTitle>
                 <DialogDescription>
                   Définissez les détails de votre service
@@ -123,7 +128,9 @@ export const ServicesManager = ({ services, onUpdateServices }: ServicesManagerP
                   <Input
                     id="serviceName"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     placeholder="Ex: Révision complète"
                   />
                 </div>
@@ -136,7 +143,12 @@ export const ServicesManager = ({ services, onUpdateServices }: ServicesManagerP
                       min="0"
                       step="0.01"
                       value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          price: parseFloat(e.target.value) || 0,
+                        })
+                      }
                       placeholder="0.00"
                     />
                   </div>
@@ -148,7 +160,12 @@ export const ServicesManager = ({ services, onUpdateServices }: ServicesManagerP
                       min="15"
                       step="15"
                       value={formData.duration}
-                      onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 60 })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          duration: parseInt(e.target.value) || 60,
+                        })
+                      }
                       placeholder="60"
                     />
                   </div>
@@ -158,17 +175,28 @@ export const ServicesManager = ({ services, onUpdateServices }: ServicesManagerP
                   <Textarea
                     id="serviceDescription"
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                     placeholder="Description détaillée du service..."
                     rows={3}
                   />
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => handleDialogOpenChange(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => handleDialogOpenChange(false)}
+                >
                   Annuler
                 </Button>
-                <Button onClick={editingService !== null ? handleUpdateService : handleAddService}>
+                <Button
+                  onClick={
+                    editingService !== null
+                      ? handleUpdateService
+                      : handleAddService
+                  }
+                >
                   {editingService !== null ? "Modifier" : "Ajouter"}
                 </Button>
               </DialogFooter>
@@ -179,11 +207,10 @@ export const ServicesManager = ({ services, onUpdateServices }: ServicesManagerP
       <CardContent>
         {services.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-muted-foreground">
-              Aucun service configuré
-            </div>
+            <div className="text-muted-foreground">Aucun service configuré</div>
             <p className="text-sm text-muted-foreground mt-1">
-              Ajoutez vos premiers services pour commencer à recevoir des réservations
+              Ajoutez vos premiers services pour commencer à recevoir des
+              réservations
             </p>
           </div>
         ) : (
@@ -196,11 +223,17 @@ export const ServicesManager = ({ services, onUpdateServices }: ServicesManagerP
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h4 className="font-medium">{service.name}</h4>
-                    <Badge variant="secondary" className="flex items-center gap-1">
+                    <Badge
+                      variant="secondary"
+                      className="flex items-center gap-1"
+                    >
                       <Euro className="h-3 w-3" />
                       {service.price}€
                     </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1">
+                    <Badge
+                      variant="outline"
+                      className="flex items-center gap-1"
+                    >
                       <Clock className="h-3 w-3" />
                       {service.duration}min
                     </Badge>

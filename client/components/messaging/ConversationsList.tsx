@@ -19,9 +19,9 @@ interface ConversationsListProps {
   selectedConversationId?: string;
 }
 
-export const ConversationsList = ({ 
-  onSelectConversation, 
-  selectedConversationId 
+export const ConversationsList = ({
+  onSelectConversation,
+  selectedConversationId,
 }: ConversationsListProps) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,9 @@ export const ConversationsList = ({
 
   const getUserDisplayName = (user: any) => {
     if (user.userType === "client") {
-      return `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email;
+      return (
+        `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email
+      );
     }
     return user.companyName || user.email;
   };
@@ -84,7 +86,8 @@ export const ConversationsList = ({
             <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Aucune conversation</h3>
             <p className="text-muted-foreground text-sm">
-              Vos conversations apparaîtront ici une fois que vous commencerez à échanger
+              Vos conversations apparaîtront ici une fois que vous commencerez à
+              échanger
             </p>
           </div>
         ) : (
@@ -92,7 +95,11 @@ export const ConversationsList = ({
             {conversations.map((conversation) => (
               <Button
                 key={conversation.conversationId}
-                variant={selectedConversationId === conversation.conversationId ? "secondary" : "ghost"}
+                variant={
+                  selectedConversationId === conversation.conversationId
+                    ? "secondary"
+                    : "ghost"
+                }
                 className="w-full justify-start h-auto p-3"
                 onClick={() => onSelectConversation(conversation)}
               >
@@ -107,28 +114,34 @@ export const ConversationsList = ({
                       <Building className="absolute -bottom-1 -right-1 h-4 w-4 bg-background rounded-full p-0.5" />
                     )}
                   </div>
-                  
+
                   <div className="flex-1 text-left space-y-1">
                     <div className="flex items-center justify-between">
                       <h4 className="font-medium text-sm">
                         {getUserDisplayName(conversation.otherUser)}
                       </h4>
                       {conversation.unreadCount > 0 && (
-                        <Badge variant="destructive" className="h-5 w-5 p-0 text-xs">
+                        <Badge
+                          variant="destructive"
+                          className="h-5 w-5 p-0 text-xs"
+                        >
                           {conversation.unreadCount}
                         </Badge>
                       )}
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <p className="text-xs text-muted-foreground truncate max-w-[200px]">
                         {conversation.lastMessage.content}
                       </p>
                       <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        {formatDistanceToNow(new Date(conversation.lastMessage.createdAt), {
-                          addSuffix: true,
-                          locale: fr,
-                        })}
+                        {formatDistanceToNow(
+                          new Date(conversation.lastMessage.createdAt),
+                          {
+                            addSuffix: true,
+                            locale: fr,
+                          },
+                        )}
                       </span>
                     </div>
                   </div>

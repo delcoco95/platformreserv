@@ -23,11 +23,13 @@ export const ServiceSelector = ({
   onSelectionChange,
 }: ServiceSelectorProps) => {
   const handleServiceToggle = (service: Service) => {
-    const isSelected = selectedServices.some(s => s.name === service.name);
-    
+    const isSelected = selectedServices.some((s) => s.name === service.name);
+
     if (isSelected) {
       // Désélectionner le service
-      const newSelection = selectedServices.filter(s => s.name !== service.name);
+      const newSelection = selectedServices.filter(
+        (s) => s.name !== service.name,
+      );
       onSelectionChange(newSelection);
     } else {
       // Sélectionner le service
@@ -37,15 +39,21 @@ export const ServiceSelector = ({
   };
 
   const isServiceSelected = (service: Service) => {
-    return selectedServices.some(s => s.name === service.name);
+    return selectedServices.some((s) => s.name === service.name);
   };
 
   const getTotalPrice = () => {
-    return selectedServices.reduce((total, service) => total + service.price, 0);
+    return selectedServices.reduce(
+      (total, service) => total + service.price,
+      0,
+    );
   };
 
   const getTotalDuration = () => {
-    return selectedServices.reduce((total, service) => total + service.duration, 0);
+    return selectedServices.reduce(
+      (total, service) => total + service.duration,
+      0,
+    );
   };
 
   if (services.length === 0) {
@@ -100,7 +108,10 @@ export const ServiceSelector = ({
               <div className="flex items-center justify-between mb-1">
                 <h4 className="font-medium">{service.name}</h4>
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="flex items-center gap-1">
+                  <Badge
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
                     <Euro className="h-3 w-3" />
                     {service.price}€
                   </Badge>
@@ -118,7 +129,7 @@ export const ServiceSelector = ({
             </div>
           </div>
         ))}
-        
+
         {selectedServices.length === 0 && (
           <p className="text-muted-foreground text-center py-4 text-sm">
             Sélectionnez au moins un service pour continuer

@@ -41,19 +41,28 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { appointmentService } from "../services/appointmentService";
 import { EditProfileDialog } from "../components/EditProfileDialog";
-import { ServicesManager, AvailabilityManager } from "../components/professional";
+import {
+  ServicesManager,
+  AvailabilityManager,
+} from "../components/professional";
 import { ConversationsList, ChatWindow } from "../components/messaging";
 import { Appointment, ProfessionalProfile } from "../types";
 import { parseDate, formatDate, formatTime } from "../lib/dateUtils";
 import { Conversation } from "../services/messageService";
 
 export default function ProfessionalDashboard() {
-  const { currentUser, userProfile, loading: authLoading, updateUserProfile } = useAuth();
+  const {
+    currentUser,
+    userProfile,
+    loading: authLoading,
+    updateUserProfile,
+  } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showEditProfile, setShowEditProfile] = useState(false);
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [selectedConversation, setSelectedConversation] =
+    useState<Conversation | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -113,7 +122,9 @@ export default function ProfessionalDashboard() {
       case "confirmed":
         return <Badge className="bg-green-100 text-green-800">Confirmé</Badge>;
       case "pending":
-        return <Badge className="bg-yellow-100 text-yellow-800">En attente</Badge>;
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800">En attente</Badge>
+        );
       case "completed":
         return <Badge className="bg-blue-100 text-blue-800">Terminé</Badge>;
       case "cancelled":
@@ -272,7 +283,9 @@ export default function ProfessionalDashboard() {
                   <Calendar className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{todayAppointments.length}</p>
+                  <p className="text-2xl font-bold">
+                    {todayAppointments.length}
+                  </p>
                   <p className="text-sm text-muted-foreground">Aujourd'hui</p>
                 </div>
               </div>
@@ -285,7 +298,9 @@ export default function ProfessionalDashboard() {
                   <CheckCircle className="h-6 w-6 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{completedAppointments.length}</p>
+                  <p className="text-2xl font-bold">
+                    {completedAppointments.length}
+                  </p>
                   <p className="text-sm text-muted-foreground">RDV réalisés</p>
                 </div>
               </div>
@@ -314,7 +329,9 @@ export default function ProfessionalDashboard() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{totalEarnings}€</p>
-                  <p className="text-sm text-muted-foreground">Revenus totaux</p>
+                  <p className="text-sm text-muted-foreground">
+                    Revenus totaux
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -342,7 +359,9 @@ export default function ProfessionalDashboard() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm">
                       <Building className="h-4 w-4 text-muted-foreground" />
-                      <span>{professionalProfile?.companyName || "Non renseigné"}</span>
+                      <span>
+                        {professionalProfile?.companyName || "Non renseigné"}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Mail className="h-4 w-4 text-muted-foreground" />
@@ -355,7 +374,7 @@ export default function ProfessionalDashboard() {
                       </div>
                     )}
                   </div>
-                  
+
                   {professionalProfile?.rating && (
                     <div className="flex items-center gap-2 pt-2 border-t">
                       <Star className="h-4 w-4 text-yellow-500 fill-current" />
@@ -427,7 +446,8 @@ export default function ProfessionalDashboard() {
                           Sélectionnez une conversation
                         </h3>
                         <p className="text-muted-foreground">
-                          Choisissez une conversation dans la liste pour commencer à discuter
+                          Choisissez une conversation dans la liste pour
+                          commencer à discuter
                         </p>
                       </div>
                     </CardContent>
@@ -447,20 +467,28 @@ export default function ProfessionalDashboard() {
                 {appointments.length === 0 ? (
                   <div className="text-center py-8">
                     <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Aucun rendez-vous</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Aucun rendez-vous
+                    </h3>
                     <p className="text-muted-foreground">
-                      Vos rendez-vous apparaîtront ici une fois que les clients commenceront à réserver
+                      Vos rendez-vous apparaîtront ici une fois que les clients
+                      commenceront à réserver
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {appointments.map((appointment) => (
-                      <Card key={appointment.id} className="border-l-4 border-l-primary">
+                      <Card
+                        key={appointment.id}
+                        className="border-l-4 border-l-primary"
+                      >
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between">
                             <div className="flex-1 space-y-3">
                               <div className="flex items-center gap-3">
-                                <h3 className="font-semibold text-lg">{appointment.service}</h3>
+                                <h3 className="font-semibold text-lg">
+                                  {appointment.service}
+                                </h3>
                                 {getStatusBadge(appointment.status)}
                               </div>
                               <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
@@ -488,7 +516,9 @@ export default function ProfessionalDashboard() {
                               {appointment.status === "confirmed" && (
                                 <Button
                                   size="sm"
-                                  onClick={() => handleValidateAppointment(appointment.id)}
+                                  onClick={() =>
+                                    handleValidateAppointment(appointment.id)
+                                  }
                                 >
                                   <CheckCircle className="h-4 w-4 mr-2" />
                                   Valider
