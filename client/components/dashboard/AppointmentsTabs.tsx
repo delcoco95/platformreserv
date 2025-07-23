@@ -37,6 +37,7 @@ export const AppointmentsTabs = ({
   formatDate,
   formatTime,
   onCancelAppointment,
+  onSendMessage,
 }: AppointmentsTabsProps) => {
   const renderAppointmentCard = (
     appointment: Appointment,
