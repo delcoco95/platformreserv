@@ -619,7 +619,7 @@ export default function ProfessionalProfile() {
             </Card>
 
             {/* Services List */}
-            {professional.services && professional.services.length > 0 && (
+            {professional.services && Array.isArray(professional.services) && professional.services.length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle>Spécialités</CardTitle>
