@@ -51,6 +51,14 @@ export default function Signup() {
   // Redirection automatique si déjà connecté
   useSignupRedirection(currentUser, userProfile);
 
+  // Pré-sélectionner le type de compte selon les paramètres URL
+  useEffect(() => {
+    const typeParam = searchParams.get("type");
+    if (typeParam === "professionnel") {
+      setAccountType("professionnel");
+    }
+  }, [searchParams]);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
