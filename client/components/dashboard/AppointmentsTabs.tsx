@@ -27,6 +27,7 @@ interface AppointmentsTabsProps {
   formatDate: (date: any) => string;
   formatTime: (date: any) => string;
   onCancelAppointment: (appointmentId: string) => void;
+  onSendMessage?: (professionalId: string, professionalName: string, appointmentSubject: string) => void;
 }
 
 export const AppointmentsTabs = ({
