@@ -190,16 +190,21 @@ export default function ProfessionalProfile() {
       const clientProfile = userProfile as ClientProfile;
       const address = clientAddress || clientProfile?.address || "";
 
+      const totalPrice = selectedServices.reduce((sum, service) => sum + service.price, 0);
+      const totalDuration = selectedServices.reduce((sum, service) => sum + service.duration, 0);
+      const servicesNames = selectedServices.map(s => s.name).join(", ");
+
       const appointmentData = {
         clientId: currentUser.uid,
         professionalId: professional.uid,
-        service: selectedService.name,
+        service: servicesNames, // For backward compatibility
+        services: selectedServices.map(s => ({ name: s.name, price: s.price, duration: s.duration })),
         date: new Date(
           `${selectedSlot.date}T${selectedSlot.start}:00`,
         ).toISOString(),
-        duration: selectedService.duration,
+        duration: totalDuration,
         status: "pending" as const,
-        price: selectedService.price,
+        price: totalPrice,
         address: address,
         notes: bookingNotes,
         coordinates: {
