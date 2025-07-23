@@ -31,18 +31,26 @@ export const CommonFields = ({
 }: CommonFieldsProps) => {
   // États internes si les props ne sont pas fournies
   const [internalShowPassword, setInternalShowPassword] = useState(false);
-  const [internalShowConfirmPassword, setInternalShowConfirmPassword] = useState(false);
+  const [internalShowConfirmPassword, setInternalShowConfirmPassword] =
+    useState(false);
 
   // Utiliser les props externes ou les états internes
-  const showPassword = externalShowPassword !== undefined ? externalShowPassword : internalShowPassword;
+  const showPassword =
+    externalShowPassword !== undefined
+      ? externalShowPassword
+      : internalShowPassword;
   const setShowPassword = externalSetShowPassword || setInternalShowPassword;
-  const showConfirmPassword = externalShowConfirmPassword !== undefined ? externalShowConfirmPassword : internalShowConfirmPassword;
-  const setShowConfirmPassword = externalSetShowConfirmPassword || setInternalShowConfirmPassword;
+  const showConfirmPassword =
+    externalShowConfirmPassword !== undefined
+      ? externalShowConfirmPassword
+      : internalShowConfirmPassword;
+  const setShowConfirmPassword =
+    externalSetShowConfirmPassword || setInternalShowConfirmPassword;
 
   return (
     <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
       <h3 className="font-semibold text-gray-900">Informations de connexion</h3>
-      
+
       <div className="space-y-2">
         <Label htmlFor="email">
           Adresse email <span className="text-red-500">*</span>
@@ -86,7 +94,9 @@ export const CommonFields = ({
               <Eye className="h-4 w-4" />
             )}
             <span className="sr-only">
-              {showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              {showPassword
+                ? "Masquer le mot de passe"
+                : "Afficher le mot de passe"}
             </span>
           </Button>
         </div>
@@ -120,7 +130,9 @@ export const CommonFields = ({
               <Eye className="h-4 w-4" />
             )}
             <span className="sr-only">
-              {showConfirmPassword ? "Masquer la confirmation" : "Afficher la confirmation"}
+              {showConfirmPassword
+                ? "Masquer la confirmation"
+                : "Afficher la confirmation"}
             </span>
           </Button>
         </div>

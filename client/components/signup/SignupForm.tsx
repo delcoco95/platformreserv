@@ -81,12 +81,7 @@ export const SignupForm = ({
       )}
 
       {accountType && (
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={isLoading}
-          size="lg"
-        >
+        <Button type="submit" className="w-full" disabled={isLoading} size="lg">
           {isLoading ? "Création du compte..." : "Créer mon compte"}
         </Button>
       )}

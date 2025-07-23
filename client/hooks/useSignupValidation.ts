@@ -25,7 +25,7 @@ export const useSignupValidation = () => {
 
   const validateForm = (
     accountType: AccountType,
-    formData: FormData
+    formData: FormData,
   ): boolean => {
     setError("");
 
@@ -77,7 +77,7 @@ export const useSignupValidation = () => {
 
   const prepareAdditionalData = (
     accountType: AccountType,
-    formData: FormData
+    formData: FormData,
   ) => {
     return accountType === "client"
       ? {

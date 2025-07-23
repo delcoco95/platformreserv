@@ -9,11 +9,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { useSignupValidation } from "../hooks/useSignupValidation";
 import { useSignupRedirection } from "../hooks/useSignupRedirection";
-import {
-  SignupHeader,
-  SignupFooter,
-  SignupForm,
-} from "../components/signup";
+import { SignupHeader, SignupFooter, SignupForm } from "../components/signup";
 
 type AccountType = "client" | "professionnel" | "";
 
@@ -32,7 +28,8 @@ interface FormData {
 
 export default function Signup() {
   const { register, currentUser, userProfile } = useAuth();
-  const { error, setError, validateForm, prepareAdditionalData } = useSignupValidation();
+  const { error, setError, validateForm, prepareAdditionalData } =
+    useSignupValidation();
 
   const [accountType, setAccountType] = useState<AccountType>("");
   const [formData, setFormData] = useState<FormData>({

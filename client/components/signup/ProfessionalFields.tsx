@@ -1,6 +1,12 @@
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 interface FormDataType {
   companyName: string;
@@ -29,8 +35,10 @@ export const ProfessionalFields = ({
 
   return (
     <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
-      <h3 className="font-semibold text-green-900">Informations professionnelles</h3>
-      
+      <h3 className="font-semibold text-green-900">
+        Informations professionnelles
+      </h3>
+
       <div className="space-y-2">
         <Label htmlFor="companyName">
           Nom de l'entreprise <span className="text-red-500">*</span>

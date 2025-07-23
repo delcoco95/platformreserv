@@ -7,7 +7,7 @@ interface User {
 
 export const useSignupRedirection = (
   currentUser: any,
-  userProfile: User | null
+  userProfile: User | null,
 ) => {
   const navigate = useNavigate();
 

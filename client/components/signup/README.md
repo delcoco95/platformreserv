@@ -7,7 +7,7 @@ Cette architecture modulaire divise le formulaire d'inscription en 6 composants 
 ```
 client/components/signup/
 ├── SignupAccountTypeSelector.tsx  # ✅ Sélecteur Client/Professionnel
-├── ClientFields.tsx               # 👤 Champs spécifiques clients  
+├── ClientFields.tsx               # 👤 Champs spécifiques clients
 ├── ProfessionalFields.tsx         # 🏢 Champs spécifiques professionnels
 ├── CommonFields.tsx               # 📞 Champs partagés (email, password, etc.)
 ├── SignupHeader.tsx               # 🎯 En-tête avec logo et titre
@@ -31,12 +31,13 @@ client/hooks/
 Le composant `Signup.tsx` est maintenant réduit à **120 lignes** (contre 270+ initialement) :
 
 - **État local** : Gestion des données du formulaire
-- **Logique métier** : Déléguée aux hooks personnalisés  
+- **Logique métier** : Déléguée aux hooks personnalisés
 - **Interface** : Assemblage des composants modulaires
 
 ## 📋 Props des Composants
 
 ### SignupAccountTypeSelector
+
 ```tsx
 interface Props {
   accountType: string;
@@ -45,6 +46,7 @@ interface Props {
 ```
 
 ### ClientFields / ProfessionalFields
+
 ```tsx
 interface Props {
   formData: FormDataType;
@@ -54,6 +56,7 @@ interface Props {
 ```
 
 ### CommonFields
+
 ```tsx
 interface Props {
   formData: FormDataType;

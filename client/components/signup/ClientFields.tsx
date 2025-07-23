@@ -22,7 +22,7 @@ export const ClientFields = ({
   return (
     <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
       <h3 className="font-semibold text-blue-900">Informations personnelles</h3>
-      
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="firstName">
@@ -37,7 +37,7 @@ export const ClientFields = ({
             className="bg-white"
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="lastName">
             Nom <span className="text-red-500">*</span>

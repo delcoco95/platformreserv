@@ -40,7 +40,7 @@ export const SignupAccountTypeSelector = ({
               </div>
             </Label>
           </div>
-          
+
           <div>
             <RadioGroupItem
               value="professionnel"
