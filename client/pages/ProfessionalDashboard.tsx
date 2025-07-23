@@ -316,7 +316,9 @@ export default function ProfessionalDashboard() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">
-                    {professionalProfile?.rating?.toFixed(1) || "0.0"}
+                    {professionalProfile?.rating && professionalProfile.rating > 0
+                      ? professionalProfile.rating.toFixed(1)
+                      : "-"}
                   </p>
                   <p className="text-sm text-muted-foreground">Note moyenne</p>
                 </div>
