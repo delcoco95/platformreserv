@@ -31,7 +31,6 @@ interface FormData {
 }
 
 export default function Signup() {
-  const navigate = useNavigate();
   const { register, currentUser, userProfile } = useAuth();
   const { error, setError, validateForm, prepareAdditionalData } = useSignupValidation();
 
@@ -51,15 +50,7 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Redirection automatique si déjà connecté
-  useEffect(() => {
-    if (currentUser && userProfile) {
-      const redirectPath =
-        userProfile.userType === "client"
-          ? "/espace-client"
-          : "/espace-professionnel";
-      navigate(redirectPath, { replace: true });
-    }
-  }, [currentUser, userProfile, navigate]);
+  useSignupRedirection(currentUser, userProfile);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
