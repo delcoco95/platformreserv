@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Alert, AlertDescription } from "../components/ui/alert";
-import { AlertCircle, UserCheck } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useSignupValidation } from "../hooks/useSignupValidation";
 import {
@@ -17,6 +17,8 @@ import {
   ClientFields,
   ProfessionalFields,
   CommonFields,
+  SignupHeader,
+  SignupFooter,
 } from "../components/signup";
 
 type AccountType = "client" | "professionnel" | "";
@@ -54,7 +56,7 @@ export default function Signup() {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirection automatique si déjà connecté
+  // Redirection automatique si d��jà connecté
   useEffect(() => {
     if (currentUser && userProfile) {
       const redirectPath =
