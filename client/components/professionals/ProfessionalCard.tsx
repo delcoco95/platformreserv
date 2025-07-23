@@ -217,7 +217,7 @@ export const ProfessionalCard = ({ professional }: ProfessionalCardProps) => {
             <div className="flex flex-wrap gap-1">
               {professional.services.slice(0, 3).map((service, index) => (
                 <Badge key={index} variant="outline" className="text-xs">
-                  {service}
+                  {typeof service === 'string' ? service : service.name}
                 </Badge>
               ))}
               {professional.services.length > 3 && (
