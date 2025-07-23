@@ -27,6 +27,8 @@ export default function ProfessionalsList() {
   useEffect(() => {
     // Utiliser un listener temps réel pour les professionnels
     const unsubscribe = professionalService.onProfessionalsChange((data) => {
+      console.log('Données professionnels reçues:', data);
+
       // Vérification de sécurité pour éviter les erreurs
       const validProfessionals = data.filter(prof => {
         // Vérifier que les services sont valides
