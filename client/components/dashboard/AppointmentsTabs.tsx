@@ -94,7 +94,16 @@ export const AppointmentsTabs = ({
           <div className="flex gap-2 ml-4">
             {isUpcoming && (
               <>
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onSendMessage?.(
+                    appointment.professionalId,
+                    appointment.professionalName || "Professionnel",
+                    appointment.service
+                  )}
+                  title="Envoyer un message"
+                >
                   <MessageCircle className="h-4 w-4" />
                 </Button>
                 {appointment.status === "confirmed" && (
