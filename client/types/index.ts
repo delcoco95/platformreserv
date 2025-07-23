@@ -46,7 +46,8 @@ export interface Appointment {
   id: string;
   clientId: string;
   professionalId: string;
-  service: string;
+  service?: string; // Kept for backward compatibility
+  services?: { name: string; price: number; duration: number }[];
   date: string; // ISO date string
   duration: number; // en minutes
   status: "pending" | "confirmed" | "completed" | "cancelled";
