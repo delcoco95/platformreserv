@@ -27,6 +27,17 @@ import {
 } from "./pages/SimplePages";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Composant pour scroll automatique en haut
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
