@@ -211,7 +211,7 @@ export const ProfessionalCard = ({ professional }: ProfessionalCardProps) => {
         )}
 
         {/* Services */}
-        {professional.services && professional.services.length > 0 && (
+        {professional.services && Array.isArray(professional.services) && professional.services.length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium">Services :</p>
             <div className="flex flex-wrap gap-1">
