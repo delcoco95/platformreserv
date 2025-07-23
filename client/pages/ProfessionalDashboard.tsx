@@ -259,9 +259,11 @@ export default function ProfessionalDashboard() {
                 <Settings className="h-4 w-4 mr-2" />
                 Modifier mes informations
               </Button>
-              <Button variant="outline">
-                <Eye className="h-4 w-4 mr-2" />
-                Ma fiche publique
+              <Button variant="outline" asChild>
+                <Link to={`/professionnel/${professionalProfile?.uid}`}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Ma fiche publique
+                </Link>
               </Button>
             </div>
           </div>
