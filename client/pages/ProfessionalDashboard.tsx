@@ -397,15 +397,27 @@ export default function ProfessionalDashboard() {
                   <CardTitle>Actions rapides</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => alert("Fonctionnalité des statistiques à venir")}
+                  >
                     <BarChart3 className="h-4 w-4 mr-2" />
                     Mes statistiques
                   </Button>
-                  <Button variant="outline" className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => alert("Fonctionnalité de gestion des avis à venir")}
+                  >
                     <Star className="h-4 w-4 mr-2" />
                     Gérer mes avis
                   </Button>
-                  <Button variant="outline" className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => window.open("mailto:support@rendezvousmo.fr", "_blank")}
+                  >
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Support pro
                   </Button>
