@@ -138,8 +138,10 @@ export const ProfessionalCard = ({ professional }: ProfessionalCardProps) => {
                         <div className="flex items-center gap-1">
                           <Star className="h-3 w-3 text-yellow-500 fill-current" />
                           <span className="text-sm">
-                            {professional.rating.toFixed(1)} (
-                            {professional.totalReviews || 0} avis)
+                            {professional.rating.toFixed(1)}{" "}
+                            {professional.totalReviews && professional.totalReviews > 0
+                              ? `(${professional.totalReviews} avis)`
+                              : "(Nouveau)"}
                           </span>
                         </div>
                       </div>
