@@ -155,6 +155,11 @@ class UserMemory {
     });
   }
 
+  select(fields) {
+    // Simuler la méthode select de Mongoose
+    return this;
+  }
+
   static async findByIdAndUpdate(id, updateData, options = {}) {
     const userIndex = this.users.findIndex(user => user._id === id);
     if (userIndex === -1) return null;
