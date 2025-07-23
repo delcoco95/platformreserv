@@ -31,6 +31,7 @@ export default function Signup() {
   const { register, currentUser, userProfile } = useAuth();
   const { error, setError, validateForm, prepareAdditionalData } =
     useSignupValidation();
+  const [searchParams] = useSearchParams();
 
   const [accountType, setAccountType] = useState<AccountType>("");
   const [formData, setFormData] = useState<FormData>({
