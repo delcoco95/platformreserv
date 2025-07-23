@@ -123,17 +123,17 @@ export default function Signup() {
       const additionalData =
         accountType === "client"
           ? {
-              nom: formData.lastName,
-              prenom: formData.firstName,
-              telephone: formData.phone,
-              adresse: formData.address,
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              phone: formData.phone,
+              address: formData.address,
             }
           : {
-              nom: formData.companyName,
-              metier: formData.profession,
+              companyName: formData.companyName,
+              profession: formData.profession,
               siret: formData.siret,
-              telephone: formData.phone,
-              adresse: formData.address,
+              phone: formData.phone,
+              address: formData.address,
             };
 
       await register(
