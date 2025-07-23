@@ -79,6 +79,8 @@ exports.register = async (req, res) => {
     const newUser = new User(userData);
     await newUser.save();
 
+    console.log("✅ Utilisateur créé avec succès:", newUser._id);
+
     // Générer le token JWT
     const token = jwt.sign(
       { id: newUser._id, userType: newUser.userType },
@@ -93,6 +95,7 @@ exports.register = async (req, res) => {
       userType: newUser.userType,
     };
 
+    console.log("🔑 Token généré et réponse envoyée");
     res.status(201).json({
       success: true,
       data: { user: userResponse, token },
