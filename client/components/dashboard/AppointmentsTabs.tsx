@@ -99,8 +99,8 @@ export const AppointmentsTabs = ({
                   size="sm"
                   onClick={() => onSendMessage?.(
                     appointment.professionalId,
-                    appointment.professionalName || "Professionnel",
-                    appointment.service
+                    "Professionnel",
+                    `Rendez-vous ${appointment.service}`
                   )}
                   title="Envoyer un message"
                 >
