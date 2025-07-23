@@ -388,53 +388,11 @@ export default function ProfessionalProfile() {
             </Card>
 
             {/* Services */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Services proposés</CardTitle>
-                <CardDescription>
-                  Sélectionnez le service dont vous avez besoin
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4">
-                  {services.map((service) => (
-                    <div
-                      key={service.id}
-                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                        selectedService?.id === service.id
-                          ? "border-primary bg-primary/5"
-                          : "hover:border-gray-300"
-                      }`}
-                      onClick={() => setSelectedService(service)}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="font-semibold">{service.name}</h3>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {service.description}
-                          </p>
-                          <div className="flex items-center gap-4 mt-3">
-                            <div className="flex items-center gap-1">
-                              <Euro className="h-4 w-4 text-green-600" />
-                              <span className="font-medium">
-                                {service.price}€
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4 text-blue-600" />
-                              <span>{service.duration} min</span>
-                            </div>
-                          </div>
-                        </div>
-                        {selectedService?.id === service.id && (
-                          <CheckCircle className="h-5 w-5 text-primary" />
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <ServiceSelector
+              services={services}
+              selectedServices={selectedServices}
+              onSelectionChange={setSelectedServices}
+            />
 
             {/* Disponibilités */}
             {selectedService && (
