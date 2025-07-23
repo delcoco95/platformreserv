@@ -182,7 +182,7 @@ export default function ProfessionalProfile() {
   }, [id]);
 
   const handleBookingSubmit = async () => {
-    if (!selectedService || !selectedSlot || !currentUser || !professional) {
+    if (!selectedServices.length || !selectedSlot || !currentUser || !professional) {
       return;
     }
 
