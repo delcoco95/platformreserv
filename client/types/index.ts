@@ -29,7 +29,10 @@ export interface ProfessionalProfile extends User {
   phone?: string;
   address?: string;
   description?: string;
-  services?: (string | { name: string; price: number; duration?: number; description?: string })[];
+  services?: (
+    | string
+    | { name: string; price: number; duration?: number; description?: string }
+  )[];
   rating?: number;
   totalReviews?: number;
   isVerified?: boolean;

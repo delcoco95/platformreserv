@@ -211,23 +211,25 @@ export const ProfessionalCard = ({ professional }: ProfessionalCardProps) => {
         )}
 
         {/* Services */}
-        {professional.services && Array.isArray(professional.services) && professional.services.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm font-medium">Services :</p>
-            <div className="flex flex-wrap gap-1">
-              {professional.services.slice(0, 3).map((service, index) => (
-                <Badge key={index} variant="outline" className="text-xs">
-                  {typeof service === 'string' ? service : service.name}
-                </Badge>
-              ))}
-              {professional.services.length > 3 && (
-                <Badge variant="outline" className="text-xs">
-                  +{professional.services.length - 3} autres
-                </Badge>
-              )}
+        {professional.services &&
+          Array.isArray(professional.services) &&
+          professional.services.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Services :</p>
+              <div className="flex flex-wrap gap-1">
+                {professional.services.slice(0, 3).map((service, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {typeof service === "string" ? service : service.name}
+                  </Badge>
+                ))}
+                {professional.services.length > 3 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{professional.services.length - 3} autres
+                  </Badge>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Location */}
         {professional.address && (

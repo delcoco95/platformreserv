@@ -27,13 +27,13 @@ export default function ProfessionalsList() {
   useEffect(() => {
     // Utiliser un listener temps réel pour les professionnels
     const unsubscribe = professionalService.onProfessionalsChange((data) => {
-      console.log('Données professionnels reçues:', data);
+      console.log("Données professionnels reçues:", data);
 
       // Vérification de sécurité pour éviter les erreurs
-      const validProfessionals = data.filter(prof => {
+      const validProfessionals = data.filter((prof) => {
         // Vérifier que les services sont valides
         if (prof.services && !Array.isArray(prof.services)) {
-          console.warn('Services invalides pour le professionnel:', prof.uid);
+          console.warn("Services invalides pour le professionnel:", prof.uid);
           return false;
         }
         return true;
@@ -75,9 +75,13 @@ export default function ProfessionalsList() {
         (prof) =>
           normalizeText(prof.companyName || "").includes(query) ||
           normalizeText(prof.profession || "").includes(query) ||
-          (prof.services && Array.isArray(prof.services) && prof.services.some((service) =>
-            normalizeText(typeof service === 'string' ? service : (service?.name || '')).includes(query),
-          )) ||
+          (prof.services &&
+            Array.isArray(prof.services) &&
+            prof.services.some((service) =>
+              normalizeText(
+                typeof service === "string" ? service : service?.name || "",
+              ).includes(query),
+            )) ||
           normalizeText(prof.address || "").includes(query) ||
           normalizeText(prof.description || "").includes(query),
       );

@@ -182,7 +182,12 @@ export default function ProfessionalProfile() {
   }, [id]);
 
   const handleBookingSubmit = async () => {
-    if (!selectedServices.length || !selectedSlot || !currentUser || !professional) {
+    if (
+      !selectedServices.length ||
+      !selectedSlot ||
+      !currentUser ||
+      !professional
+    ) {
       return;
     }
 
@@ -190,15 +195,25 @@ export default function ProfessionalProfile() {
       const clientProfile = userProfile as ClientProfile;
       const address = clientAddress || clientProfile?.address || "";
 
-      const totalPrice = selectedServices.reduce((sum, service) => sum + service.price, 0);
-      const totalDuration = selectedServices.reduce((sum, service) => sum + service.duration, 0);
-      const servicesNames = selectedServices.map(s => s.name).join(", ");
+      const totalPrice = selectedServices.reduce(
+        (sum, service) => sum + service.price,
+        0,
+      );
+      const totalDuration = selectedServices.reduce(
+        (sum, service) => sum + service.duration,
+        0,
+      );
+      const servicesNames = selectedServices.map((s) => s.name).join(", ");
 
       const appointmentData = {
         clientId: currentUser.uid,
         professionalId: professional.uid,
         service: servicesNames, // For backward compatibility
-        services: selectedServices.map(s => ({ name: s.name, price: s.price, duration: s.duration })),
+        services: selectedServices.map((s) => ({
+          name: s.name,
+          price: s.price,
+          duration: s.duration,
+        })),
         date: new Date(
           `${selectedSlot.date}T${selectedSlot.start}:00`,
         ).toISOString(),
@@ -448,7 +463,8 @@ export default function ProfessionalProfile() {
                           <ul className="list-disc list-inside mt-1">
                             {selectedServices.map((service, index) => (
                               <li key={index} className="text-sm">
-                                {service.name} - {service.price}€ ({service.duration} min)
+                                {service.name} - {service.price}€ (
+                                {service.duration} min)
                               </li>
                             ))}
                           </ul>
@@ -461,11 +477,20 @@ export default function ProfessionalProfile() {
                           <strong>Heure :</strong> {selectedSlot.start}
                         </p>
                         <p>
-                          <strong>Durée totale :</strong> {selectedServices.reduce((sum, service) => sum + service.duration, 0)}{" "}
+                          <strong>Durée totale :</strong>{" "}
+                          {selectedServices.reduce(
+                            (sum, service) => sum + service.duration,
+                            0,
+                          )}{" "}
                           minutes
                         </p>
                         <p>
-                          <strong>Prix total :</strong> {selectedServices.reduce((sum, service) => sum + service.price, 0)}€
+                          <strong>Prix total :</strong>{" "}
+                          {selectedServices.reduce(
+                            (sum, service) => sum + service.price,
+                            0,
+                          )}
+                          €
                         </p>
                       </div>
                     </div>
@@ -590,26 +615,32 @@ export default function ProfessionalProfile() {
             </Card>
 
             {/* Services List */}
-            {professional.services && Array.isArray(professional.services) && professional.services.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Spécialités</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {professional.services.map((service, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-2 text-sm"
-                      >
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                        <span>{typeof service === 'string' ? service : service.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {professional.services &&
+              Array.isArray(professional.services) &&
+              professional.services.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Spécialités</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {professional.services.map((service, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-2 text-sm"
+                        >
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <span>
+                            {typeof service === "string"
+                              ? service
+                              : service.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
             {/* Professional Stats */}
             <Card>
