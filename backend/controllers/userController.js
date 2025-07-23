@@ -169,53 +169,32 @@ exports.getAllProfessionals = async (req, res) => {
 exports.searchProfessionals = async (req, res) => {
   try {
     const { q, profession, location } = req.query;
-
-    // Obtenir tous les professionnels
-    const allUsers = User.users || [];
-    let professionals = allUsers.filter(
-      (user) => user.userType === "professionnel",
-    );
+    let query = { userType: "professionnel" };
 
     // Filtre par profession
     if (profession && profession !== "all") {
-      professionals = professionals.filter(
-        (prof) => prof.profession === profession,
-      );
+      query.profession = profession;
     }
 
     // Recherche textuelle
     if (q) {
-      const searchQuery = q.toLowerCase();
-      professionals = professionals.filter(
-        (prof) =>
-          (prof.companyName &&
-            prof.companyName.toLowerCase().includes(searchQuery)) ||
-          (prof.description &&
-            prof.description.toLowerCase().includes(searchQuery)) ||
-          (prof.services &&
-            prof.services.some((service) =>
-              service.toLowerCase().includes(searchQuery),
-            )) ||
-          (prof.address && prof.address.toLowerCase().includes(searchQuery)),
-      );
+      const searchRegex = new RegExp(q, "i");
+      query.$or = [
+        { companyName: searchRegex },
+        { description: searchRegex },
+        { services: { $in: [searchRegex] } },
+        { address: searchRegex },
+      ];
     }
 
     // Filtre par localisation
     if (location) {
-      const locationQuery = location.toLowerCase();
-      professionals = professionals.filter(
-        (prof) =>
-          prof.address && prof.address.toLowerCase().includes(locationQuery),
-      );
+      query.address = new RegExp(location, "i");
     }
 
-    // Exclure le password et trier
-    professionals = professionals
-      .map((prof) => {
-        const { password, ...profWithoutPassword } = prof;
-        return profWithoutPassword;
-      })
-      .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    const professionals = await User.find(query)
+      .select("-password")
+      .sort({ rating: -1, createdAt: -1 });
 
     const transformedProfessionals = professionals.map((prof) => ({
       uid: prof._id,
