@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,17 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Alert, AlertDescription } from "../components/ui/alert";
-import { AlertCircle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useSignupValidation } from "../hooks/useSignupValidation";
 import {
-  SignupAccountTypeSelector,
-  ClientFields,
-  ProfessionalFields,
-  CommonFields,
   SignupHeader,
   SignupFooter,
+  SignupForm,
 } from "../components/signup";
 
 type AccountType = "client" | "professionnel" | "";
