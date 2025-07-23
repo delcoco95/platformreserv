@@ -177,21 +177,26 @@ export const ProfessionalCard = ({ professional }: ProfessionalCardProps) => {
 
       <CardContent className="space-y-4">
         {/* Rating */}
-        {professional.rating && (
-          <div className="flex items-center space-x-2">
-            <div className="flex items-center">
-              <Star className="h-4 w-4 text-yellow-500 fill-current" />
-              <span className="text-sm font-medium ml-1">
-                {professional.rating.toFixed(1)}
-              </span>
-            </div>
-            {professional.totalReviews && (
+        <div className="flex items-center space-x-2">
+          {professional.rating && professional.rating > 0 ? (
+            <>
+              <div className="flex items-center">
+                <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                <span className="text-sm font-medium ml-1">
+                  {professional.rating.toFixed(1)}
+                </span>
+              </div>
               <span className="text-sm text-muted-foreground">
-                ({professional.totalReviews} avis)
+                ({professional.totalReviews || 0} avis)
               </span>
-            )}
-          </div>
-        )}
+            </>
+          ) : (
+            <div className="flex items-center text-muted-foreground">
+              <Star className="h-4 w-4" />
+              <span className="text-sm ml-1">Pas encore de note</span>
+            </div>
+          )}
+        </div>
 
         {/* Description */}
         {professional.description && (
