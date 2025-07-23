@@ -1,10 +1,9 @@
 const express = require("express");
-const connectDB = require("./config/db");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
 dotenv.config();
-connectDB();
+// connectDB(); // Désactivé pour le développement
 
 const app = express();
 app.use(cors());
