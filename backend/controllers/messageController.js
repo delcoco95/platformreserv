@@ -1,5 +1,6 @@
 const Message = require("../models/Message");
 const User = require("../models/User");
+const mongoose = require("mongoose");
 
 // Envoyer un message
 exports.sendMessage = async (req, res) => {
