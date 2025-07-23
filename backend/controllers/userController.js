@@ -3,7 +3,10 @@ const User = require("../models/UserMemory");
 
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select("-password");
+    const user = await User.findById(req.params.id);
+    if (user && user.password) {
+      delete user.password; // Exclure le password
+    }
 
     if (!user) {
       return res.status(404).json({
