@@ -149,31 +149,10 @@ class UserMemory {
   }
 
   static async find(query = {}) {
-    const results = this.users.filter(user => {
+    return this.users.filter(user => {
       if (query.userType) return user.userType === query.userType;
       return true;
     });
-
-    // Retourner un objet qui simule le comportement de Mongoose
-    return {
-      select: (fields) => results.map(user => {
-        // Simuler l'exclusion du password avec select("-password")
-        if (fields === "-password") {
-          const { password, ...userWithoutPassword } = user;
-          return userWithoutPassword;
-        }
-        return user;
-      }),
-      sort: (sortObj) => ({
-        select: (fields) => results.map(user => {
-          if (fields === "-password") {
-            const { password, ...userWithoutPassword } = user;
-            return userWithoutPassword;
-          }
-          return user;
-        })
-      })
-    };
   }
 
   static async findByIdAndUpdate(id, updateData, options = {}) {
