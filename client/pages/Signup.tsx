@@ -11,6 +11,7 @@ import {
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { AlertCircle, UserCheck } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useSignupValidation } from "../hooks/useSignupValidation";
 import {
   SignupAccountTypeSelector,
   ClientFields,
