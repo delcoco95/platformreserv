@@ -129,16 +129,9 @@ exports.updateUser = async (req, res) => {
 
 exports.getAllProfessionals = async (req, res) => {
   try {
-    // Obtenir tous les professionnels sans .select() et .sort() pour le modèle en mémoire
-    const allUsers = User.users || [];
-    const professionals = allUsers
-      .filter((user) => user.userType === "professionnel")
-      .map((prof) => {
-        // Exclure le password
-        const { password, ...profWithoutPassword } = prof;
-        return profWithoutPassword;
-      })
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const professionals = await User.find({ userType: "professionnel" })
+      .select("-password")
+      .sort({ createdAt: -1 });
 
     const transformedProfessionals = professionals.map((prof) => ({
       uid: prof._id,
