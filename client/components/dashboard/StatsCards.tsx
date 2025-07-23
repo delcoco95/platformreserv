@@ -25,13 +25,6 @@ export const StatsCards = ({
       value: completedAppointmentsCount,
       label: "Services reçus",
     },
-    {
-      icon: Star,
-      iconBg: "bg-orange-100",
-      iconColor: "text-orange-600",
-      value: averageRating,
-      label: "Note moyenne",
-    },
   ];
 
   return (
