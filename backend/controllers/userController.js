@@ -1,4 +1,5 @@
-const User = require("../models/User");
+// Utiliser le modèle en mémoire pour le développement
+const User = require("../models/UserMemory");
 
 exports.getUserById = async (req, res) => {
   try {
