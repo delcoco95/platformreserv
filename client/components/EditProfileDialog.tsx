@@ -81,17 +81,11 @@ export function EditProfileDialog({
           },
         };
       } else {
-        const servicesArray = (formData.services as string)
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0);
-
         updateData = {
           companyName: formData.companyName as string,
           phone: formData.phone as string,
           address: formData.address as string,
           description: formData.description as string,
-          services: servicesArray,
         };
       }
 
