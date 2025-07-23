@@ -461,11 +461,11 @@ export default function ProfessionalProfile() {
                           <strong>Heure :</strong> {selectedSlot.start}
                         </p>
                         <p>
-                          <strong>Durée :</strong> {selectedService.duration}{" "}
+                          <strong>Durée totale :</strong> {selectedServices.reduce((sum, service) => sum + service.duration, 0)}{" "}
                           minutes
                         </p>
                         <p>
-                          <strong>Prix :</strong> {selectedService.price}€
+                          <strong>Prix total :</strong> {selectedServices.reduce((sum, service) => sum + service.price, 0)}€
                         </p>
                       </div>
                     </div>
