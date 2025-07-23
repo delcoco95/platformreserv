@@ -132,6 +132,7 @@ export default function ClientDashboard() {
               formatDate={formatDate}
               formatTime={formatTime}
               onCancelAppointment={handleCancelAppointment}
+              onSendMessage={handleSendMessage}
             />
           </div>
 
