@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-import { SafeHeader } from "./components/SafeHeader";
+import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
-import { SafeAutoRedirect } from "./components/SafeAutoRedirect";
+import { AutoRedirect } from "./components/AutoRedirect";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
 import ProfessionalProfile from "./pages/ProfessionalProfile";
