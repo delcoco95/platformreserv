@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
-import api from "../lib/api";
-import { ClientProfile, ProfessionalProfile, AuthUser } from "../types"; // chemin à adapter si nécessaire
 import {
   Card,
   CardContent,
@@ -14,11 +12,11 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import { AlertCircle, UserCheck } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import {
-  AccountTypeSelector,
-  ClientForm,
-  ProfessionalForm,
+  SignupAccountTypeSelector,
+  ClientFields,
+  ProfessionalFields,
   CommonFields,
-} from "../components/auth";
+} from "../components/signup";
 
 type AccountType = "client" | "professionnel" | "";
 
@@ -120,7 +118,6 @@ export default function Signup() {
 
     setIsLoading(true);
 
-<<<<<<< HEAD
     try {
       // Préparer les données additionnelles selon le type de compte
       const additionalData =
@@ -138,36 +135,24 @@ export default function Signup() {
               phone: formData.phone,
               address: formData.address,
             };
-=======
-const register = async (
-  email: string,
-  password: string,
-  userType: "client" | "professionnel",
-  additionalData?: Partial<ClientProfile | ProfessionalProfile>
-): Promise<void> => {
-  try {
-    const res = await api.post<{
-      user: AuthUser;
-      token: string;
-    }>("/auth/register", {
-      email,
-      password,
-      userType,
-      ...additionalData,
-    });
 
-    const { token, user } = res;
-
-    localStorage.setItem("auth_token", token);
-    setCurrentUser(user);
-    await userProfile(user.uid);
-  } catch (err) {
-    console.error("Erreur d'inscription :", err);
-    throw err; // 🔁 très important pour que l'erreur remonte au formulaire
-  }
-};
->>>>>>> abf56a8f8a1407eb3a82e35d6c98a87d5746ad1f
-
+      await register(
+        formData.email,
+        formData.password,
+        accountType,
+        additionalData,
+      );
+    } catch (error: any) {
+      console.error("Erreur d'inscription:", error);
+      if (error.message) {
+        setError(error.message);
+      } else {
+        setError("Erreur d'inscription. Veuillez réessayer");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -200,32 +185,32 @@ const register = async (
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <AccountTypeSelector
-                value={accountType}
+              <SignupAccountTypeSelector
+                accountType={accountType}
                 onChange={setAccountType}
               />
 
               {accountType === "client" && (
-                <ClientForm
+                <ClientFields
                   formData={formData}
-                  onInputChange={handleInputChange}
-                  isLoading={isLoading}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
                 />
               )}
 
               {accountType === "professionnel" && (
-                <ProfessionalForm
+                <ProfessionalFields
                   formData={formData}
-                  onInputChange={handleInputChange}
-                  isLoading={isLoading}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
                 />
               )}
 
               {accountType && (
                 <CommonFields
                   formData={formData}
-                  onInputChange={handleInputChange}
-                  isLoading={isLoading}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
                 />
               )}
 
