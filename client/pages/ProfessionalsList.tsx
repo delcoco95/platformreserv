@@ -73,9 +73,9 @@ export default function ProfessionalsList() {
         (prof) =>
           normalizeText(prof.companyName || "").includes(query) ||
           normalizeText(prof.profession || "").includes(query) ||
-          prof.services?.some((service) =>
-            normalizeText(typeof service === 'string' ? service : service.name).includes(query),
-          ) ||
+          (prof.services && Array.isArray(prof.services) && prof.services.some((service) =>
+            normalizeText(typeof service === 'string' ? service : (service?.name || '')).includes(query),
+          )) ||
           normalizeText(prof.address || "").includes(query) ||
           normalizeText(prof.description || "").includes(query),
       );
