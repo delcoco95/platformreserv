@@ -27,7 +27,11 @@ interface AppointmentsTabsProps {
   formatDate: (date: any) => string;
   formatTime: (date: any) => string;
   onCancelAppointment: (appointmentId: string) => void;
-  onSendMessage?: (professionalId: string, professionalName: string, appointmentSubject: string) => void;
+  onSendMessage?: (
+    professionalId: string,
+    professionalName: string,
+    appointmentSubject: string,
+  ) => void;
 }
 
 export const AppointmentsTabs = ({
@@ -97,11 +101,13 @@ export const AppointmentsTabs = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onSendMessage?.(
-                    appointment.professionalId,
-                    "Professionnel",
-                    `Rendez-vous ${appointment.service}`
-                  )}
+                  onClick={() =>
+                    onSendMessage?.(
+                      appointment.professionalId,
+                      "Professionnel",
+                      `Rendez-vous ${appointment.service}`,
+                    )
+                  }
                   title="Envoyer un message"
                 >
                   <MessageCircle className="h-4 w-4" />

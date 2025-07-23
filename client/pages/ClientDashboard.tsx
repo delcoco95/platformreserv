@@ -41,7 +41,11 @@ export default function ClientDashboard() {
     appointmentSubject: "",
   });
 
-  const handleSendMessage = (professionalId: string, professionalName: string, appointmentSubject: string) => {
+  const handleSendMessage = (
+    professionalId: string,
+    professionalName: string,
+    appointmentSubject: string,
+  ) => {
     setQuickMessageModal({
       open: true,
       receiverId: professionalId,
@@ -152,7 +156,9 @@ export default function ClientDashboard() {
 
         <QuickMessageModal
           open={quickMessageModal.open}
-          onOpenChange={(open) => setQuickMessageModal(prev => ({ ...prev, open }))}
+          onOpenChange={(open) =>
+            setQuickMessageModal((prev) => ({ ...prev, open }))
+          }
           receiverId={quickMessageModal.receiverId}
           receiverName={quickMessageModal.receiverName}
           appointmentSubject={quickMessageModal.appointmentSubject}

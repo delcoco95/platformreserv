@@ -43,7 +43,7 @@ export const QuickMessageModal = ({
       await messageService.sendMessage(receiverId, message.trim());
       setSuccess(true);
       setMessage("");
-      
+
       // Fermer le modal après un court délai
       setTimeout(() => {
         onOpenChange(false);
@@ -114,8 +114,8 @@ export const QuickMessageModal = ({
             <Button variant="outline" onClick={handleClose} disabled={loading}>
               Annuler
             </Button>
-            <Button 
-              onClick={handleSend} 
+            <Button
+              onClick={handleSend}
               disabled={!message.trim() || loading || message.length > 500}
             >
               {loading ? (

@@ -79,7 +79,7 @@ export default function ProfessionalDashboard() {
         (appointmentsData) => {
           setAppointments(appointmentsData);
           setLoading(false);
-        }
+        },
       );
 
       return () => unsubscribe();
@@ -316,7 +316,8 @@ export default function ProfessionalDashboard() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">
-                    {professionalProfile?.rating && professionalProfile.rating > 0
+                    {professionalProfile?.rating &&
+                    professionalProfile.rating > 0
                       ? professionalProfile.rating.toFixed(1)
                       : "-"}
                   </p>
@@ -386,7 +387,8 @@ export default function ProfessionalDashboard() {
                         {professionalProfile.rating.toFixed(1)}
                       </span>
                       <span className="text-sm text-muted-foreground">
-                        {professionalProfile.totalReviews && professionalProfile.totalReviews > 0
+                        {professionalProfile.totalReviews &&
+                        professionalProfile.totalReviews > 0
                           ? `(${professionalProfile.totalReviews} avis)`
                           : "(Aucun avis)"}
                       </span>
@@ -404,7 +406,9 @@ export default function ProfessionalDashboard() {
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => alert("Fonctionnalité des statistiques à venir")}
+                    onClick={() =>
+                      alert("Fonctionnalité des statistiques à venir")
+                    }
                   >
                     <BarChart3 className="h-4 w-4 mr-2" />
                     Mes statistiques
@@ -412,7 +416,9 @@ export default function ProfessionalDashboard() {
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => alert("Fonctionnalité de gestion des avis à venir")}
+                    onClick={() =>
+                      alert("Fonctionnalité de gestion des avis à venir")
+                    }
                   >
                     <Star className="h-4 w-4 mr-2" />
                     Gérer mes avis
@@ -420,7 +426,9 @@ export default function ProfessionalDashboard() {
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => window.open("mailto:support@rendezvousmo.fr", "_blank")}
+                    onClick={() =>
+                      window.open("mailto:support@rendezvousmo.fr", "_blank")
+                    }
                   >
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Support pro
