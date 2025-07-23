@@ -48,6 +48,7 @@ import {
 import { professionalService } from "../services/professionalService";
 import { appointmentService } from "../services/appointmentService";
 import { emailService } from "../services/emailService";
+import { ServiceSelector } from "../components/booking";
 import { useAuth } from "../contexts/AuthContext";
 import {
   ProfessionalProfile as ProfessionalType,
