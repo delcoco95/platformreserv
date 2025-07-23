@@ -443,9 +443,16 @@ export default function ProfessionalProfile() {
                         Récapitulatif de votre réservation
                       </h3>
                       <div className="space-y-2 text-sm">
-                        <p>
-                          <strong>Service :</strong> {selectedService.name}
-                        </p>
+                        <div>
+                          <strong>Services :</strong>
+                          <ul className="list-disc list-inside mt-1">
+                            {selectedServices.map((service, index) => (
+                              <li key={index} className="text-sm">
+                                {service.name} - {service.price}€ ({service.duration} min)
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                         <p>
                           <strong>Date :</strong>{" "}
                           {formatDate(selectedSlot.date)}
