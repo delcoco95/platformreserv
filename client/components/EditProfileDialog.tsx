@@ -50,7 +50,6 @@ export function EditProfileDialog({
         phone: professional.phone || "",
         address: professional.address || "",
         description: professional.description || "",
-        services: professional.services?.join(", ") || "",
       };
     }
   });
