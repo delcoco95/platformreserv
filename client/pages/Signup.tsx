@@ -109,54 +109,15 @@ export default function Signup() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {error && (
-              <Alert variant="destructive" className="mb-6">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <SignupAccountTypeSelector
-                accountType={accountType}
-                onChange={setAccountType}
-              />
-
-              {accountType === "client" && (
-                <ClientFields
-                  formData={formData}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                />
-              )}
-
-              {accountType === "professionnel" && (
-                <ProfessionalFields
-                  formData={formData}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                />
-              )}
-
-              {accountType && (
-                <CommonFields
-                  formData={formData}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                />
-              )}
-
-              {accountType && (
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                  size="lg"
-                >
-                  {isLoading ? "Création du compte..." : "Créer mon compte"}
-                </Button>
-              )}
-            </form>
+            <SignupForm
+              accountType={accountType}
+              formData={formData}
+              error={error}
+              isLoading={isLoading}
+              onAccountTypeChange={setAccountType}
+              onInputChange={handleInputChange}
+              onSubmit={handleSubmit}
+            />
 
             <SignupFooter />
           </CardContent>
