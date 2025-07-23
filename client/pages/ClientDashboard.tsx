@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { EditProfileDialog } from "../components/EditProfileDialog";
+import { QuickMessageModal } from "../components/messaging";
 import {
   HeaderSection,
   StatsCards,
