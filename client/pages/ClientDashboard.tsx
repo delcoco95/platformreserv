@@ -149,6 +149,14 @@ export default function ClientDashboard() {
           open={showEditProfile}
           onOpenChange={setShowEditProfile}
         />
+
+        <QuickMessageModal
+          open={quickMessageModal.open}
+          onOpenChange={(open) => setQuickMessageModal(prev => ({ ...prev, open }))}
+          receiverId={quickMessageModal.receiverId}
+          receiverName={quickMessageModal.receiverName}
+          appointmentSubject={quickMessageModal.appointmentSubject}
+        />
       </div>
     </div>
   );
