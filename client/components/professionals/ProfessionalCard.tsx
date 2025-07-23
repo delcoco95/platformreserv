@@ -189,7 +189,9 @@ export const ProfessionalCard = ({ professional }: ProfessionalCardProps) => {
                 </span>
               </div>
               <span className="text-sm text-muted-foreground">
-                ({professional.totalReviews || 0} avis)
+                {professional.totalReviews && professional.totalReviews > 0
+                  ? `(${professional.totalReviews} avis)`
+                  : "(Nouveau)"}
               </span>
             </>
           ) : (
