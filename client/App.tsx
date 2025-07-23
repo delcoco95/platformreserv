@@ -31,8 +31,8 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <div className="min-h-screen bg-background flex flex-col">
-          <SafeAutoRedirect />
-          <SafeHeader />
+          <AutoRedirect />
+          <Header />
           <main className="flex-1">
             <Routes>
               <Route path="/" element={<Index />} />
