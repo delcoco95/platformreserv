@@ -1,16 +1,14 @@
 import { Card, CardContent } from "../ui/card";
-import { Calendar, CalendarCheck, Star } from "lucide-react";
+import { Calendar, CalendarCheck } from "lucide-react";
 
 interface StatsCardsProps {
   upcomingAppointmentsCount: number;
   completedAppointmentsCount: number;
-  averageRating?: number;
 }
 
 export const StatsCards = ({
   upcomingAppointmentsCount,
   completedAppointmentsCount,
-  averageRating = 4.8,
 }: StatsCardsProps) => {
   const stats = [
     {
