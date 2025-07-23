@@ -107,12 +107,7 @@ export const AppointmentsTabs = ({
                 )}
               </>
             )}
-            {!isUpcoming && appointment.status === "completed" && (
-              <Button variant="outline" size="sm">
-                <Star className="h-4 w-4 mr-2" />
-                Noter
-              </Button>
-            )}
+            {/* Bouton Noter supprimé selon les exigences */}
           </div>
         </div>
       </CardContent>
