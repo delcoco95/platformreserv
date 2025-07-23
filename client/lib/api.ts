@@ -1,9 +1,11 @@
+// client/lib/api.ts
+
 const API_BASE_URL = "http://localhost:5000/api";
 
 interface ApiResponse<T> {
   success: boolean;
   data?: T;
-  error?: string;
+  message?: string;
 }
 
 const api = {
@@ -19,8 +21,8 @@ const api = {
 
     const result: ApiResponse<T> = await response.json();
 
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || response.statusText);
+    if (!response.ok || result.success === false) {
+      throw new Error(result.message || response.statusText);
     }
 
     return result.data!;
@@ -40,8 +42,8 @@ const api = {
 
     const result: ApiResponse<T> = await response.json();
 
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || response.statusText);
+    if (!response.ok || result.success === false) {
+      throw new Error(result.message || response.statusText);
     }
 
     return result.data!;
@@ -61,8 +63,8 @@ const api = {
 
     const result: ApiResponse<T> = await response.json();
 
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || response.statusText);
+    if (!response.ok || result.success === false) {
+      throw new Error(result.message || response.statusText);
     }
 
     return result.data!;
@@ -81,8 +83,8 @@ const api = {
 
     const result: ApiResponse<T> = await response.json();
 
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || response.statusText);
+    if (!response.ok || result.success === false) {
+      throw new Error(result.message || response.statusText);
     }
 
     return result.data!;

@@ -1,23 +1,5 @@
 const mongoose = require("mongoose");
 
-<<<<<<< HEAD
-const userSchema = new mongoose.Schema({
-  role: {
-    type: String,
-    enum: ['client', 'professionnel'],
-    required: true,
-  },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  nom: String,
-  telephone: String,
-  adresse: String,
-  siret: String,
-  metier: String,
-});
-
-module.exports = mongoose.model('User', userSchema);
-=======
 const userSchema = new mongoose.Schema(
   {
     // Champs communs
@@ -101,4 +83,3 @@ userSchema.virtual("uid").get(function () {
 });
 
 module.exports = mongoose.model("User", userSchema);
->>>>>>> 4887ae1b0f3731e01d38efe3ec0a807d7dfe9bfa

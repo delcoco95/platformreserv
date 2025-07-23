@@ -19,6 +19,13 @@ exports.register = async (req, res) => {
       siret,
     } = req.body;
 
+    if (!email || !password || !userType) {
+      return res.status(400).json({
+        success: false,
+        message: "Champs requis manquants (email, password ou userType)",
+      });
+    }
+
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({ email });
     if (existingUser) {
