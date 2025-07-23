@@ -1,22 +1,40 @@
 const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+
+let mongod;
 
 const connectDB = async () => {
   try {
-    // Utiliser une base de données en mémoire pour le développement
-    const mongoURI = process.env.NODE_ENV === 'production'
-      ? process.env.MONGO_URI
-      : 'mongodb://localhost:27017/rendezvouspro';
+    // En production, utiliser la vraie base MongoDB
+    if (process.env.NODE_ENV === 'production') {
+      const conn = await mongoose.connect(process.env.MONGO_URI);
+      console.log(`✅ MongoDB connecté: ${conn.connection.host}`);
+      return;
+    }
 
-    const conn = await mongoose.connect(mongoURI, {
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-    });
-    console.log(`✅ MongoDB connecté: ${conn.connection.host}`);
+    // En développement, utiliser MongoDB Memory Server
+    mongod = await MongoMemoryServer.create();
+    const mongoUri = mongod.getUri();
+
+    const conn = await mongoose.connect(mongoUri);
+    console.log(`✅ MongoDB Memory Server connecté: ${conn.connection.host}`);
+    console.log("ℹ️ Base de données temporaire - les données seront perdues au redémarrage");
   } catch (err) {
-    console.warn("⚠️ MongoDB non disponible, utilisation d'une base temporaire");
-    console.log("ℹ️ Les données seront perdues au redémarrage du serveur");
-    // Ne pas faire échouer l'application en développement
+    console.error("❌ Erreur de connexion à la base de données:", err.message);
+    process.exit(1);
   }
 };
 
-module.exports = connectDB;
+// Fonction pour fermer proprement la connection
+const closeDB = async () => {
+  try {
+    await mongoose.connection.close();
+    if (mongod) {
+      await mongod.stop();
+    }
+  } catch (err) {
+    console.error("Erreur lors de la fermeture de la DB:", err);
+  }
+};
+
+module.exports = { connectDB, closeDB };
