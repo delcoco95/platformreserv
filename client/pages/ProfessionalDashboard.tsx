@@ -126,7 +126,7 @@ export default function ProfessionalDashboard() {
           <Badge className="bg-yellow-100 text-yellow-800">En attente</Badge>
         );
       case "completed":
-        return <Badge className="bg-blue-100 text-blue-800">Terminé</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800">Termin��</Badge>;
       case "cancelled":
         return <Badge className="bg-red-100 text-red-800">Annulé</Badge>;
       default:
@@ -386,7 +386,9 @@ export default function ProfessionalDashboard() {
                         {professionalProfile.rating.toFixed(1)}
                       </span>
                       <span className="text-sm text-muted-foreground">
-                        ({professionalProfile.totalReviews || 0} avis)
+                        {professionalProfile.totalReviews && professionalProfile.totalReviews > 0
+                          ? `(${professionalProfile.totalReviews} avis)`
+                          : "(Aucun avis)"}
                       </span>
                     </div>
                   )}
