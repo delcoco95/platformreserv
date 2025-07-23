@@ -395,7 +395,7 @@ export default function ProfessionalProfile() {
             />
 
             {/* Disponibilités */}
-            {selectedService && (
+            {selectedServices.length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle>Choisir un créneau</CardTitle>
