@@ -198,6 +198,18 @@ export default function ProfessionalDashboard() {
   }
 
   const professionalProfile = userProfile as ProfessionalProfile;
+
+  // Vérification de sécurité pour éviter les pages blanches
+  if (!professionalProfile) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-muted-foreground">Chargement de votre profil...</p>
+        </div>
+      </div>
+    );
+  }
   const IconComponent = getCategoryIcon(professionalProfile?.profession || "");
 
   // Calculer les statistiques
