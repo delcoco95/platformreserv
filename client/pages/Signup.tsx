@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
+import api from "../lib/api";
+import { ClientProfile, ProfessionalProfile, AuthUser } from "../types"; // chemin à adapter si nécessaire
 import {
   Card,
   CardContent,
@@ -118,6 +120,7 @@ export default function Signup() {
 
     setIsLoading(true);
 
+<<<<<<< HEAD
     try {
       // Préparer les données additionnelles selon le type de compte
       const additionalData =
@@ -135,24 +138,36 @@ export default function Signup() {
               phone: formData.phone,
               address: formData.address,
             };
+=======
+const register = async (
+  email: string,
+  password: string,
+  userType: "client" | "professionnel",
+  additionalData?: Partial<ClientProfile | ProfessionalProfile>
+): Promise<void> => {
+  try {
+    const res = await api.post<{
+      user: AuthUser;
+      token: string;
+    }>("/auth/register", {
+      email,
+      password,
+      userType,
+      ...additionalData,
+    });
 
-      await register(
-        formData.email,
-        formData.password,
-        accountType,
-        additionalData,
-      );
-    } catch (error: any) {
-      console.error("Erreur d'inscription:", error);
-      if (error.message) {
-        setError(error.message);
-      } else {
-        setError("Erreur d'inscription. Veuillez réessayer");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const { token, user } = res;
+
+    localStorage.setItem("auth_token", token);
+    setCurrentUser(user);
+    await userProfile(user.uid);
+  } catch (err) {
+    console.error("Erreur d'inscription :", err);
+    throw err; // 🔁 très important pour que l'erreur remonte au formulaire
+  }
+};
+>>>>>>> abf56a8f8a1407eb3a82e35d6c98a87d5746ad1f
+
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">

@@ -18,11 +18,11 @@ interface AuthContextType {
     email: string,
     password: string,
     userType: "client" | "professionnel",
-    additionalData?: Partial<ClientProfile | ProfessionalProfile>,
+    additionalData?: Partial<ClientProfile | ProfessionalProfile>
   ) => Promise<void>;
   logout: () => Promise<void>;
   updateUserProfile: (
-    data: Partial<ClientProfile | ProfessionalProfile>,
+    data: Partial<ClientProfile | ProfessionalProfile>
   ) => Promise<void>;
 }
 
@@ -54,39 +54,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     ClientProfile | ProfessionalProfile | null
   >(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const loadUserProfile = async (user: AuthUser) => {
+  const loadUserProfile = async (userId: string) => {
     try {
       const profile = await api.get<ClientProfile | ProfessionalProfile>(
-        `/users/${user.uid}`,
+        `/users/${userId}`
       );
       setUserProfile(profile);
-      setError(null);
-    } catch (error) {
-      console.error("Erreur lors du chargement du profil:", error);
-      setError("Impossible de charger le profil utilisateur");
-      // Ne pas faire échouer complètement, juste log l'erreur
+    } catch (err) {
+      console.error("Erreur chargement profil :", err);
     }
   };
 
   const login = async (email: string, password: string) => {
     try {
-      setError(null);
       const response = await api.post<{ user: AuthUser; token: string }>(
         "/auth/login",
-        {
-          email,
-          password,
-        },
+        { email, password }
       );
-
-      localStorage.setItem("auth_token", response.token);
-      setCurrentUser(response.user);
-      await loadUserProfile(response.user);
+      const { user, token } = response;
+      localStorage.setItem("auth_token", token);
+      setCurrentUser(user);
+      await loadUserProfile(user.uid);
     } catch (error) {
-      console.error("Erreur de connexion:", error);
-      setError("Erreur de connexion");
+      console.error("Erreur de connexion :", error);
       throw error;
     }
   };
@@ -95,7 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     email: string,
     password: string,
     userType: "client" | "professionnel",
-    additionalData: Partial<ClientProfile | ProfessionalProfile> = {},
+    additionalData?: Partial<ClientProfile | ProfessionalProfile>
   ) => {
     try {
       const response = await api.post<{ user: AuthUser; token: string }>(
@@ -103,16 +94,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         {
           email,
           password,
-          userType,
+          userType, // ✅ correction ici
           ...additionalData,
-        },
+        }
       );
-
       const { user, token } = response;
-
       localStorage.setItem("auth_token", token);
       setCurrentUser(user);
-      await loadUserProfile(user);
+      await loadUserProfile(user.uid);
     } catch (error) {
       console.error("Erreur d'inscription :", error);
       throw error;
@@ -132,42 +121,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const updateUserProfile = async (
-    data: Partial<ClientProfile | ProfessionalProfile>,
+    data: Partial<ClientProfile | ProfessionalProfile>
   ) => {
     if (!currentUser) throw new Error("Utilisateur non connecté");
 
     try {
       const updatedProfile = await api.put<ClientProfile | ProfessionalProfile>(
         `/users/${currentUser.uid}`,
-        data,
+        data
       );
       setUserProfile(updatedProfile);
     } catch (error) {
-      console.error("Erreur lors de la mise à jour:", error);
+      console.error("Erreur mise à jour du profil :", error);
       throw error;
     }
   };
 
-  // Vérifier l'authentification au chargement
   useEffect(() => {
     const checkAuth = async () => {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const token = localStorage.getItem("auth_token");
-        if (token) {
-          try {
-            const user = await api.get<AuthUser>("/auth/me");
-            setCurrentUser(user);
-            await loadUserProfile(user);
-          } catch (error) {
-            console.error("Token invalide:", error);
-            localStorage.removeItem("auth_token");
-          }
-        }
-      } catch (error) {
-        console.error(
-          "Erreur lors de la vérification de l'authentification:",
-          error,
-        );
+        const user = await api.get<AuthUser>("/auth/me");
+        setCurrentUser(user);
+        await loadUserProfile(user.uid);
+      } catch (err) {
+        console.error("Token invalide ou expiré :", err);
+        logout();
       } finally {
         setLoading(false);
       }
@@ -176,16 +160,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     checkAuth();
   }, []);
 
-  const value = {
-    currentUser,
-    userProfile,
-    loading,
-    login,
-    register,
-    logout,
-    updateUserProfile,
-  };
-
-  // Toujours retourner le provider, même en cas d'erreur
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        currentUser,
+        userProfile,
+        loading,
+        login,
+        register,
+        logout,
+        updateUserProfile,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
