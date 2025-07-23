@@ -136,8 +136,8 @@ exports.getAllProfessionals = async (req, res) => {
     // Obtenir tous les professionnels sans .select() et .sort() pour le modèle en mémoire
     const allUsers = User.users || [];
     const professionals = allUsers
-      .filter(user => user.userType === "professionnel")
-      .map(prof => {
+      .filter((user) => user.userType === "professionnel")
+      .map((prof) => {
         // Exclure le password
         const { password, ...profWithoutPassword } = prof;
         return profWithoutPassword;
@@ -183,35 +183,46 @@ exports.searchProfessionals = async (req, res) => {
 
     // Obtenir tous les professionnels
     const allUsers = User.users || [];
-    let professionals = allUsers.filter(user => user.userType === "professionnel");
+    let professionals = allUsers.filter(
+      (user) => user.userType === "professionnel",
+    );
 
     // Filtre par profession
     if (profession && profession !== "all") {
-      professionals = professionals.filter(prof => prof.profession === profession);
+      professionals = professionals.filter(
+        (prof) => prof.profession === profession,
+      );
     }
 
     // Recherche textuelle
     if (q) {
       const searchQuery = q.toLowerCase();
-      professionals = professionals.filter(prof =>
-        (prof.companyName && prof.companyName.toLowerCase().includes(searchQuery)) ||
-        (prof.description && prof.description.toLowerCase().includes(searchQuery)) ||
-        (prof.services && prof.services.some(service => service.toLowerCase().includes(searchQuery))) ||
-        (prof.address && prof.address.toLowerCase().includes(searchQuery))
+      professionals = professionals.filter(
+        (prof) =>
+          (prof.companyName &&
+            prof.companyName.toLowerCase().includes(searchQuery)) ||
+          (prof.description &&
+            prof.description.toLowerCase().includes(searchQuery)) ||
+          (prof.services &&
+            prof.services.some((service) =>
+              service.toLowerCase().includes(searchQuery),
+            )) ||
+          (prof.address && prof.address.toLowerCase().includes(searchQuery)),
       );
     }
 
     // Filtre par localisation
     if (location) {
       const locationQuery = location.toLowerCase();
-      professionals = professionals.filter(prof =>
-        prof.address && prof.address.toLowerCase().includes(locationQuery)
+      professionals = professionals.filter(
+        (prof) =>
+          prof.address && prof.address.toLowerCase().includes(locationQuery),
       );
     }
 
     // Exclure le password et trier
     professionals = professionals
-      .map(prof => {
+      .map((prof) => {
         const { password, ...profWithoutPassword } = prof;
         return profWithoutPassword;
       })
