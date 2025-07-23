@@ -154,7 +154,7 @@ export default function ProfessionalProfile() {
   const [services] = useState<Service[]>(mockServices);
   const [timeSlots] = useState<TimeSlot[]>(generateTimeSlots());
   const [loading, setLoading] = useState(true);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [selectedServices, setSelectedServices] = useState<Service[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [showBookingDialog, setShowBookingDialog] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
