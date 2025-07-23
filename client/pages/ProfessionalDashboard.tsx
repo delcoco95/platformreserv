@@ -72,20 +72,20 @@ export default function ProfessionalDashboard() {
       return;
     }
 
-    // Charger les rendez-vous
-    const loadAppointments = async () => {
-      try {
-        // Simulation d'un appel API - remplacez par le vrai service
-        setAppointments([]);
-        setLoading(false);
-      } catch (err) {
-        console.error("Erreur lors du chargement des appointments:", err);
-        setAppointments([]);
-        setLoading(false);
-      }
-    };
+    // Charger les rendez-vous du professionnel
+    if (professionalProfile?.uid) {
+      const unsubscribe = appointmentService.onProfessionalAppointmentsChange(
+        professionalProfile.uid,
+        (appointmentsData) => {
+          setAppointments(appointmentsData);
+          setLoading(false);
+        }
+      );
 
-    loadAppointments();
+      return () => unsubscribe();
+    } else {
+      setLoading(false);
+    }
   }, [currentUser, authLoading]);
 
   const handleValidateAppointment = async (appointmentId: string) => {
