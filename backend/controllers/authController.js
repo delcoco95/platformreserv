@@ -1,5 +1,4 @@
-// Utiliser le modèle en mémoire pour le développement
-const User = require("../models/UserMemory");
+const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
