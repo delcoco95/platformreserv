@@ -57,12 +57,16 @@ export default function ProfessionalDashboard() {
     loading: authLoading,
     updateUserProfile,
   } = useAuth();
+
+  // (Suppression de la redéclaration de professionalProfile ici)
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation | null>(null);
+
+  const professionalProfile = userProfile as ProfessionalProfile;
 
   useEffect(() => {
     if (authLoading) return;
@@ -197,7 +201,9 @@ export default function ProfessionalDashboard() {
     );
   }
 
-  const professionalProfile = userProfile as ProfessionalProfile;
+
+  // Définir l'icône de la catégorie selon la profession
+  const IconComponent = getCategoryIcon(professionalProfile?.profession);
 
   // Vérification de sécurité pour éviter les pages blanches
   if (!professionalProfile) {
@@ -210,8 +216,6 @@ export default function ProfessionalDashboard() {
       </div>
     );
   }
-  const IconComponent = getCategoryIcon(professionalProfile?.profession || "");
-
   // Calculer les statistiques
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -452,7 +456,17 @@ export default function ProfessionalDashboard() {
 
           <TabsContent value="services" className="space-y-6">
             <ServicesManager
-              services={professionalProfile?.services || []}
+              services={
+                (professionalProfile?.services || []).map((s) =>
+                  typeof s === "string"
+                    ? { name: s, price: 0, duration: 0, description: "" }
+                    : {
+                        ...s,
+                        duration: s.duration ?? 0,
+                        description: s.description ?? "",
+                      }
+                )
+              }
               onUpdateServices={handleUpdateServices}
             />
           </TabsContent>
