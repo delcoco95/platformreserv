@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
   root: path.resolve(__dirname), // 👈 C'est cette ligne qu'on ajoute
   server: {
     host: "::",
-    port: 8080,
+    port: 3000,
   },
   build: {
     outDir: "dist/spa",
