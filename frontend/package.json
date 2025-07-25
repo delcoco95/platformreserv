@@ -5,21 +5,21 @@
   "pkg": {
     "assets": [
       "dist/spa/*"
-    ],
-    "scripts": [
-      "dist/server/**/*.js"
     ]
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build",
-    "build:server": "vite build --config vite.config.server.ts",
-    "start": "node dist/server/node-build.mjs",
-    "test": "vitest --run",
-    "format.fix": "prettier --write .",
-    "typecheck": "tsc"
-  },
+    },
+    "homepage": "https://delcoco95.github.io/platformreserv",
+"scripts": {
+  "dev": "vite",
+  "build": "npm run build:client && npm run build:server",
+  "build:client": "vite build",
+  "build:server": "vite build --config vite.config.server.ts",
+  "start": "node dist/server/node-build.mjs",
+  "test": "vitest --run",
+  "format.fix": "prettier --write .",
+  "typecheck": "tsc",
+  "predeploy": "npm run build:client",
+  "deploy": "gh-pages -d dist/spa"
+},
   "dependencies": {
     "express": "^4.18.2",
     "leaflet": "^1.9.4",
