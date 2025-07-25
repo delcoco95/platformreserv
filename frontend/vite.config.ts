@@ -5,6 +5,7 @@ import { createServer } from "./server";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  root: path.resolve(__dirname), // 👈 C'est cette ligne qu'on ajoute
   server: {
     host: "::",
     port: 8080,
@@ -15,8 +16,8 @@ export default defineConfig(({ mode }) => ({
   plugins: [react(), expressPlugin()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./client"),
-      "@shared": path.resolve(__dirname, "./shared"),
+      "@": path.resolve(__dirname, "./"),
+      "@shared": path.resolve(__dirname, "../shared"), // ⚠️ ici, shared est dans le dossier parent
     },
   },
 }));
