@@ -4,3 +4,4 @@ export { AppointmentsTabs } from "./AppointmentsTabs";
 export { Sidebar } from "./Sidebar";
 export { ProfessionalStats } from "./ProfessionalStats";
 export { ProfessionalProfileSection } from "./ProfessionalProfileSection";
+export { ProfessionalOverview } from "./ProfessionalOverview";
