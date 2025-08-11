@@ -105,7 +105,10 @@ export default function ProfessionalDashboard() {
           </TabsList>
 
           <TabsContent value="overview">
-            {/* Contenu à implémenter */}
+            <ProfessionalOverview
+              appointments={appointments}
+              onValidateAppointment={handleValidateAppointment}
+            />
           </TabsContent>
 
           <TabsContent value="services">
