@@ -73,9 +73,9 @@ export default function ProfessionalDashboard() {
     }
 
     // Charger les rendez-vous du professionnel
-    if (professionalProfile?.uid) {
+    if (userProfile?.uid) {
       const unsubscribe = appointmentService.onProfessionalAppointmentsChange(
-        professionalProfile.uid,
+        userProfile.uid,
         (appointmentsData) => {
           setAppointments(appointmentsData);
           setLoading(false);
