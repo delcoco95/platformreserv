@@ -18,7 +18,14 @@
     "start": "node dist/server/node-build.mjs",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "deploy": "bash scripts/deploy.sh",
+    "docker:build": "docker build -t rendezvous-pro .",
+    "docker:dev": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "backend:dev": "cd backend && npm run dev",
+    "backend:start": "cd backend && npm start",
+    "setup": "npm install && cd backend && npm install"
   },
   "dependencies": {
     "express": "^4.18.2",
