@@ -8,7 +8,7 @@ import { EditProfileDialog } from "../components/EditProfileDialog";
 import { ServicesManager, AvailabilityManager } from "../components/professional";
 import { ConversationsList, ChatWindow } from "../components/messaging";
 import { LoadingSpinner } from "../components/common";
-import { ProfessionalStats, ProfessionalProfileSection } from "../components/dashboard";
+import { ProfessionalStats, ProfessionalProfileSection, ProfessionalOverview } from "../components/dashboard";
 import { useProfessionalDashboard } from "../hooks/useProfessionalDashboard";
 import { Conversation } from "../services/messageService";
 
