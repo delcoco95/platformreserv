@@ -13,6 +13,7 @@ import FAQ from './pages/FAQ'
 import Legal from './pages/Legal'
 import About from './pages/About'
 import Privacy from './pages/Privacy'
+import BookingPage from './pages/BookingPage'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
