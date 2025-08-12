@@ -89,12 +89,19 @@ const Header = () => {
               >
                 Services
               </Link>
-              <Link 
-                to="/professionals" 
+              <Link
+                to="/professionals"
                 className="text-gray-700 hover:text-blue-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Professionnels
+              </Link>
+              <Link
+                to="/contact"
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contact
               </Link>
               
               {user ? (
