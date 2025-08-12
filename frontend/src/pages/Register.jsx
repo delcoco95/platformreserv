@@ -13,6 +13,13 @@ const Register = () => {
     userType: searchParams.get('type') || 'client',
     businessInfo: {
       companyName: '',
+      siret: '',
+      businessAddress: {
+        street: '',
+        city: '',
+        zipCode: '',
+        country: 'France'
+      },
       profession: 'automobile',
       description: ''
     }
