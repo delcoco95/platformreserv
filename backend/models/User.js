@@ -48,6 +48,23 @@ const userSchema = new mongoose.Schema({
   // Données spécifiques professionnel
   businessInfo: {
     companyName: String,
+    siret: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: function(v) {
+          // SIRET doit avoir 14 chiffres
+          return !v || /^\d{14}$/.test(v);
+        },
+        message: 'Le numéro SIRET doit contenir exactement 14 chiffres'
+      }
+    },
+    businessAddress: {
+      street: String,
+      city: String,
+      zipCode: String,
+      country: { type: String, default: 'France' }
+    },
     profession: {
       type: String,
       enum: ['automobile', 'plomberie', 'serrurerie', 'electricite']
