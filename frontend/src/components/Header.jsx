@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Car, User, LogOut, Menu, X } from 'lucide-react'
+import { User, LogOut, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 
 const Header = () => {
@@ -19,9 +19,8 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <Car className="h-8 w-8 text-blue-600" />
-            <span className="text-xl font-bold text-gray-900">BookAuto</span>
+          <Link to="/" className="flex items-center">
+            <span className="text-xl font-bold text-gray-900">BOOKAUTO</span>
           </Link>
 
           {/* Navigation Desktop */}
