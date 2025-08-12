@@ -26,7 +26,7 @@ const HomePage = () => {
               <span className="text-blue-600 block">au bon moment</span>
             </h1>
             <p className="text-xl text-gray-600 mb-12 leading-relaxed">
-              R��servez en ligne vos rendez-vous avec des professionnels de confiance
+              Réservez en ligne vos rendez-vous avec des professionnels de confiance
               près de chez vous. Simple, rapide et sécurisé.
             </p>
             
@@ -143,7 +143,7 @@ const HomePage = () => {
       {/* Ce qu'on propose */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Pourquoi choisir RendezVousPro ?</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Pourquoi choisir BookAuto ?</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
               <Star className="w-12 h-12 text-yellow-500 mx-auto mb-4" />

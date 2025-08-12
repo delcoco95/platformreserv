@@ -5,7 +5,7 @@ const AboutPage = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              À propos de RendezVousPro
+              À propos de BookAuto
             </h1>
             <p className="text-xl text-gray-600">
               La plateforme qui révolutionne la prise de rendez-vous
@@ -14,7 +14,7 @@ const AboutPage = () => {
 
           <div className="prose prose-lg mx-auto">
             <p>
-              RendezVousPro est née d'un constat simple : il est souvent difficile de trouver 
+              BookAuto est née d'un constat simple : il est souvent difficile de trouver 
               le bon professionnel au bon moment. Notre mission est de simplifier cette recherche 
               et de faciliter la prise de rendez-vous.
             </p>
