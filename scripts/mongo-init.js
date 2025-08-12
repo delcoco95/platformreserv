@@ -1,5 +1,5 @@
-// Script d'initialisation MongoDB
-db = db.getSiblingDB('rendezvous-pro');
+// Script d'initialisation MongoDB pour BookAuto
+db = db.getSiblingDB('platformreserv');
 
 // Créer un utilisateur admin (optionnel)
 db.createUser({
@@ -8,7 +8,7 @@ db.createUser({
   roles: [
     {
       role: 'readWrite',
-      db: 'rendezvous-pro'
+      db: 'platformreserv'
     }
   ]
 });
