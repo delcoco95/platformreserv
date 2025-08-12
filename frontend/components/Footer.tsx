@@ -239,7 +239,7 @@ export function Footer() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-sm text-gray-400">
-              © {currentYear} RendezVousPro. Tous droits réservés. Made with{" "}
+              © {currentYear} BookAuto. Tous droits réservés. Made with{" "}
               <Heart className="h-4 w-4 inline text-red-500" /> in France.
             </div>
             <div className="flex flex-wrap justify-center md:justify-end gap-4">
