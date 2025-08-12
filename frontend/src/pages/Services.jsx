@@ -1,4 +1,4 @@
-import { Car, Wrench, Key, Zap, Scissors, TreePine } from 'lucide-react'
+import { Car, Wrench, Key, Zap } from 'lucide-react'
 
 const Services = () => {
   const services = [
@@ -29,20 +29,6 @@ const Services = () => {
       description: 'Installation, dépannage, mise aux normes',
       count: '78+ professionnels',
       color: 'orange'
-    },
-    {
-      icon: TreePine,
-      name: 'Jardinage',
-      description: 'Entretien, aménagement, élagage, tondeuse',
-      count: '45+ professionnels',
-      color: 'green'
-    },
-    {
-      icon: Scissors,
-      name: 'Autre',
-      description: 'Divers services à domicile et réparations',
-      count: '32+ professionnels',
-      color: 'purple'
     }
   ]
 
