@@ -1,141 +1,163 @@
-import { useState } from "react";
+import { useState, useEffect } from 'react';
+import { Search, MapPin, Star, Clock, Euro } from 'lucide-react';
+import { servicesService } from '@services/api';
+import LoadingSpinner from '@components/LoadingSpinner';
 
-function ProfessionalsPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("tous");
-
-  const categories = [
-    { value: "tous", label: "Tous" },
-    { value: "automobile", label: "Automobile" },
-    { value: "plomberie", label: "Plomberie" },
-    { value: "serrurerie", label: "Serrurerie" },
-  ];
-
-  // Données d'exemple (à remplacer par des données réelles)
-  const professionals = [
-    {
-      id: 1,
-      name: "Jean Dupont",
-      profession: "automobile",
-      rating: 4.8,
-      services: ["Révision", "Réparation", "Diagnostic"],
-      location: "Paris 15e",
-    },
-    {
-      id: 2,
-      name: "Marie Martin",
-      profession: "plomberie",
-      rating: 4.9,
-      services: ["Dépannage", "Installation", "Maintenance"],
-      location: "Paris 12e",
-    },
-  ];
-
-  const filteredProfessionals = professionals.filter(prof => {
-    const matchesSearch = prof.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "tous" || prof.profession === selectedCategory;
-    return matchesSearch && matchesCategory;
+const ProfessionalsPage = () => {
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    category: '',
+    city: '',
+    search: ''
   });
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">Trouvez votre professionnel</h1>
-        
-        {/* Filtres de recherche */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <input
-            type="text"
-            placeholder="Rechercher un professionnel..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="input flex-1"
-          />
-          
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="input md:w-48"
-          >
-            {categories.map(cat => (
-              <option key={cat.value} value={cat.value}>
-                {cat.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+  useEffect(() => {
+    loadServices();
+  }, [filters]);
 
-      {/* Liste des professionnels */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProfessionals.length > 0 ? (
-          filteredProfessionals.map(prof => (
-            <div key={prof.id} className="card p-6">
-              <div className="flex items-center mb-3">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 font-semibold">
-                    {prof.name.split(' ').map(n => n[0]).join('')}
-                  </span>
-                </div>
-                <div className="ml-3">
-                  <h3 className="font-semibold">{prof.name}</h3>
-                  <p className="text-sm text-gray-600 capitalize">{prof.profession}</p>
-                </div>
-              </div>
-              
-              <div className="mb-3">
-                <div className="flex items-center mb-1">
-                  <span className="text-yellow-500">★</span>
-                  <span className="ml-1 text-sm">{prof.rating}</span>
-                </div>
-                <p className="text-sm text-gray-600">{prof.location}</p>
-              </div>
-              
-              <div className="mb-4">
-                <p className="text-sm font-medium mb-1">Services:</p>
-                <div className="flex flex-wrap gap-1">
-                  {prof.services.map(service => (
-                    <span
-                      key={service}
-                      className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"
-                    >
-                      {service}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              
-              <button className="btn btn-primary w-full">
-                Prendre RDV
-              </button>
+  const loadServices = async () => {
+    try {
+      setLoading(true);
+      const response = await servicesService.getAll(filters);
+      setServices(response.data.services || []);
+    } catch (error) {
+      console.error('Erreur chargement services:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const categories = [
+    { value: '', label: 'Tous les services' },
+    { value: 'automobile', label: 'Automobile' },
+    { value: 'plomberie', label: 'Plomberie' },
+    { value: 'serrurerie', label: 'Serrurerie' },
+    { value: 'electricite', label: 'Électricité' },
+    { value: 'beaute', label: 'Beauté & Bien-être' }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Trouvez votre professionnel
+          </h1>
+          <p className="text-xl text-gray-600">
+            Des milliers de professionnels qualifiés à votre service
+          </p>
+        </div>
+
+        {/* Filtres */}
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Rechercher un service..."
+                value={filters.search}
+                onChange={(e) => setFilters({...filters, search: e.target.value})}
+                className="input pl-12"
+              />
             </div>
-          ))
+            
+            <select
+              value={filters.category}
+              onChange={(e) => setFilters({...filters, category: e.target.value})}
+              className="input"
+            >
+              {categories.map(cat => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+            
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Ville..."
+                value={filters.city}
+                onChange={(e) => setFilters({...filters, city: e.target.value})}
+                className="input pl-12"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Résultats */}
+        {loading ? (
+          <LoadingSpinner text="Chargement des professionnels..." />
         ) : (
-          <div className="col-span-full text-center py-8">
-            <p className="text-gray-600">Aucun professionnel trouvé</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.length > 0 ? (
+              services.map((service) => (
+                <div key={service._id} className="card card-hover p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-1">{service.name}</h3>
+                      <p className="text-gray-600 text-sm">{service.description}</p>
+                    </div>
+                    <span className="badge badge-primary">{service.category}</span>
+                  </div>
+                  
+                  {service.professionalId && (
+                    <div className="mb-4">
+                      <p className="font-medium">
+                        {service.professionalId.firstName} {service.professionalId.lastName}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {service.professionalId.businessInfo?.companyName}
+                      </p>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Clock className="w-4 h-4 mr-1" />
+                      {service.duration} min
+                    </div>
+                    <div className="flex items-center text-lg font-semibold text-blue-600">
+                      <Euro className="w-4 h-4 mr-1" />
+                      {service.price}
+                    </div>
+                  </div>
+                  
+                  {service.professionalId?.stats && (
+                    <div className="flex items-center mb-4">
+                      <Star className="w-4 h-4 text-yellow-500 mr-1" />
+                      <span className="text-sm">
+                        {service.professionalId.stats.averageRating || 'N/A'} 
+                        ({service.professionalId.stats.totalReviews || 0} avis)
+                      </span>
+                    </div>
+                  )}
+                  
+                  <button className="btn btn-primary w-full">
+                    Réserver
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-600 mb-4">Aucun professionnel trouvé</p>
+                <button
+                  onClick={() => setFilters({ category: '', city: '', search: '' })}
+                  className="btn btn-outline"
+                >
+                  Réinitialiser les filtres
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
-
-      {/* Message si pas de résultats */}
-      {filteredProfessionals.length === 0 && (searchTerm || selectedCategory !== "tous") && (
-        <div className="text-center py-8">
-          <p className="text-gray-600">
-            Aucun professionnel ne correspond à vos critères de recherche.
-          </p>
-          <button
-            onClick={() => {
-              setSearchTerm("");
-              setSelectedCategory("tous");
-            }}
-            className="btn btn-secondary mt-4"
-          >
-            Réinitialiser les filtres
-          </button>
-        </div>
-      )}
     </div>
   );
-}
+};
 
 export default ProfessionalsPage;
