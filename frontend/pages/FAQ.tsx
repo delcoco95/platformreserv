@@ -33,9 +33,9 @@ export default function FAQ() {
       icon: Users,
       questions: [
         {
-          question: "Comment fonctionne RendezVousPro ?",
+          question: "Comment fonctionne BookAuto ?",
           answer:
-            "RendezVousPro est une plateforme qui met en relation des clients avec des professionnels qualifiés. Vous recherchez un service, choisissez un professionnel, réservez un créneau et le professionnel vous contacte pour finaliser les détails.",
+            "BookAuto est une plateforme qui met en relation des clients avec des professionnels qualifiés. Vous recherchez un service, choisissez un professionnel, réservez un créneau et le professionnel vous contacte pour finaliser les détails.",
         },
         {
           question: "Quels types de services proposez-vous ?",
