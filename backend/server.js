@@ -72,7 +72,7 @@ app.get("/health", (req, res) => {
 
 app.get("/", (req, res) => {
   res.json({
-    message: "🚀 API RendezVousPro",
+    message: "🚀 API BookAuto",
     version: "2.0.0",
     status: "active"
   });

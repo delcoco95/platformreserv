@@ -4,7 +4,7 @@ const config = {
     timeout: 10000,
   },
   app: {
-    name: "RendezVousPro",
+    name: "BookAuto",
     version: "1.0.0",
   },
   features: {
