@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Car, Mail, Phone, MapPin } from 'lucide-react'
+import { Mail, Phone, MapPin } from 'lucide-react'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -10,9 +10,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo et description */}
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <Car className="h-8 w-8 text-blue-500" />
-              <span className="text-xl font-bold text-white">BookAuto</span>
+            <div className="mb-4">
+              <span className="text-xl font-bold text-white">BOOKAUTO</span>
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
               La plateforme de référence pour réserver vos services automobiles. 
@@ -92,7 +91,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-sm text-gray-400">
-            © {currentYear} BookAuto. Tous droits réservés.
+            © {currentYear} BOOKAUTO. Tous droits réservés.
           </p>
         </div>
       </div>
