@@ -17,8 +17,8 @@ const FAQPage = () => {
   const faqs = [
     {
       id: 1,
-      question: "Comment fonctionne RendezVousPro ?",
-      answer: "RendezVousPro vous permet de rechercher des professionnels qualifiés, de consulter leurs services et tarifs, puis de réserver directement en ligne avec paiement sécurisé."
+      question: "Comment fonctionne BookAuto ?",
+      answer: "BookAuto vous permet de rechercher des professionnels qualifiés, de consulter leurs services et tarifs, puis de réserver directement en ligne avec paiement sécurisé."
     },
     {
       id: 2,

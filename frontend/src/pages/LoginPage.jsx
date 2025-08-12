@@ -48,7 +48,7 @@ const LoginPage = () => {
             Bon retour !
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Connectez-vous à votre compte RendezVousPro
+            Connectez-vous à votre compte BookAuto
           </p>
         </div>
 

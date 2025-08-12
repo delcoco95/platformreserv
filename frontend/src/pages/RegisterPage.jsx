@@ -80,7 +80,7 @@ const RegisterPage = () => {
             Créer un compte
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Rejoignez la communauté RendezVousPro
+            Rejoignez la communauté BookAuto
           </p>
         </div>
 
