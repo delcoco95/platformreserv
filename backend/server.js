@@ -4,6 +4,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const path = require("path");
 
 // Configuration
 dotenv.config();
@@ -54,6 +55,10 @@ app.use("/api/bookings", require("./routes/bookingRoutes"));
 app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/conversations", require("./routes/conversationRoutes"));
 app.use("/api/payments", require("./routes/paymentRoutes"));
+app.use("/api/upload", require("./routes/uploadRoutes"));
+
+// Servir les fichiers statiques (images uploadées)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes de santé
 app.get("/health", (req, res) => {
