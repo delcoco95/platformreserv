@@ -27,9 +27,7 @@ const Register = () => {
     { value: 'automobile', label: 'Automobile' },
     { value: 'plomberie', label: 'Plomberie' },
     { value: 'serrurerie', label: 'Serrurerie' },
-    { value: 'electricite', label: 'Électricité' },
-    { value: 'jardinage', label: 'Jardinage' },
-    { value: 'autre', label: 'Autre' }
+    { value: 'electricite', label: 'Électricité' }
   ]
 
   const handleSubmit = async (e) => {
