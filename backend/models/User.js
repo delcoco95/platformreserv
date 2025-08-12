@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema({
     siret: String,
     profession: {
       type: String,
-      enum: ["automobile", "plomberie", "serrurerie", "electricite", "menage", "jardinage", "beaute", "autre"]
+      enum: ["automobile", "plomberie", "serrurerie", "electricite", "jardinage", "autre"]
     },
     description: String,
     logo: String,

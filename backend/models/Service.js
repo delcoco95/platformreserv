@@ -21,7 +21,7 @@ const serviceSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ["automobile", "plomberie", "serrurerie", "electricite", "menage", "jardinage", "beaute", "autre"]
+    enum: ["automobile", "plomberie", "serrurerie", "electricite", "jardinage", "autre"]
   },
   
   // Tarifs et durée

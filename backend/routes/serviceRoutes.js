@@ -23,7 +23,7 @@ const serviceValidation = [
     .isLength({ min: 10, max: 500 })
     .withMessage("La description doit contenir entre 10 et 500 caractères"),
   body("category")
-    .isIn(["automobile", "plomberie", "serrurerie", "electricite", "menage", "jardinage", "beaute", "autre"])
+    .isIn(["automobile", "plomberie", "serrurerie", "electricite", "jardinage", "autre"])
     .withMessage("Catégorie invalide"),
   body("price")
     .isFloat({ min: 1 })
