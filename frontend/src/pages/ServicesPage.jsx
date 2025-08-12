@@ -44,14 +44,22 @@ const ServicesPage = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service) => (
-            <div key={service.category} className="card card-hover p-8 text-center">
-              <div className="text-6xl mb-4">{service.icon}</div>
-              <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-              <p className="text-gray-600 mb-4">{service.description}</p>
-              <p className="text-sm text-blue-600 font-medium mb-6">{service.count}</p>
-              <button className="btn btn-primary w-full">
-                Voir les professionnels
-              </button>
+            <div key={service.category} className="card card-hover overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img
+                  src={service.image}
+                  alt={service.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="p-6 text-center">
+                <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                <p className="text-gray-600 mb-4">{service.description}</p>
+                <p className="text-sm text-blue-600 font-medium mb-6">{service.count}</p>
+                <button className="btn btn-primary w-full">
+                  Voir les professionnels
+                </button>
+              </div>
             </div>
           ))}
         </div>
