@@ -59,6 +59,10 @@ const userSchema = new mongoose.Schema({
     },
     description: String,
     logo: String,
+    images: [{
+      type: String,
+      url: String
+    }],
     experience: Number, // en années
     certification: [String]
   },
