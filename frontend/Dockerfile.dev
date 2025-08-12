@@ -1,6 +1,12 @@
+# Dockerfile pour BookAuto Frontend (Développement)
 FROM node:18-alpine
 
 WORKDIR /app
+
+# Installer les dépendances système
+RUN apk add --no-cache \
+    curl \
+    bash
 
 # Copier package.json et installer les dépendances
 COPY package*.json ./
@@ -12,5 +18,11 @@ COPY . .
 # Exposer le port
 EXPOSE 3000
 
-# Commande par défaut
+# Créer un utilisateur non-root
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nodejs -u 1001
+RUN chown -R nodejs:nodejs /app
+USER nodejs
+
+# Commande de développement
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
