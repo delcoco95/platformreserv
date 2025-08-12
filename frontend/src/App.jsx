@@ -35,6 +35,14 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route
+                path="/booking"
+                element={
+                  <ProtectedRoute>
+                    <BookingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
