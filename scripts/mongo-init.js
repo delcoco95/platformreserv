@@ -63,4 +63,4 @@ db.users.insertMany([
   }
 ]);
 
-print('Base de données RendezVousPro initialisée avec succès!');
+print('Base de données BookAuto initialisée avec succès!');
