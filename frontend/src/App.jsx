@@ -9,6 +9,10 @@ import Dashboard from './pages/Dashboard'
 import Services from './pages/Services'
 import Professionals from './pages/Professionals'
 import Contact from './pages/Contact'
+import FAQ from './pages/FAQ'
+import Legal from './pages/Legal'
+import About from './pages/About'
+import Privacy from './pages/Privacy'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
