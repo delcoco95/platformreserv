@@ -26,7 +26,7 @@ const Header = () => {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">RP</span>
             </div>
-            <span className="font-bold text-xl text-gray-900">RendezVousPro</span>
+            <span className="font-bold text-xl text-gray-900">BookAuto</span>
           </Link>
 
           {/* Navigation Desktop */}

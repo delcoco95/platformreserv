@@ -83,7 +83,7 @@ export function Header() {
               <Calendar className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-primary">
-              RendezVousPro
+              BookAuto
             </span>
           </Link>
 
