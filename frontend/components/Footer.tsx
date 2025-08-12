@@ -81,7 +81,7 @@ export function Footer() {
                 <Calendar className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold text-white">
-                RendezVousPro
+                BookAuto
               </span>
             </div>
             <p className="text-sm leading-relaxed mb-6">
