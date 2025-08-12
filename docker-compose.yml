@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7-jammy
+    container_name: bookauto-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: bookauto
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts:/docker-entrypoint-initdb.d:ro
+    networks:
+      - bookauto-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  bookauto-network:
+    driver: bridge
