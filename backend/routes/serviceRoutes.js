@@ -49,7 +49,7 @@ router.get('/', async (req, res) => {
 router.post('/', auth, [
   body('name').trim().isLength({ min: 3 }),
   body('description').trim().isLength({ min: 10 }),
-  body('category').isIn(['automobile', 'plomberie', 'serrurerie', 'electricite', 'jardinage', 'autre']),
+  body('category').isIn(['automobile', 'plomberie', 'serrurerie', 'electricite']),
   body('price').isNumeric().isFloat({ min: 0 }),
   body('duration').isNumeric().isInt({ min: 15 })
 ], async (req, res) => {

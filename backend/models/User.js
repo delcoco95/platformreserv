@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema({
     companyName: String,
     profession: {
       type: String,
-      enum: ['automobile', 'plomberie', 'serrurerie', 'electricite', 'jardinage', 'autre']
+      enum: ['automobile', 'plomberie', 'serrurerie', 'electricite']
     },
     description: String,
     images: [String] // URLs des images
