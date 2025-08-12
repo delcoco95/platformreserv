@@ -4,28 +4,28 @@ const ServicesPage = () => {
       category: 'automobile',
       title: 'Services Automobile',
       description: 'Mécaniciens, carrossiers, dépannage',
-      icon: '🚗',
+      image: '/images/garage-service.jpg',
       count: '120+ pros'
     },
     {
       category: 'plomberie',
       title: 'Plomberie',
       description: 'Dépannage, installation, rénovation',
-      icon: '🔧',
+      image: '/images/plumbing-service.jpg',
       count: '89+ pros'
     },
     {
       category: 'serrurerie',
       title: 'Serrurerie',
       description: 'Ouverture de porte, installation',
-      icon: '🗝️',
+      image: '/images/locksmith-service.jpg',
       count: '65+ pros'
     },
     {
       category: 'electricite',
       title: 'Électricité',
       description: 'Installation, dépannage électrique',
-      icon: '⚡',
+      image: '/images/electrical-service.jpg',
       count: '78+ pros'
     }
   ];
