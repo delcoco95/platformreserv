@@ -1,188 +1,192 @@
 const User = require("../models/User");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
 
-exports.register = async (req, res) => {
+// Générer un token JWT
+const generateToken = (userId) => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: "30d"
+  });
+};
+
+// Inscription
+const register = async (req, res) => {
   try {
-    console.log("📝 Inscription - Données reçues:", req.body);
+    // Validation des erreurs
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: "Données invalides",
+        errors: errors.array()
+      });
+    }
 
     const {
       email,
       password,
       userType,
-      // Champs client
       firstName,
       lastName,
       phone,
-      address,
-      // Champs professionnel
-      companyName,
-      profession,
-      siret,
+      businessInfo
     } = req.body;
-
-    if (!email || !password || !userType) {
-      return res.status(400).json({
-        success: false,
-        message: "Champs requis manquants (email, password ou userType)",
-      });
-    }
 
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "Cette adresse email est déjà utilisée",
+        message: "Un compte existe déjà avec cet email"
       });
     }
 
-    // Validation des champs obligatoires selon le type d'utilisateur
-    if (userType === "client") {
-      if (!firstName || !lastName) {
-        return res.status(400).json({
-          success: false,
-          message: "Le prénom et nom sont obligatoires pour les clients",
-        });
-      }
-    } else if (userType === "professionnel") {
-      if (!companyName || !profession) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Le nom d'entreprise et la profession sont obligatoires pour les professionnels",
-        });
-      }
-    }
-
-    // Hacher le mot de passe
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // Créer l'utilisateur avec les bons champs selon le type
+    // Créer le nouvel utilisateur
     const userData = {
       email,
-      password: hashedPassword,
+      password,
       userType,
-      phone,
-      address,
+      firstName,
+      lastName,
+      phone
     };
 
-    if (userType === "client") {
-      userData.firstName = firstName;
-      userData.lastName = lastName;
-    } else if (userType === "professionnel") {
-      userData.companyName = companyName;
-      userData.profession = profession;
-      userData.siret = siret;
+    // Ajouter les informations business pour les professionnels
+    if (userType === "professionnel" && businessInfo) {
+      userData.businessInfo = businessInfo;
     }
 
-    const newUser = new User(userData);
-    await newUser.save();
+    const user = new User(userData);
+    await user.save();
 
-    console.log("✅ Utilisateur créé avec succès:", newUser._id);
+    // Générer le token
+    const token = generateToken(user._id);
 
-    // Générer le token JWT
-    const token = jwt.sign(
-      { id: newUser._id, userType: newUser.userType },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" },
-    );
+    // Mettre à jour la dernière connexion
+    user.lastLogin = new Date();
+    await user.save();
 
-    // Retourner l'utilisateur et le token
-    const userResponse = {
-      uid: newUser._id,
-      email: newUser.email,
-      userType: newUser.userType,
-    };
-
-    console.log("🔑 Token généré et réponse envoyée");
     res.status(201).json({
       success: true,
-      data: { user: userResponse, token },
+      message: "Inscription réussie",
+      data: {
+        user: user.getPublicProfile(),
+        token
+      }
     });
-  } catch (err) {
-    console.error("Erreur register:", err);
+
+  } catch (error) {
+    console.error("Erreur inscription:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur lors de l'inscription",
+      message: "Erreur serveur lors de l'inscription"
     });
   }
 };
 
-exports.login = async (req, res) => {
+// Connexion
+const login = async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: "Données invalides",
+        errors: errors.array()
+      });
+    }
+
     const { email, password } = req.body;
 
-    // Vérifier si l'utilisateur existe
+    // Trouver l'utilisateur
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "Aucun compte trouvé avec cette adresse email",
+        message: "Email ou mot de passe incorrect"
       });
     }
 
     // Vérifier le mot de passe
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
-        message: "Mot de passe incorrect",
+        message: "Email ou mot de passe incorrect"
       });
     }
 
-    // Générer le token JWT
-    const token = jwt.sign(
-      { id: user._id, userType: user.userType },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" },
-    );
+    // Vérifier si le compte est actif
+    if (!user.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: "Compte désactivé. Contactez le support."
+      });
+    }
 
-    // Retourner l'utilisateur et le token
-    const userResponse = {
-      uid: user._id,
-      email: user.email,
-      userType: user.userType,
-    };
+    // Générer le token
+    const token = generateToken(user._id);
 
-    res.status(200).json({
+    // Mettre à jour la dernière connexion
+    user.lastLogin = new Date();
+    await user.save();
+
+    res.json({
       success: true,
-      data: { user: userResponse, token },
+      message: "Connexion réussie",
+      data: {
+        user: user.getPublicProfile(),
+        token
+      }
     });
-  } catch (err) {
-    console.error("Erreur login:", err);
+
+  } catch (error) {
+    console.error("Erreur connexion:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur lors de la connexion",
+      message: "Erreur serveur lors de la connexion"
     });
   }
 };
 
-exports.me = async (req, res) => {
+// Récupérer le profil utilisateur actuel
+const getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "Utilisateur non trouvé",
-      });
-    }
-
-    const userResponse = {
-      uid: user._id,
-      email: user.email,
-      userType: user.userType,
-    };
-
+    const user = await User.findById(req.user._id).select("-password");
+    
     res.json({
       success: true,
-      data: userResponse,
+      data: user.getPublicProfile()
     });
-  } catch (err) {
-    console.error("Erreur me:", err);
+  } catch (error) {
+    console.error("Erreur getMe:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur",
+      message: "Erreur serveur"
     });
   }
+};
+
+// Déconnexion (côté client principalement)
+const logout = async (req, res) => {
+  try {
+    // Ici on pourrait invalider le token si on utilisait une blacklist
+    res.json({
+      success: true,
+      message: "Déconnexion réussie"
+    });
+  } catch (error) {
+    console.error("Erreur logout:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur"
+    });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  getMe,
+  logout
 };
