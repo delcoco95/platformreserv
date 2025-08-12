@@ -12,7 +12,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">RP</span>
               </div>
-              <span className="font-bold text-xl">RendezVousPro</span>
+              <span className="font-bold text-xl">BookAuto</span>
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               La plateforme de référence pour prendre rendez-vous avec des professionnels 
@@ -139,7 +139,7 @@ const Footer = () => {
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2024 RendezVousPro. Tous droits réservés.
+              © 2024 BookAuto. Tous droits réservés.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link to="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
