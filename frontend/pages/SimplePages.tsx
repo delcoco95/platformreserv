@@ -185,7 +185,7 @@ export function Coverage() {
               Zone de couverture
             </h1>
             <p className="text-lg text-muted-foreground">
-              RendezVousPro est disponible dans toute la France
+              BookAuto est disponible dans toute la France
             </p>
           </div>
 
