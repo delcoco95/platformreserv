@@ -416,7 +416,7 @@ export function Terms() {
             <CardContent>
               <p className="text-muted-foreground">
                 BookAuto est une plateforme de mise en relation. Nous ne
-                réalisons pas directement les prestations de service, mais
+                r��alisons pas directement les prestations de service, mais
                 facilitons le contact entre clients et professionnels qualifiés.
               </p>
             </CardContent>
@@ -428,7 +428,7 @@ export function Terms() {
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-muted-foreground">
-                RendezVousPro s'engage à vérifier les qualifications des
+                BookAuto s'engage à vérifier les qualifications des
                 professionnels partenaires, mais ne peut être tenu responsable
                 de la qualité des prestations réalisées.
               </p>
