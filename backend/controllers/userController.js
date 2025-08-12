@@ -1,226 +1,164 @@
 const User = require("../models/User");
+const { validationResult } = require("express-validator");
 
-exports.getUserById = async (req, res) => {
+// Récupérer le profil utilisateur
+const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select("-password");
-
+    const user = await User.findById(req.user._id).select("-password");
+    
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Utilisateur non trouvé",
+        message: "Utilisateur non trouvé"
       });
-    }
-
-    // Transformer les données pour correspondre aux interfaces frontend
-    const userData = {
-      uid: user._id,
-      email: user.email,
-      userType: user.userType,
-      createdAt: user.createdAt?.toISOString(),
-      updatedAt: user.updatedAt?.toISOString(),
-      phone: user.phone,
-      address: user.address,
-    };
-
-    if (user.userType === "client") {
-      userData.firstName = user.firstName;
-      userData.lastName = user.lastName;
-      userData.preferences = user.preferences;
-    } else if (user.userType === "professionnel") {
-      userData.companyName = user.companyName;
-      userData.profession = user.profession;
-      userData.siret = user.siret;
-      userData.description = user.description;
-      userData.services = user.services;
-      userData.rating = user.rating;
-      userData.totalReviews = user.totalReviews;
-      userData.isVerified = user.isVerified;
-      userData.coordinates = user.coordinates;
-      userData.availability = user.availability;
     }
 
     res.json({
       success: true,
-      data: userData,
+      data: user.getPublicProfile()
     });
-  } catch (err) {
-    console.error("Erreur getUserById:", err);
+  } catch (error) {
+    console.error("Erreur getProfile:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur",
+      message: "Erreur serveur"
     });
   }
 };
 
-exports.updateUser = async (req, res) => {
+// Mettre à jour le profil
+const updateProfile = async (req, res) => {
   try {
-    const userId = req.params.id;
-    const updateData = req.body;
-
-    // Vérifier que l'utilisateur modifie son propre profil
-    if (req.user.id !== userId) {
-      return res.status(403).json({
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
         success: false,
-        message: "Non autorisé à modifier ce profil",
+        message: "Données invalides",
+        errors: errors.array()
       });
     }
 
-    // Supprimer les champs sensibles
-    delete updateData.password;
-    delete updateData._id;
-    delete updateData.uid;
-
-    const user = await User.findByIdAndUpdate(userId, updateData, {
-      new: true,
-      runValidators: true,
-    }).select("-password");
-
+    const user = await User.findById(req.user._id);
+    
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Utilisateur non trouvé",
+        message: "Utilisateur non trouvé"
       });
     }
 
-    // Transformer les données comme dans getUserById
-    const userData = {
-      uid: user._id,
-      email: user.email,
-      userType: user.userType,
-      createdAt: user.createdAt?.toISOString(),
-      updatedAt: user.updatedAt?.toISOString(),
-      phone: user.phone,
-      address: user.address,
-    };
+    // Mettre à jour les champs autorisés
+    const allowedFields = [
+      'firstName', 'lastName', 'phone', 'address', 
+      'businessInfo', 'avatar'
+    ];
+    
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        user[field] = req.body[field];
+      }
+    });
 
-    if (user.userType === "client") {
-      userData.firstName = user.firstName;
-      userData.lastName = user.lastName;
-      userData.preferences = user.preferences;
-    } else if (user.userType === "professionnel") {
-      userData.companyName = user.companyName;
-      userData.profession = user.profession;
-      userData.siret = user.siret;
-      userData.description = user.description;
-      userData.services = user.services;
-      userData.rating = user.rating;
-      userData.totalReviews = user.totalReviews;
-      userData.isVerified = user.isVerified;
-      userData.coordinates = user.coordinates;
-      userData.availability = user.availability;
-    }
+    await user.save();
 
     res.json({
       success: true,
-      data: userData,
+      message: "Profil mis à jour avec succès",
+      data: user.getPublicProfile()
     });
-  } catch (err) {
-    console.error("Erreur updateUser:", err);
+  } catch (error) {
+    console.error("Erreur updateProfile:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur lors de la mise à jour",
+      message: "Erreur serveur"
     });
   }
 };
 
-exports.getAllProfessionals = async (req, res) => {
+// Upload avatar (placeholder)
+const uploadAvatar = async (req, res) => {
   try {
-    const professionals = await User.find({ userType: "professionnel" })
-      .select("-password")
+    // Ici on intégrerait Cloudinary ou autre service de stockage
+    res.json({
+      success: true,
+      message: "Upload avatar non implémenté",
+      data: { avatarUrl: "/placeholder-avatar.jpg" }
+    });
+  } catch (error) {
+    console.error("Erreur uploadAvatar:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur"
+    });
+  }
+};
+
+// Récupérer tous les utilisateurs (publique, filtrée)
+const getAllUsers = async (req, res) => {
+  try {
+    const { userType, page = 1, limit = 20 } = req.query;
+    
+    const filter = { isActive: true };
+    if (userType) filter.userType = userType;
+
+    const users = await User.find(filter)
+      .select("-password -__v")
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
       .sort({ createdAt: -1 });
 
-    const transformedProfessionals = professionals.map((prof) => ({
-      uid: prof._id,
-      email: prof.email,
-      userType: prof.userType,
-      createdAt: prof.createdAt?.toISOString(),
-      updatedAt: prof.updatedAt?.toISOString(),
-      phone: prof.phone,
-      address: prof.address,
-      companyName: prof.companyName,
-      profession: prof.profession,
-      siret: prof.siret,
-      description: prof.description,
-      services: prof.services,
-      rating: prof.rating,
-      totalReviews: prof.totalReviews,
-      isVerified: prof.isVerified,
-      coordinates: prof.coordinates,
-      availability: prof.availability,
-    }));
+    const total = await User.countDocuments(filter);
 
     res.json({
       success: true,
-      data: transformedProfessionals,
+      data: {
+        users: users.map(user => user.getPublicProfile()),
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(total / limit),
+          totalUsers: total
+        }
+      }
     });
-  } catch (err) {
-    console.error("Erreur getAllProfessionals:", err);
+  } catch (error) {
+    console.error("Erreur getAllUsers:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur",
+      message: "Erreur serveur"
     });
   }
 };
 
-exports.searchProfessionals = async (req, res) => {
+// Récupérer un utilisateur par ID
+const getUserById = async (req, res) => {
   try {
-    const { q, profession, location } = req.query;
-    let query = { userType: "professionnel" };
+    const user = await User.findById(req.params.id)
+      .select("-password -__v");
 
-    // Filtre par profession
-    if (profession && profession !== "all") {
-      query.profession = profession;
+    if (!user || !user.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: "Utilisateur non trouvé"
+      });
     }
-
-    // Recherche textuelle
-    if (q) {
-      const searchRegex = new RegExp(q, "i");
-      query.$or = [
-        { companyName: searchRegex },
-        { description: searchRegex },
-        { services: { $in: [searchRegex] } },
-        { address: searchRegex },
-      ];
-    }
-
-    // Filtre par localisation
-    if (location) {
-      query.address = new RegExp(location, "i");
-    }
-
-    const professionals = await User.find(query)
-      .select("-password")
-      .sort({ rating: -1, createdAt: -1 });
-
-    const transformedProfessionals = professionals.map((prof) => ({
-      uid: prof._id,
-      email: prof.email,
-      userType: prof.userType,
-      createdAt: prof.createdAt?.toISOString(),
-      updatedAt: prof.updatedAt?.toISOString(),
-      phone: prof.phone,
-      address: prof.address,
-      companyName: prof.companyName,
-      profession: prof.profession,
-      siret: prof.siret,
-      description: prof.description,
-      services: prof.services,
-      rating: prof.rating,
-      totalReviews: prof.totalReviews,
-      isVerified: prof.isVerified,
-      coordinates: prof.coordinates,
-      availability: prof.availability,
-    }));
 
     res.json({
       success: true,
-      data: transformedProfessionals,
+      data: user.getPublicProfile()
     });
-  } catch (err) {
-    console.error("Erreur searchProfessionals:", err);
+  } catch (error) {
+    console.error("Erreur getUserById:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur",
+      message: "Erreur serveur"
     });
   }
+};
+
+module.exports = {
+  getProfile,
+  updateProfile,
+  uploadAvatar,
+  getAllUsers,
+  getUserById
 };
