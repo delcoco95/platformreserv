@@ -132,14 +132,14 @@ export default function LegalNotice() {
               <p className="text-sm">
                 L'ensemble du contenu de ce site (textes, images, logos, bases
                 de données, etc.) est protégé par les droits de propriété
-                intellectuelle et appartient à RendezVousPro SAS ou à ses
+                intellectuelle et appartient à BookAuto SAS ou à ses
                 partenaires.
               </p>
               <p className="text-sm">
                 Toute reproduction, représentation, modification, publication,
                 adaptation de tout ou partie des éléments du site, quel que soit
                 le moyen ou le procédé utilisé, est interdite, sauf autorisation
-                écrite préalable de RendezVousPro SAS.
+                écrite préalable de BookAuto SAS.
               </p>
               <p className="text-sm">
                 L'exploitation non autorisée du site ou de l'un quelconque des
@@ -158,17 +158,17 @@ export default function LegalNotice() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm">
-                RendezVousPro SAS met tout en œuvre pour offrir aux utilisateurs
+                BookAuto SAS met tout en œuvre pour offrir aux utilisateurs
                 des informations et/ou des outils disponibles et vérifiés, mais
                 ne saurait être tenue pour responsable des erreurs, d'une
                 absence de disponibilité des informations et/ou de la présence
                 de virus sur son site.
               </p>
               <p className="text-sm">
-                En tant qu'intermédiaire, RendezVousPro SAS n'est pas
+                En tant qu'intermédiaire, BookAuto SAS n'est pas
                 responsable de la qualité des services fournis par les
                 professionnels référencés sur la plateforme. La responsabilité
-                de RendezVousPro SAS ne saurait être engagée en raison des
+                de BookAuto SAS ne saurait être engagée en raison des
                 prestations fournies par les professionnels.
               </p>
             </CardContent>
