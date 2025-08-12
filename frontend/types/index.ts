@@ -21,6 +21,14 @@ export interface ClientProfile extends User {
   };
 }
 
+export interface Conversation {
+  id: string;
+  participants: string[]; // Contient des uid
+  lastMessage?: string;
+  updatedAt: string; // ISO date string
+}
+
+
 export interface ProfessionalProfile extends User {
   userType: "professionnel";
   companyName?: string;

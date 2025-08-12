@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 version: '3.8'
 
 services:
@@ -49,9 +50,43 @@ services:
       - .:/app
       - /app/node_modules
       - /app/client/node_modules
+=======
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/platformreserv
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+>>>>>>> d01419f8abec017db4f3a11fa6a4e19bdcc973fd
     depends_on:
       - backend
 
 volumes:
+<<<<<<< HEAD
   mongodb_data:
     driver: local
+=======
+  mongo-data:
+>>>>>>> d01419f8abec017db4f3a11fa6a4e19bdcc973fd
