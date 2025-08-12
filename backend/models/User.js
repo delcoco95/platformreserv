@@ -1,91 +1,108 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
-const userSchema = new mongoose.Schema(
-  {
-    // Champs communs
-    email: { type: String, unique: true, required: true },
-    password: { type: String, required: true },
-    userType: {
-      type: String,
-      enum: ["client", "professionnel"],
-      required: true,
-    },
-    phone: String,
-    address: String,
-
-    // Champs spécifiques aux clients
-    firstName: {
-      type: String,
-      required: function () {
-        return this.userType === "client";
-      },
-    },
-    lastName: {
-      type: String,
-      required: function () {
-        return this.userType === "client";
-      },
-    },
-    preferences: {
-      notifications: { type: Boolean, default: true },
-      emailAlerts: { type: Boolean, default: true },
-      smsAlerts: { type: Boolean, default: false },
-    },
-
-    // Champs spécifiques aux professionnels
-    companyName: {
-      type: String,
-      required: function () {
-        return this.userType === "professionnel";
-      },
-    },
+const userSchema = new mongoose.Schema({
+  // Informations de base
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 6
+  },
+  userType: {
+    type: String,
+    required: true,
+    enum: ["client", "professionnel"]
+  },
+  
+  // Profil personnel
+  firstName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  phone: {
+    type: String,
+    trim: true
+  },
+  avatar: {
+    type: String,
+    default: ""
+  },
+  
+  // Localisation
+  address: {
+    street: String,
+    city: String,
+    zipCode: String,
+    country: { type: String, default: "France" }
+  },
+  
+  // Données spécifiques professionnel
+  businessInfo: {
+    companyName: String,
+    siret: String,
     profession: {
       type: String,
-      enum: ["automobile", "plomberie", "serrurerie"],
-      required: function () {
-        return this.userType === "professionnel";
-      },
+      enum: ["automobile", "plomberie", "serrurerie", "electricite", "menage", "jardinage", "beaute", "autre"]
     },
-    siret: String,
     description: String,
-    services: [
-      {
-        name: { type: String, required: true },
-        price: { type: Number, required: true },
-        duration: { type: Number, default: 60 }, // en minutes
-        description: String,
-      },
-    ],
-    rating: { type: Number, default: 0 },
-    totalReviews: { type: Number, default: 0 },
-    isVerified: { type: Boolean, default: false },
-    coordinates: {
-      lat: Number,
-      lng: Number,
-    },
-    availability: {
-      type: mongoose.Schema.Types.Mixed,
-      default: {
-        monday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-        tuesday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-        wednesday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-        thursday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-        friday: { enabled: true, slots: [{ start: "09:00", end: "17:00" }] },
-        saturday: { enabled: false, slots: [] },
-        sunday: { enabled: false, slots: [] },
-      },
-    },
+    logo: String,
+    experience: Number, // en années
+    certification: [String]
   },
-  {
-    timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
+  
+  // Statistiques
+  stats: {
+    totalBookings: { type: Number, default: 0 },
+    totalRevenue: { type: Number, default: 0 },
+    averageRating: { type: Number, default: 0 },
+    totalReviews: { type: Number, default: 0 }
   },
-);
-
-// Virtual pour l'ID frontend
-userSchema.virtual("uid").get(function () {
-  return this._id.toHexString();
+  
+  // Statut et dates
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  lastLogin: Date
+}, {
+  timestamps: true
 });
+
+// Hash du mot de passe avant sauvegarde
+userSchema.pre("save", async function(next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
+// Méthode pour comparer les mots de passe
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Méthode pour obtenir le profil public
+userSchema.methods.getPublicProfile = function() {
+  const profile = this.toObject();
+  delete profile.password;
+  delete profile.__v;
+  return profile;
+};
 
 module.exports = mongoose.model("User", userSchema);
