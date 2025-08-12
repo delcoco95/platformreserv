@@ -1,81 +1,64 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-// Middleware pour vérifier l'authentification
 const auth = async (req, res, next) => {
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
-    
-    if (!token) {
+    // Récupérer le token depuis l'header Authorization
+    const authHeader = req.header('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        message: "Accès refusé. Token manquant."
+        message: 'Accès refusé. Token manquant.'
       });
     }
 
+    const token = authHeader.substring(7); // Enlever "Bearer "
+
+    // Vérifier et décoder le token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select("-password");
-    
+
+    // Récupérer l'utilisateur
+    const user = await User.findById(decoded.id).select('-password');
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Token invalide. Utilisateur non trouvé."
+        message: 'Token invalide. Utilisateur non trouvé.'
       });
     }
 
+    // Vérifier que le compte est actif
     if (!user.isActive) {
       return res.status(401).json({
         success: false,
-        message: "Compte désactivé."
+        message: 'Compte désactivé.'
       });
     }
 
+    // Ajouter l'utilisateur à la requête
     req.user = user;
     next();
+
   } catch (error) {
-    console.error("Erreur auth middleware:", error);
-    res.status(401).json({
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token invalide.'
+      });
+    }
+    
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token expiré.'
+      });
+    }
+
+    console.error('Erreur middleware auth:', error);
+    res.status(500).json({
       success: false,
-      message: "Token invalide."
+      message: 'Erreur serveur'
     });
   }
 };
 
-// Middleware pour vérifier le type d'utilisateur
-const checkUserType = (allowedTypes) => {
-  return (req, res, next) => {
-    if (!allowedTypes.includes(req.user.userType)) {
-      return res.status(403).json({
-        success: false,
-        message: `Accès interdit. Type d'utilisateur requis: ${allowedTypes.join(" ou ")}`
-      });
-    }
-    next();
-  };
-};
-
-// Middleware optionnel (ne bloque pas si pas de token)
-const optionalAuth = async (req, res, next) => {
-  try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
-    
-    if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.userId).select("-password");
-      if (user && user.isActive) {
-        req.user = user;
-      }
-    }
-    
-    next();
-  } catch (error) {
-    // Continuer sans utilisateur si le token est invalide
-    next();
-  }
-};
-
-module.exports = {
-  auth,
-  checkUserType,
-  optionalAuth
-};
+module.exports = auth;
