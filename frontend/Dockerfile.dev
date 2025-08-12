@@ -1,0 +1,16 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copier package.json et installer les dépendances
+COPY package*.json ./
+RUN npm ci
+
+# Copier le code source
+COPY . .
+
+# Exposer le port
+EXPOSE 3000
+
+# Commande par défaut
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
