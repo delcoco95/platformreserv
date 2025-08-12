@@ -386,7 +386,7 @@ export function Terms() {
             <CardContent>
               <p className="text-muted-foreground">
                 Les présentes conditions générales d'utilisation (CGU)
-                s'appliquent à l'utilisation de la plateforme RendezVousPro,
+                s'appliquent à l'utilisation de la plateforme BookAuto,
                 service de mise en relation entre clients particuliers et
                 professionnels de services �� domicile.
               </p>
@@ -415,7 +415,7 @@ export function Terms() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                RendezVousPro est une plateforme de mise en relation. Nous ne
+                BookAuto est une plateforme de mise en relation. Nous ne
                 réalisons pas directement les prestations de service, mais
                 facilitons le contact entre clients et professionnels qualifiés.
               </p>
