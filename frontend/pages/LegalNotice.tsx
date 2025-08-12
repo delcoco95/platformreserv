@@ -27,7 +27,7 @@ export default function LegalNotice() {
           </h1>
           <p className="text-lg text-muted-foreground">
             Informations légales et réglementaires de la plateforme
-            RendezVousPro
+            BookAuto
           </p>
         </div>
       </section>
@@ -45,7 +45,7 @@ export default function LegalNotice() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2">RendezVousPro SAS</h3>
+                <h3 className="font-semibold mb-2">BookAuto SAS</h3>
                 <div className="space-y-1 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
@@ -91,7 +91,7 @@ export default function LegalNotice() {
             </CardHeader>
             <CardContent>
               <p className="text-sm">
-                M. Jean Dupont, Président de RendezVousPro SAS
+                M. Jean Dupont, Président de BookAuto SAS
               </p>
             </CardContent>
           </Card>
