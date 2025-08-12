@@ -1,23 +1,24 @@
 {
-  "name": "rendezvous-pro-platform",
-  "private": true,
-  "type": "module",
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
+  "name": "bookauto",
+  "version": "1.0.0",
+  "description": "BookAuto - Plateforme de réservation automobile",
   "scripts": {
-    "dev": "cd frontend && npm run dev",
-    "build": "cd frontend && npm run build",
-    "start": "cd backend && npm start",
-    "backend:dev": "cd backend && npm run dev",
-    "backend:start": "cd backend && npm start",
-    "setup": "npm install && cd frontend && npm install && cd ../backend && npm install",
-    "docker:build": "docker build -t rendezvous-pro .",
-    "docker:dev": "docker-compose up -d",
-    "docker:down": "docker-compose down"
+    "dev": "concurrently \"npm run dev:db\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:db": "docker-compose up -d mongodb",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "start": "npm run start:db && npm run start:backend",
+    "start:db": "docker-compose up -d mongodb",
+    "start:backend": "cd backend && npm start",
+    "build:frontend": "cd frontend && npm run build",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "clean": "docker-compose down -v",
+    "setup": "npm run install:all && npm run dev:db"
   },
   "devDependencies": {
-    "gh-pages": "^6.3.0"
-  }
+    "concurrently": "^8.2.0"
+  },
+  "keywords": ["bookauto", "automobile", "reservation", "booking"],
+  "author": "BookAuto Team",
+  "license": "MIT"
 }
