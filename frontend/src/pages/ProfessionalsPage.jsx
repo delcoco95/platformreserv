@@ -33,8 +33,7 @@ const ProfessionalsPage = () => {
     { value: 'automobile', label: 'Automobile' },
     { value: 'plomberie', label: 'Plomberie' },
     { value: 'serrurerie', label: 'Serrurerie' },
-    { value: 'electricite', label: 'Électricité' },
-    { value: 'beaute', label: 'Beauté & Bien-être' }
+    { value: 'electricite', label: 'Électricité' }
   ];
 
   return (

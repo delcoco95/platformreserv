@@ -241,9 +241,7 @@ const RegisterPage = () => {
                     <option value="plomberie">Plomberie</option>
                     <option value="serrurerie">Serrurerie</option>
                     <option value="electricite">Électricité</option>
-                    <option value="menage">Ménage</option>
                     <option value="jardinage">Jardinage</option>
-                    <option value="beaute">Beauté & Bien-être</option>
                     <option value="autre">Autre</option>
                   </select>
                 </div>

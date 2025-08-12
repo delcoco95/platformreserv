@@ -27,20 +27,6 @@ const ServicesPage = () => {
       description: 'Installation, dépannage électrique',
       icon: '⚡',
       count: '78+ pros'
-    },
-    {
-      category: 'beaute',
-      title: 'Beauté & Bien-être',
-      description: 'Coiffure, esthétique, massage',
-      icon: '💅',
-      count: '200+ pros'
-    },
-    {
-      category: 'menage',
-      title: 'Ménage & Nettoyage',
-      description: 'Ménage à domicile, nettoyage',
-      icon: '🧹',
-      count: '95+ pros'
     }
   ];
 
