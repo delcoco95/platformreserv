@@ -1,249 +1,223 @@
 # 🚗 BookAuto - Plateforme de Réservation Automobile
 
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](docker-compose.yml)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow.svg)](frontend/)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](backend/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-7+-green.svg)](docker-compose.yml)
+Une plateforme simple et efficace pour réserver des services automobiles avec des professionnels qualifiés.
 
-BookAuto est une plateforme moderne et intuitive qui révolutionne la prise de rendez-vous entre particuliers et professionnels automobiles. Inspirée de Planity, elle offre une expérience utilisateur fluide et des fonctionnalités avancées de gestion.
-
-![BookAuto Screenshot](https://via.placeholder.com/800x400/3B82F6/FFFFFF?text=BookAuto+Platform)
-
-## 🚀 Démarrage rapide avec Docker
-
-```bash
-# 1. Cloner le repository
-git clone <votre-repo-url>
-cd bookauto
-
-# 2. Démarrer avec le script automatique
-./start.sh dev
-
-# OU manuellement :
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-docker-compose -f docker-compose.dev.yml up --build
-```
-
-**Accès immédiat :**
-- 🌐 Frontend: http://localhost:3000
-- 🔧 Backend API: http://localhost:5000
-- 📊 Health Check: http://localhost:5000/health
-
-## ✨ Fonctionnalités
-
-### 👥 Pour les Clients
-- 🔍 **Recherche avancée** de professionnels par localisation et services
-- 📅 **Réservation en ligne** avec créneaux disponibles en temps réel
-- 💬 **Messagerie intégrée** avec les professionnels
-- ⭐ **Système d'avis et notes** pour guider les choix
-- 📱 **Interface responsive** optimisée mobile et desktop
-
-### 🔧 Pour les Professionnels
-- 📊 **Tableau de bord complet** avec statistiques et revenus
-- 📅 **Gestion des disponibilités** et créneaux personnalisables
-- 📷 **Upload d'images** de l'atelier et des services
-- 💼 **Gestion des services** avec tarifs et descriptions
-- 📧 **Notifications** de nouvelles réservations
-
-### 🛡️ Sécurité & Administration
-- 🔐 **Authentification JWT** sécurisée
-- 👤 **Gestion des rôles** (client/professionnel)
-- 🛡️ **Validation des données** côté frontend et backend
-- 📊 **Monitoring** avec health checks automatiques
-
-## 🏗️ Architecture Technique
+## 🏗️ Architecture
 
 ```
 BookAuto/
-├── 🐳 Docker Configuration
-│   ├── docker-compose.yml         # Configuration production
-│   ├── docker-compose.dev.yml     # Configuration développement
-│   └── start.sh                   # Script de démarrage rapide
-│
-├── 🖥️ Frontend (React + JavaScript)
-│   ├── src/
-│   │   ├── components/            # Composants réutilisables
-│   │   ├── pages/                 # Pages de l'application
-│   │   ├── contexts/              # Contextes React (Auth, etc.)
-│   │   └── styles/                # Styles CSS et Tailwind
-│   ├── Dockerfile                 # Image production (Nginx)
-│   └── Dockerfile.dev             # Image développement
-│
-├── 🔧 Backend (Node.js + Express)
-│   ├── controllers/               # Logique métier
-│   ├── models/                    # Modèles MongoDB
-│   ├── routes/                    # Définition des API
-│   ├── middleware/                # Middlewares (auth, upload, etc.)
-│   └── Dockerfile                 # Image Node.js
-│
-└── 🗄️ Database & Scripts
-    ├── scripts/mongo-init.js      # Initialisation MongoDB
-    └── README-Docker.md           # Documentation Docker complète
+├── backend/           # API Node.js + Express
+├── frontend/          # Interface React
+├── scripts/           # Scripts d'initialisation MongoDB
+├── docker-compose.yml # Configuration MongoDB
+└── package.json       # Scripts principaux
 ```
 
-## 🛠️ Stack Technique
+## 🚀 Démarrage rapide
 
-### Frontend
-- **React 18** - Interface utilisateur moderne
-- **JavaScript ES6+** - Pas de TypeScript, 100% JS natif
-- **Tailwind CSS** - Framework CSS utilitaire
-- **Vite** - Build tool ultra-rapide
-- **React Router** - Navigation SPA
-- **Lucide React** - Icônes modernes
+### 1. Installation
+
+```bash
+# Cloner le repository
+git clone <votre-repo>
+cd bookauto
+
+# Installer toutes les dépendances
+npm run install:all
+```
+
+### 2. Configuration
+
+```bash
+# Copier les fichiers d'environnement
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+### 3. Lancement
+
+```bash
+# Démarrer tout en mode développement
+npm run dev
+
+# OU démarrer les services séparément :
+npm run dev:db        # MongoDB uniquement
+npm run dev:backend   # API backend
+npm run dev:frontend  # Interface React
+```
+
+## 🌐 Accès à l'application
+
+- **Frontend** : http://localhost:3000
+- **Backend API** : http://localhost:5000
+- **MongoDB** : localhost:27017
+
+## 📁 Structure détaillée
+
+### Backend (Node.js + Express)
+```
+backend/
+├── models/           # Modèles MongoDB (User, Service, Booking)
+├── routes/           # Routes API (auth, users, services, bookings)
+├── middleware/       # Middleware d'authentification
+├── server.js         # Serveur principal
+└── .env             # Configuration
+```
+
+### Frontend (React + Vite)
+```
+frontend/
+├── src/
+│   ├── components/   # Composants réutilisables
+│   ├── pages/        # Pages de l'application
+│   ├── contexts/     # Contexte d'authentification
+│   ├── services/     # Services API
+│   └── App.jsx       # Composant principal
+├── index.html        # Point d'entrée
+└── .env             # Configuration
+```
+
+## 🔧 Scripts disponibles
+
+### Scripts principaux
+```bash
+npm run dev          # Démarrer tout (DB + Backend + Frontend)
+npm run setup        # Installation complète + démarrage DB
+npm run clean        # Nettoyer la base de données
+```
+
+### Scripts backend
+```bash
+cd backend
+npm start           # Démarrer en production
+npm run dev         # Démarrer avec nodemon
+```
+
+### Scripts frontend
+```bash
+cd frontend
+npm run dev         # Serveur de développement
+npm run build       # Build de production
+npm run preview     # Prévisualiser le build
+```
+
+## 🗄️ Base de données
+
+### MongoDB avec Docker
+- **Image** : mongo:7-jammy
+- **Port** : 27017
+- **Base** : bookauto
+- **Volume persistant** : mongodb_data
+
+### Comptes de test
+- **Client** : client@test.com / 123456
+- **Professionnel** : pro@test.com / 123456
+
+## 🛠️ Technologies utilisées
 
 ### Backend
 - **Node.js 18+** - Runtime JavaScript
-- **Express.js** - Framework web minimal
-- **MongoDB 7** - Base de données NoSQL
-- **Mongoose** - ODM pour MongoDB
-- **JWT** - Authentification stateless
-- **Multer** - Upload de fichiers
-- **Bcrypt** - Hachage des mots de passe
+- **Express.js** - Framework web
+- **MongoDB** - Base de données NoSQL
+- **Mongoose** - ODM MongoDB
+- **JWT** - Authentification
+- **bcryptjs** - Hachage des mots de passe
 
-### DevOps & Deployment
-- **Docker & Docker Compose** - Containerisation complète
-- **Nginx** - Serveur web pour la production
-- **Health Checks** - Monitoring automatique
-- **Multi-stage builds** - Optimisation des images
+### Frontend
+- **React 18** - Interface utilisateur
+- **Vite** - Build tool rapide
+- **React Router** - Navigation
+- **Tailwind CSS** - Styles
+- **Axios** - Requêtes HTTP
+- **Lucide React** - Icônes
 
-## 🎯 Services Disponibles
+## 🔐 Variables d'environnement
 
-| Service | Description | Professionnels |
-|---------|-------------|----------------|
-| 🚗 **Automobile** | Mécanique, carrosserie, entretien | 120+ |
-| 🔧 **Plomberie** | Dépannage, installation, rénovation | 89+ |
-| 🗝️ **Serrurerie** | Ouverture, installation, sécurité | 65+ |
-| ⚡ **Électricité** | Installation, dépannage électrique | 78+ |
-
-## 📱 Captures d'écran
-
-<details>
-<summary>🖼️ Voir les captures d'écran</summary>
-
-### Page d'accueil
-![Accueil](https://via.placeholder.com/600x400/3B82F6/FFFFFF?text=Page+Accueil)
-
-### Tableau de bord professionnel
-![Dashboard](https://via.placeholder.com/600x400/10B981/FFFFFF?text=Dashboard+Pro)
-
-### Upload d'images
-![Upload](https://via.placeholder.com/600x400/F59E0B/FFFFFF?text=Upload+Images)
-
-</details>
-
-## 🚀 Modes de Déploiement
-
-### 1. Développement (recommandé)
-```bash
-# Avec hot-reload et sources montées
-./start.sh dev
-# OU
-docker-compose -f docker-compose.dev.yml up --build
-```
-
-### 2. Production
-```bash
-# Build optimisé avec Nginx
-./start.sh prod
-# OU
-docker-compose --profile production up --build
-```
-
-### 3. Avec Cache Redis
-```bash
-# Ajoute Redis pour les performances
-docker-compose --profile cache up --build
-```
-
-## 🔧 Configuration
-
-### Variables d'environnement essentielles
-
-**Backend (.env)**
+### Backend (.env)
 ```bash
 PORT=5000
-MONGO_URI=mongodb://mongodb:27017/platformreserv
-JWT_SECRET=your-super-secret-key-change-in-production
+NODE_ENV=development
+MONGO_URI=mongodb://localhost:27017/bookauto
+JWT_SECRET=your-secret-key
 FRONTEND_URL=http://localhost:3000
 ```
 
-**Frontend (.env)**
+### Frontend (.env)
 ```bash
 VITE_API_URL=http://localhost:5000
-VITE_APP_TITLE=BookAuto
 ```
 
-## 📖 Documentation
+## 📡 API Endpoints
 
-- 📚 **[Guide Docker Complet](README-Docker.md)** - Installation et déploiement
-- 🔧 **[API Documentation](backend/README.md)** - Endpoints et modèles
-- 🎨 **[Guide Frontend](frontend/README.md)** - Composants et structure
-- 🐛 **[Troubleshooting](README-Docker.md#-résolution-de-problèmes)** - Solutions aux problèmes courants
+### Authentification
+- `POST /api/auth/register` - Inscription
+- `POST /api/auth/login` - Connexion
 
-## 🛡️ Sécurité
+### Utilisateurs
+- `GET /api/users/profile` - Profil utilisateur
+- `PUT /api/users/profile` - Modifier le profil
+- `GET /api/users/professionals` - Liste des professionnels
 
-### Fonctionnalités implémentées
-- ✅ Authentification JWT avec refresh tokens
-- ✅ Hachage des mots de passe avec bcrypt
-- ✅ Validation des données avec express-validator
-- ✅ Rate limiting pour prévenir les attaques
-- ✅ Headers de sécurité avec Helmet
-- ✅ CORS configuré correctement
-- ✅ Upload de fichiers sécurisé avec validation
+### Services
+- `GET /api/services` - Liste des services
+- `POST /api/services` - Créer un service (pro)
+- `GET /api/services/:id` - Détails d'un service
 
-### Pour la production
-1. **Changez tous les secrets** dans les fichiers `.env`
-2. **Activez HTTPS** avec des certificats SSL
-3. **Configurez un firewall** pour limiter les accès
-4. **Activez les logs** pour le monitoring
-5. **Mettez à jour régulièrement** les dépendances
+### Réservations
+- `POST /api/bookings` - Créer une réservation
+- `GET /api/bookings/my-bookings` - Mes réservations
+- `PUT /api/bookings/:id/status` - Modifier le statut (pro)
 
-## 🧪 Tests et Qualité
+## 🎯 Fonctionnalités
 
+### Pour les clients
+- ✅ Inscription et connexion
+- ✅ Recherche de professionnels
+- ✅ Réservation de services
+- ✅ Gestion des rendez-vous
+
+### Pour les professionnels
+- ✅ Profil d'entreprise
+- ✅ Gestion des services
+- ✅ Réception des réservations
+- ✅ Tableau de bord
+
+## 🚨 Résolution de problèmes
+
+### MongoDB ne démarre pas
 ```bash
-# Tests backend
-cd backend && npm test
+# Vérifier que Docker est démarré
+docker --version
 
-# Validation de la configuration Docker
-./validate-docker.sh
-
-# Health check de l'API
-curl http://localhost:5000/health
+# Redémarrer MongoDB
+npm run clean
+npm run dev:db
 ```
 
-## 🤝 Contribution
+### Erreur de port occupé
+```bash
+# Tuer les processus sur les ports
+kill -9 $(lsof -ti:3000)  # Frontend
+kill -9 $(lsof -ti:5000)  # Backend
+kill -9 $(lsof -ti:27017) # MongoDB
+```
 
-1. Fork le projet
-2. Créez votre branche : `git checkout -b feature/nouvelle-fonctionnalite`
-3. Committez : `git commit -m 'Ajout nouvelle fonctionnalité'`
-4. Push : `git push origin feature/nouvelle-fonctionnalite`
-5. Ouvrez une Pull Request
+### Erreur de dépendances
+```bash
+# Réinstaller toutes les dépendances
+rm -rf node_modules backend/node_modules frontend/node_modules
+npm run install:all
+```
+
+## 📞 Support
+
+- 📧 Email : support@bookauto.fr
+- 🐛 Issues : [GitHub Issues](../../issues)
 
 ## 📄 Licence
 
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
-
-## 🆘 Support
-
-- 📧 **Email** : support@bookauto.fr
-- 💬 **Issues** : [GitHub Issues](../../issues)
-- 📖 **Documentation** : [README-Docker.md](README-Docker.md)
-
-## 🎉 Changelog
-
-### v2.0.0 - Refonte Docker complète
-- ✨ **Dockerisation complète** de l'application
-- 🔄 **Migration TypeScript → JavaScript** pour simplifier
-- 📷 **Upload d'images** pour les professionnels
-- 🎨 **Interface modernisée** avec Tailwind CSS
-- 🔧 **Amélioration des performances** et monitoring
-
-### v1.0.0 - Version initiale
-- 🚀 Version MVP avec fonctionnalités de base
+MIT License - voir le fichier LICENSE pour plus de détails.
 
 ---
 
-**🚗 Développé avec ❤️ par l'équipe BookAuto**
-
-*Simplifiez vos rendez-vous automobiles dès aujourd'hui !*
+**🚗 Développé avec ❤️ pour simplifier vos réservations automobiles**
