@@ -8,6 +8,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Services from './pages/Services'
 import Professionals from './pages/Professionals'
+import Contact from './pages/Contact'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
