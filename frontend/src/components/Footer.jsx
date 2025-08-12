@@ -93,6 +93,14 @@ const Footer = () => {
           <p className="text-sm text-gray-400">
             © {currentYear} BOOKAUTO. Tous droits réservés.
           </p>
+          <div className="mt-2 flex justify-center space-x-4">
+            <Link to="/privacy" className="text-xs text-gray-500 hover:text-gray-300 transition-colors">
+              Politique de confidentialité
+            </Link>
+            <Link to="/legal" className="text-xs text-gray-500 hover:text-gray-300 transition-colors">
+              Mentions légales
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
