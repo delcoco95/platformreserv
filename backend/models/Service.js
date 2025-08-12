@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const serviceSchema = new mongoose.Schema({
   // Référence au professionnel
   professionalId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true
   },
   
@@ -21,7 +21,7 @@ const serviceSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ["automobile", "plomberie", "serrurerie", "electricite", "jardinage", "autre"]
+    enum: ['automobile', 'plomberie', 'serrurerie', 'electricite', 'jardinage', 'autre']
   },
   
   // Tarifs et durée
@@ -29,10 +29,6 @@ const serviceSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0
-  },
-  currency: {
-    type: String,
-    default: "EUR"
   },
   duration: {
     type: Number, // en minutes
@@ -54,18 +50,6 @@ const serviceSchema = new mongoose.Schema({
   urgencyService: {
     type: Boolean,
     default: false
-  },
-  
-  // Images
-  images: [{
-    type: String
-  }],
-  
-  // Statistiques
-  stats: {
-    totalBookings: { type: Number, default: 0 },
-    averageRating: { type: Number, default: 0 },
-    totalReviews: { type: Number, default: 0 }
   }
 }, {
   timestamps: true
@@ -74,6 +58,6 @@ const serviceSchema = new mongoose.Schema({
 // Index pour les recherches
 serviceSchema.index({ professionalId: 1, category: 1 });
 serviceSchema.index({ category: 1, isActive: 1 });
-serviceSchema.index({ name: "text", description: "text" });
+serviceSchema.index({ name: 'text', description: 'text' });
 
-module.exports = mongoose.model("Service", serviceSchema);
+module.exports = mongoose.model('Service', serviceSchema);
