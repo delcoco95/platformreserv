@@ -58,8 +58,20 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    
-    if (name.startsWith('businessInfo.')) {
+
+    if (name.startsWith('businessInfo.businessAddress.')) {
+      const field = name.split('.')[2]
+      setFormData({
+        ...formData,
+        businessInfo: {
+          ...formData.businessInfo,
+          businessAddress: {
+            ...formData.businessInfo.businessAddress,
+            [field]: value
+          }
+        }
+      })
+    } else if (name.startsWith('businessInfo.')) {
       const field = name.split('.')[1]
       setFormData({
         ...formData,
