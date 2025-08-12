@@ -26,7 +26,7 @@ const HomePage = () => {
               <span className="text-blue-600 block">au bon moment</span>
             </h1>
             <p className="text-xl text-gray-600 mb-12 leading-relaxed">
-              Réservez en ligne vos rendez-vous avec des professionnels de confiance
+              R��servez en ligne vos rendez-vous avec des professionnels de confiance
               près de chez vous. Simple, rapide et sécurisé.
             </p>
             
@@ -81,15 +81,23 @@ const HomePage = () => {
           <h2 className="text-3xl font-bold text-center mb-12">Services les plus demandés</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { name: 'Automobile', icon: '🚗', count: '120+ pros' },
-              { name: 'Plomberie', icon: '🔧', count: '89+ pros' },
-              { name: 'Serrurerie', icon: '🗝️', count: '65+ pros' },
-              { name: 'Beauté', icon: '💅', count: '200+ pros' }
+              { name: 'Automobile', image: '/images/garage-service.jpg', count: '120+ pros' },
+              { name: 'Plomberie', image: '/images/plumbing-service.jpg', count: '89+ pros' },
+              { name: 'Serrurerie', image: '/images/locksmith-service.jpg', count: '65+ pros' },
+              { name: 'Électricité', image: '/images/electrical-service.jpg', count: '78+ pros' }
             ].map((service, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-shadow cursor-pointer">
-                <div className="text-4xl mb-4">{service.icon}</div>
-                <h3 className="font-semibold text-lg mb-2">{service.name}</h3>
-                <p className="text-gray-600">{service.count}</p>
+              <div key={index} className="bg-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                <div className="h-32 overflow-hidden">
+                  <img
+                    src={service.image}
+                    alt={service.name}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="p-4 text-center">
+                  <h3 className="font-semibold text-lg mb-2">{service.name}</h3>
+                  <p className="text-gray-600">{service.count}</p>
+                </div>
               </div>
             ))}
           </div>
