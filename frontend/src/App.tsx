@@ -12,19 +12,19 @@ import ProfessionalDashboard from "./pages/ProfessionalDashboard";
 import ProfessionalsList from "./pages/ProfessionalsList";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import TestData from "./pages/TestData";
-import NotFound from "./pages/NotFound";
-import HowItWorks from "./pages/HowItWorks";
-import FAQ from "./pages/FAQ";
-import LegalNotice from "./pages/LegalNotice";
-import {
-  Guarantees,
-  Coverage,
-  Help,
-  Terms,
-  Privacy,
-  Cookies,
-} from "./pages/SimplePages";
+// import TestData from "./pages/TestData";
+// import NotFound from "./pages/NotFound";
+// import HowItWorks from "./pages/HowItWorks";
+// import FAQ from "./pages/FAQ";
+// import LegalNotice from "./pages/LegalNotice";
+// import {
+//   Guarantees,
+//   Coverage,
+//   Help,
+//   Terms,
+//   Privacy,
+//   Cookies,
+// } from "./pages/SimplePages";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
 // Composant pour scroll automatique en haut
