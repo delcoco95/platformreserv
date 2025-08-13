@@ -24,6 +24,19 @@ const ClientDashboard = () => {
   const [bookings, setBookings] = useState([])
   const [conversations, setConversations] = useState([])
   const [favorites, setFavorites] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [editingProfile, setEditingProfile] = useState(false)
+  const [profileForm, setProfileForm] = useState({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    address: {
+      street: user?.address?.street || '',
+      city: user?.address?.city || '',
+      zipCode: user?.address?.zipCode || ''
+    }
+  })
 
   // Simulations de données (à remplacer par des appels API)
   useEffect(() => {
