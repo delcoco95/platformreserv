@@ -116,24 +116,37 @@ const ProfessionalDashboard = () => {
     }
   }
 
-  const handleServiceSubmit = (e) => {
+  const handleServiceSubmit = async (e) => {
     e.preventDefault()
-    if (editingService) {
-      setServices(services.map(s => s.id === editingService.id ? 
-        { ...serviceForm, id: editingService.id, active: true } : s
-      ))
-      setEditingService(null)
-    } else {
-      setServices([...services, { 
-        ...serviceForm, 
-        id: Date.now(), 
-        active: true,
+    setLoading(true)
+
+    try {
+      const serviceData = {
+        ...serviceForm,
         price: parseFloat(serviceForm.price),
         duration: parseInt(serviceForm.duration)
-      }])
+      }
+
+      if (editingService) {
+        await serviceService.updateService(editingService._id, serviceData)
+      } else {
+        await serviceService.createService(serviceData)
+      }
+
+      // Recharger les services
+      loadProfessionalData()
+
+      // Réinitialiser le formulaire
+      setServiceForm({ name: '', description: '', price: '', duration: '', category: user?.businessInfo?.profession || 'automobile' })
+      setShowServiceForm(false)
+      setEditingService(null)
+
+    } catch (error) {
+      console.error('Erreur sauvegarde service:', error)
+      alert('Erreur lors de la sauvegarde du service')
+    } finally {
+      setLoading(false)
     }
-    setServiceForm({ name: '', description: '', price: '', duration: '', category: user?.businessInfo?.profession || 'automobile' })
-    setShowServiceForm(false)
   }
 
   const handleBookingAction = async (bookingId, action) => {
@@ -590,7 +603,7 @@ const ProfessionalDashboard = () => {
                           </div>
                           <div className="text-sm text-gray-500">
                             <p>{booking.date} à {booking.time}</p>
-                            <p className="font-medium">{booking.price}��</p>
+                            <p className="font-medium">{booking.price}€</p>
                           </div>
                         </div>
                         <div className="mt-2 flex items-center space-x-4 text-sm text-gray-600">
