@@ -33,19 +33,14 @@ export default function About() {
 
   const team = [
     {
-      name: "Jean DUPONT",
-      role: "Fondateur & CEO",
-      description: "Expert en digital avec 15 ans d'expérience dans les services à domicile"
+      name: "Hedi",
+      role: "CEO",
+      description: "Fondateur et dirigeant de BOOKAUTO, expert en digital et services aux particuliers"
     },
     {
-      name: "Marie MARTIN",
-      role: "Directrice Technique",
-      description: "Ingénieure spécialisée dans le développement de plateformes numériques"
-    },
-    {
-      name: "Pierre DUBOIS",
-      role: "Responsable Partenariats",
-      description: "Expert en recrutement de professionnels et gestion de la qualité"
+      name: "Nedj",
+      role: "Directeur Technique",
+      description: "Architecte et développeur de la plateforme, spécialisé dans les technologies web modernes"
     }
   ]
 
