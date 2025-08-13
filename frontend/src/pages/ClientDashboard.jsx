@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { 
-  Calendar, 
-  Star, 
-  Clock, 
-  MessageCircle, 
+import bookingService from '../services/bookingService'
+import {
+  Calendar,
+  Star,
+  Clock,
+  MessageCircle,
   Search,
-  Edit3, 
+  Edit3,
   Eye,
   X,
   Phone,
   Mail,
   User,
   MapPin,
-  Filter
+  Filter,
+  Save
 } from 'lucide-react'
 
 const ClientDashboard = () => {
@@ -245,7 +247,7 @@ const ClientDashboard = () => {
                   <div key={booking.id} className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0">
                     <div>
                       <p className="font-medium text-gray-900">{booking.professionalName}</p>
-                      <p className="text-sm text-gray-600">{booking.service} - {booking.date} �� {booking.time}</p>
+                      <p className="text-sm text-gray-600">{booking.service} - {booking.date} à {booking.time}</p>
                     </div>
                     <div className="text-right">
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(booking.status)}`}>
