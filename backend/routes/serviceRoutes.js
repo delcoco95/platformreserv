@@ -94,6 +94,34 @@ router.post('/', auth, [
   }
 });
 
+// Obtenir les services du professionnel connecté
+router.get('/my-services', auth, async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est un professionnel
+    if (req.user.userType !== 'professionnel') {
+      return res.status(403).json({
+        success: false,
+        message: 'Seuls les professionnels peuvent accéder à cette ressource'
+      });
+    }
+
+    const services = await Service.find({
+      professionalId: req.user.id
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      services
+    });
+  } catch (error) {
+    console.error('Erreur récupération services professionnel:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur serveur'
+    });
+  }
+});
+
 // Obtenir un service par ID
 router.get('/:id', async (req, res) => {
   try {
