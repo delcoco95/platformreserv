@@ -112,15 +112,26 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map((service, index) => {
               const IconComponent = service.icon
+              const categoryMap = {
+                'Automobile': 'automobile',
+                'Plomberie': 'plomberie',
+                'Serrurerie': 'serrurerie',
+                'Électricité': 'electricite'
+              }
+
               return (
-                <div key={index} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-                  <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4">
+                <Link
+                  key={index}
+                  to={`/professionals?category=${categoryMap[service.name]}`}
+                  className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer group"
+                >
+                  <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4 group-hover:bg-blue-200 transition-colors">
                     <IconComponent className="h-6 w-6 text-blue-600" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{service.name}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{service.name}</h3>
                   <p className="text-gray-600 text-sm mb-4">{service.description}</p>
                   <p className="text-blue-600 font-medium text-sm">{service.count}</p>
-                </div>
+                </Link>
               )
             })}
           </div>
