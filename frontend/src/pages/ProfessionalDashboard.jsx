@@ -740,6 +740,92 @@ const ProfessionalDashboard = () => {
             </div>
           </div>
         )}
+
+        {/* Modal Planning */}
+        {editingSchedule && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900">Modifier mon planning</h3>
+              </div>
+
+              <div className="p-6">
+                <div className="space-y-4">
+                  {Object.entries(schedule).map(([day, hours]) => {
+                    const dayNames = {
+                      monday: 'Lundi',
+                      tuesday: 'Mardi',
+                      wednesday: 'Mercredi',
+                      thursday: 'Jeudi',
+                      friday: 'Vendredi',
+                      saturday: 'Samedi',
+                      sunday: 'Dimanche'
+                    }
+
+                    return (
+                      <div key={day} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
+                        <div className="w-24">
+                          <span className="text-sm font-medium text-gray-700">{dayNames[day]}</span>
+                        </div>
+
+                        <label className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={hours.isWorking}
+                            onChange={(e) => handleScheduleChange(day, 'isWorking', e.target.checked)}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <span className="ml-2 text-sm text-gray-600">Ouvert</span>
+                        </label>
+
+                        {hours.isWorking && (
+                          <>
+                            <div className="flex items-center space-x-2">
+                              <label className="text-sm text-gray-600">De:</label>
+                              <input
+                                type="time"
+                                value={hours.start}
+                                onChange={(e) => handleScheduleChange(day, 'start', e.target.value)}
+                                className="px-2 py-1 border border-gray-300 rounded-md text-sm"
+                              />
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                              <label className="text-sm text-gray-600">À:</label>
+                              <input
+                                type="time"
+                                value={hours.end}
+                                onChange={(e) => handleScheduleChange(day, 'end', e.target.value)}
+                                className="px-2 py-1 border border-gray-300 rounded-md text-sm"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+                <button
+                  onClick={() => setEditingSchedule(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={saveSchedule}
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {loading ? 'Sauvegarde...' : 'Sauvegarder'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
