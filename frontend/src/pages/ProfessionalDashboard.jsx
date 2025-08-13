@@ -565,19 +565,35 @@ const ProfessionalDashboard = () => {
             {/* Liste des services */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {services.map((service) => (
-                <div key={service.id} className="bg-white rounded-lg shadow p-6">
+                <div key={service._id} className="bg-white rounded-lg shadow p-6">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-lg font-medium text-gray-900">{service.name}</h3>
-                    <button
-                      onClick={() => {
-                        setEditingService(service)
-                        setServiceForm(service)
-                        setShowServiceForm(true)
-                      }}
-                      className="text-gray-400 hover:text-gray-600"
-                    >
-                      <Edit3 className="h-4 w-4" />
-                    </button>
+                    <div className="flex space-x-1">
+                      <button
+                        onClick={() => {
+                          setEditingService(service)
+                          setServiceForm({
+                            name: service.name,
+                            description: service.description,
+                            price: service.price.toString(),
+                            duration: service.duration.toString(),
+                            category: service.category
+                          })
+                          setShowServiceForm(true)
+                        }}
+                        className="text-gray-400 hover:text-blue-600 p-1"
+                        title="Modifier"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteService(service._id)}
+                        className="text-gray-400 hover:text-red-600 p-1"
+                        title="Supprimer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                   <p className="text-gray-600 mb-4">{service.description}</p>
                   <div className="flex justify-between items-center">
@@ -586,9 +602,9 @@ const ProfessionalDashboard = () => {
                       <p className="text-lg font-bold text-gray-900">{service.price}€</p>
                     </div>
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      service.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      service.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {service.active ? 'Actif' : 'Inactif'}
+                      {service.isActive ? 'Actif' : 'Inactif'}
                     </span>
                   </div>
                 </div>
