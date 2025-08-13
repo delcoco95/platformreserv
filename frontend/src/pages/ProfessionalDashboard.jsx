@@ -29,7 +29,40 @@ const ProfessionalDashboard = () => {
   const [services, setServices] = useState([])
   const [bookings, setBookings] = useState([])
   const [conversations, setConversations] = useState([])
-  const [availability, setAvailability] = useState({})
+  const [loading, setLoading] = useState(false)
+
+  // États pour le planning
+  const [schedule, setSchedule] = useState({
+    monday: { isWorking: true, start: '08:00', end: '18:00' },
+    tuesday: { isWorking: true, start: '08:00', end: '18:00' },
+    wednesday: { isWorking: true, start: '08:00', end: '18:00' },
+    thursday: { isWorking: true, start: '08:00', end: '18:00' },
+    friday: { isWorking: true, start: '08:00', end: '18:00' },
+    saturday: { isWorking: false, start: '08:00', end: '18:00' },
+    sunday: { isWorking: false, start: '08:00', end: '18:00' }
+  })
+  const [editingSchedule, setEditingSchedule] = useState(false)
+
+  // États pour la modification du profil
+  const [editingProfile, setEditingProfile] = useState(false)
+  const [profileForm, setProfileForm] = useState({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    businessInfo: {
+      companyName: user?.businessInfo?.companyName || '',
+      siret: user?.businessInfo?.siret || '',
+      businessAddress: {
+        street: user?.businessInfo?.businessAddress?.street || '',
+        city: user?.businessInfo?.businessAddress?.city || '',
+        zipCode: user?.businessInfo?.businessAddress?.zipCode || '',
+        country: user?.businessInfo?.businessAddress?.country || 'France'
+      },
+      profession: user?.businessInfo?.profession || 'automobile',
+      description: user?.businessInfo?.description || ''
+    }
+  })
 
   // État pour les formulaires
   const [showServiceForm, setShowServiceForm] = useState(false)
