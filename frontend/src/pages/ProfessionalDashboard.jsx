@@ -75,67 +75,46 @@ const ProfessionalDashboard = () => {
     category: user?.businessInfo?.profession || 'automobile'
   })
 
-  // Simulations de données (à remplacer par des appels API)
+  // Charger les données depuis l'API
   useEffect(() => {
-    // Simulation de services
-    setServices([
-      {
-        id: 1,
-        name: 'Vidange complète',
-        description: 'Vidange moteur + filtres + vérification',
-        price: 89,
-        duration: 60,
-        category: 'automobile',
-        active: true
-      },
-      {
-        id: 2,
-        name: 'Diagnostic électronique',
-        description: 'Diagnostic complet du véhicule',
-        price: 45,
-        duration: 30,
-        category: 'automobile',
-        active: true
-      }
-    ])
-
-    // Simulation de réservations
-    setBookings([
-      {
-        id: 1,
-        clientName: 'Jean Dupont',
-        clientEmail: 'jean@email.com',
-        clientPhone: '06 12 34 56 78',
-        service: 'Vidange complète',
-        date: '2024-01-15',
-        time: '14:00',
-        status: 'pending',
-        price: 89
-      },
-      {
-        id: 2,
-        clientName: 'Marie Martin',
-        clientEmail: 'marie@email.com',
-        clientPhone: '06 98 76 54 32',
-        service: 'Diagnostic électronique',
-        date: '2024-01-16',
-        time: '10:30',
-        status: 'confirmed',
-        price: 45
-      }
-    ])
-
-    // Simulation de conversations
-    setConversations([
-      {
-        id: 1,
-        clientName: 'Jean Dupont',
-        lastMessage: 'Bonjour, je souhaiterais réserver une vidange pour demain.',
-        timestamp: '2024-01-14 15:30',
-        unread: true
-      }
-    ])
+    loadProfessionalData()
   }, [])
+
+  const loadProfessionalData = async () => {
+    try {
+      setLoading(true)
+
+      // Charger les services
+      try {
+        const servicesResponse = await serviceService.getMyServices()
+        if (servicesResponse.success) {
+          setServices(servicesResponse.services || [])
+        }
+      } catch (error) {
+        console.error('Erreur services:', error)
+        setServices([])
+      }
+
+      // Charger les réservations
+      try {
+        const bookingsResponse = await bookingService.getMyBookings()
+        if (bookingsResponse.success) {
+          setBookings(bookingsResponse.bookings || [])
+        }
+      } catch (error) {
+        console.error('Erreur réservations:', error)
+        setBookings([])
+      }
+
+      // Les conversations restent vides pour l'instant
+      setConversations([])
+
+    } catch (error) {
+      console.error('Erreur lors du chargement des données:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleServiceSubmit = (e) => {
     e.preventDefault()
