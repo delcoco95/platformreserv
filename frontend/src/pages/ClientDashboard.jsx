@@ -139,7 +139,7 @@ const ClientDashboard = () => {
     totalBookings: bookings.length,
     upcomingBookings: bookings.filter(b => ['confirmed', 'pending'].includes(b.status)).length,
     completedBookings: bookings.filter(b => b.status === 'completed').length,
-    totalSpent: bookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + b.price, 0)
+    totalSpent: bookings.filter(b => b.status === 'completed').length
   }
 
   return (
@@ -245,7 +245,7 @@ const ClientDashboard = () => {
                   <div key={booking.id} className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0">
                     <div>
                       <p className="font-medium text-gray-900">{booking.professionalName}</p>
-                      <p className="text-sm text-gray-600">{booking.service} - {booking.date} à {booking.time}</p>
+                      <p className="text-sm text-gray-600">{booking.service} - {booking.date} �� {booking.time}</p>
                     </div>
                     <div className="text-right">
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(booking.status)}`}>
