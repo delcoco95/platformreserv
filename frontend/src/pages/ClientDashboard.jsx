@@ -38,87 +38,36 @@ const ClientDashboard = () => {
     }
   })
 
-  // Simulations de données (à remplacer par des appels API)
+  // Charger les données depuis l'API
   useEffect(() => {
-    // Simulation de réservations
-    setBookings([
-      {
-        id: 1,
-        professionalName: 'Garage Martin',
-        professionalEmail: 'garage.martin@email.com',
-        professionalPhone: '01 23 45 67 89',
-        service: 'Vidange complète',
-        date: '2024-01-15',
-        time: '14:00',
-        status: 'confirmed',
-        price: 89,
-        address: '123 rue de la République, 75001 Paris',
-        canCancel: true,
-        canModify: true
-      },
-      {
-        id: 2,
-        professionalName: 'Auto Service Plus',
-        professionalEmail: 'contact@autoservice.com',
-        professionalPhone: '01 98 76 54 32',
-        service: 'Diagnostic électronique',
-        date: '2024-01-20',
-        time: '10:30',
-        status: 'pending',
-        price: 45,
-        address: '456 avenue de la Liberté, 75002 Paris',
-        canCancel: true,
-        canModify: true
-      },
-      {
-        id: 3,
-        professionalName: 'Mécanique Express',
-        professionalEmail: 'info@mecanique-express.fr',
-        professionalPhone: '01 11 22 33 44',
-        service: 'Réparation freins',
-        date: '2024-01-08',
-        time: '16:00',
-        status: 'completed',
-        price: 120,
-        address: '789 boulevard Saint-Michel, 75003 Paris',
-        canCancel: false,
-        canModify: false,
-        rating: 5,
-        review: 'Service excellent, très professionnel !'
-      }
-    ])
-
-    // Simulation de conversations
-    setConversations([
-      {
-        id: 1,
-        professionalName: 'Garage Martin',
-        lastMessage: 'Merci pour votre réservation, nous vous confirmons le rendez-vous.',
-        timestamp: '2024-01-14 16:30',
-        unread: false
-      },
-      {
-        id: 2,
-        professionalName: 'Auto Service Plus',
-        lastMessage: 'Bonjour, pouvez-vous préciser le modèle de votre véhicule ?',
-        timestamp: '2024-01-13 14:20',
-        unread: true
-      }
-    ])
-
-    // Simulation de favoris
-    setFavorites([
-      {
-        id: 1,
-        name: 'Garage Martin',
-        profession: 'Automobile',
-        rating: 4.8,
-        reviews: 127,
-        address: '123 rue de la République, 75001 Paris',
-        phone: '01 23 45 67 89'
-      }
-    ])
+    loadClientData()
   }, [])
+
+  const loadClientData = async () => {
+    try {
+      setLoading(true)
+
+      // Charger les réservations
+      const bookingsResponse = await bookingService.getMyBookings()
+      if (bookingsResponse.success) {
+        setBookings(bookingsResponse.bookings || [])
+      }
+
+      // Pour les conversations et favoris, on les laisse vides pour l'instant
+      // car ils seront implémentés avec les services correspondants
+      setConversations([])
+      setFavorites([])
+
+    } catch (error) {
+      console.error('Erreur lors du chargement des données:', error)
+      // En cas d'erreur, on garde les arrays vides
+      setBookings([])
+      setConversations([])
+      setFavorites([])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleBookingCancel = (bookingId) => {
     if (window.confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
