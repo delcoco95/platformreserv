@@ -1,22 +1,26 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { 
-  Calendar, 
-  Star, 
-  Settings, 
-  Plus, 
-  Edit3, 
-  Check, 
-  X, 
-  MessageCircle, 
-  Clock, 
+import bookingService from '../services/bookingService'
+import serviceService from '../services/serviceService'
+import {
+  Calendar,
+  Star,
+  Settings,
+  Plus,
+  Edit3,
+  Check,
+  X,
+  MessageCircle,
+  Clock,
   Euro,
   Image,
   MapPin,
   Phone,
   Mail,
   User,
-  Eye
+  Eye,
+  Save,
+  Trash2
 } from 'lucide-react'
 
 const ProfessionalDashboard = () => {
