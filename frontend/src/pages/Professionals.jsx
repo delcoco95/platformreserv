@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { userService } from '../services/api'
+import { useSearchParams } from 'react-router-dom'
+import userService from '../services/userService'
 import { Search, MapPin, Star, Phone, Mail } from 'lucide-react'
 
 const Professionals = () => {
