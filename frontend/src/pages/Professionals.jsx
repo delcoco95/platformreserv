@@ -4,10 +4,11 @@ import userService from '../services/userService'
 import { Search, MapPin, Star, Phone, Mail } from 'lucide-react'
 
 const Professionals = () => {
+  const [searchParams] = useSearchParams()
   const [professionals, setProfessionals] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '')
 
   const categories = [
     { value: '', label: 'Toutes les catégories' },
