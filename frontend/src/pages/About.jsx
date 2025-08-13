@@ -164,7 +164,7 @@ export default function About() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {team.map((member, index) => (
               <div key={index} className="bg-white rounded-xl shadow-lg p-8 text-center">
                 <div className="w-20 h-20 bg-gray-300 rounded-full mx-auto mb-4"></div>
