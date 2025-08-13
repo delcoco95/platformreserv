@@ -32,7 +32,7 @@ const ProfessionalDashboard = () => {
   const [loading, setLoading] = useState(false)
 
   // États pour le planning
-  const [schedule, setSchedule] = useState({
+  const [schedule, setSchedule] = useState(user?.businessInfo?.schedule || {
     monday: { isWorking: true, start: '08:00', end: '18:00' },
     tuesday: { isWorking: true, start: '08:00', end: '18:00' },
     wednesday: { isWorking: true, start: '08:00', end: '18:00' },
@@ -590,7 +590,7 @@ const ProfessionalDashboard = () => {
                           </div>
                           <div className="text-sm text-gray-500">
                             <p>{booking.date} à {booking.time}</p>
-                            <p className="font-medium">{booking.price}€</p>
+                            <p className="font-medium">{booking.price}��</p>
                           </div>
                         </div>
                         <div className="mt-2 flex items-center space-x-4 text-sm text-gray-600">
