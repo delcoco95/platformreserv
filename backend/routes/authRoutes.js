@@ -14,11 +14,27 @@ const generateToken = (userId) => {
 
 // Route d'inscription
 router.post('/register', [
-  body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 6 }),
-  body('firstName').trim().isLength({ min: 2 }),
-  body('lastName').trim().isLength({ min: 2 }),
-  body('userType').isIn(['client', 'professionnel'])
+  body('email').isEmail().normalizeEmail().withMessage('Email invalide'),
+  body('password').isLength({ min: 6 }).withMessage('Le mot de passe doit contenir au moins 6 caractères'),
+  body('firstName').trim().isLength({ min: 2 }).withMessage('Le prénom doit contenir au moins 2 caractères'),
+  body('lastName').trim().isLength({ min: 2 }).withMessage('Le nom doit contenir au moins 2 caractères'),
+  body('userType').isIn(['client', 'professionnel']).withMessage('Type d\'utilisateur invalide'),
+
+  // Validation conditionnelle pour les professionnels
+  body('businessInfo.companyName').if(body('userType').equals('professionnel'))
+    .trim().isLength({ min: 2 }).withMessage('Le nom de l\'entreprise est obligatoire'),
+  body('businessInfo.siret').if(body('userType').equals('professionnel'))
+    .isLength({ min: 14, max: 14 }).isNumeric().withMessage('Le SIRET doit contenir exactement 14 chiffres'),
+  body('businessInfo.businessAddress.street').if(body('userType').equals('professionnel'))
+    .trim().isLength({ min: 5 }).withMessage('L\'adresse de l\'entreprise est obligatoire'),
+  body('businessInfo.businessAddress.city').if(body('userType').equals('professionnel'))
+    .trim().isLength({ min: 2 }).withMessage('La ville de l\'entreprise est obligatoire'),
+  body('businessInfo.businessAddress.zipCode').if(body('userType').equals('professionnel'))
+    .trim().isLength({ min: 5, max: 5 }).isNumeric().withMessage('Le code postal doit contenir exactement 5 chiffres'),
+  body('businessInfo.profession').if(body('userType').equals('professionnel'))
+    .isIn(['automobile', 'plomberie', 'serrurerie', 'electricite']).withMessage('Spécialité invalide'),
+  body('businessInfo.description').if(body('userType').equals('professionnel'))
+    .trim().isLength({ min: 10 }).withMessage('La description doit contenir au moins 10 caractères')
 ], async (req, res) => {
   try {
     // Vérifier les erreurs de validation
