@@ -228,8 +228,8 @@ const ClientDashboard = () => {
                     <MessageCircle className="h-6 w-6 text-yellow-600" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Dépenses</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalSpent}€</p>
+                    <p className="text-sm font-medium text-gray-600">Services utilisés</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.totalSpent}</p>
                   </div>
                 </div>
               </div>
