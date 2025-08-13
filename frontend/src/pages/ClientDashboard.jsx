@@ -69,13 +69,69 @@ const ClientDashboard = () => {
     }
   }
 
-  const handleBookingCancel = (bookingId) => {
+  const handleBookingCancel = async (bookingId) => {
     if (window.confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
-      setBookings(bookings.map(booking => 
-        booking.id === bookingId 
-          ? { ...booking, status: 'cancelled', canCancel: false, canModify: false }
-          : booking
-      ))
+      try {
+        await bookingService.cancelBooking(bookingId)
+        // Recharger les données
+        loadClientData()
+      } catch (error) {
+        console.error('Erreur lors de l\'annulation:', error)
+        alert('Erreur lors de l\'annulation de la réservation')
+      }
+    }
+  }
+
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/users/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(profileForm)
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        alert('Profil mis à jour avec succès')
+        setEditingProfile(false)
+        // Mettre à jour le contexte utilisateur si nécessaire
+        window.location.reload() // Ou utiliser un contexte global
+      } else {
+        alert(data.message || 'Erreur lors de la mise à jour')
+      }
+    } catch (error) {
+      console.error('Erreur mise à jour profil:', error)
+      alert('Erreur lors de la mise à jour du profil')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleProfileChange = (e) => {
+    const { name, value } = e.target
+
+    if (name.startsWith('address.')) {
+      const field = name.split('.')[1]
+      setProfileForm({
+        ...profileForm,
+        address: {
+          ...profileForm.address,
+          [field]: value
+        }
+      })
+    } else {
+      setProfileForm({
+        ...profileForm,
+        [name]: value
+      })
     }
   }
 
