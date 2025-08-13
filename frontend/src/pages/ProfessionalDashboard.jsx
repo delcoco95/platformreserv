@@ -674,69 +674,271 @@ const ProfessionalDashboard = () => {
         {/* Profil */}
         {activeTab === 'profile' && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Mon profil professionnel</h2>
-            
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center space-x-6 mb-6">
-                <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
-                  <User className="h-10 w-10 text-gray-400" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-medium text-gray-900">
-                    {user?.firstName} {user?.lastName}
-                  </h3>
-                  <p className="text-gray-600">{user?.businessInfo?.companyName}</p>
-                  <p className="text-sm text-gray-500 capitalize">{user?.businessInfo?.profession}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Informations personnelles</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Email</label>
-                      <p className="text-sm text-gray-900">{user?.email}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Téléphone</label>
-                      <p className="text-sm text-gray-900">{user?.phone || 'Non renseigné'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Informations d'entreprise</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">SIRET</label>
-                      <p className="text-sm text-gray-900">{user?.businessInfo?.siret || 'Non renseigné'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Adresse</label>
-                      <p className="text-sm text-gray-900">
-                        {user?.businessInfo?.businessAddress ? 
-                          `${user.businessInfo.businessAddress.street}, ${user.businessInfo.businessAddress.zipCode} ${user.businessInfo.businessAddress.city}` :
-                          'Non renseignée'
-                        }
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {user?.businessInfo?.description && (
-                <div className="mt-6">
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">Description</h4>
-                  <p className="text-gray-600">{user.businessInfo.description}</p>
-                </div>
-              )}
-
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Mon profil professionnel</h2>
+              {!editingProfile && (
+                <button
+                  onClick={() => setEditingProfile(true)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                >
+                  <Edit3 className="h-4 w-4 mr-2" />
                   Modifier mon profil
                 </button>
-              </div>
+              )}
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              {!editingProfile ? (
+                // Vue lecture seule
+                <>
+                  <div className="flex items-center space-x-6 mb-6">
+                    <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
+                      <User className="h-10 w-10 text-gray-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-medium text-gray-900">
+                        {user?.firstName} {user?.lastName}
+                      </h3>
+                      <p className="text-gray-600">{user?.businessInfo?.companyName}</p>
+                      <p className="text-sm text-gray-500 capitalize">{user?.businessInfo?.profession}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="text-lg font-medium text-gray-900 mb-4">Informations personnelles</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Email</label>
+                          <p className="text-sm text-gray-900">{user?.email}</p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Téléphone</label>
+                          <p className="text-sm text-gray-900">{user?.phone || 'Non renseigné'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="text-lg font-medium text-gray-900 mb-4">Informations d'entreprise</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">SIRET</label>
+                          <p className="text-sm text-gray-900">{user?.businessInfo?.siret || 'Non renseigné'}</p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Adresse</label>
+                          <p className="text-sm text-gray-900">
+                            {user?.businessInfo?.businessAddress ?
+                              `${user.businessInfo.businessAddress.street}, ${user.businessInfo.businessAddress.zipCode} ${user.businessInfo.businessAddress.city}` :
+                              'Non renseignée'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {user?.businessInfo?.description && (
+                    <div className="mt-6">
+                      <h4 className="text-lg font-medium text-gray-900 mb-2">Description</h4>
+                      <p className="text-gray-600">{user.businessInfo.description}</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                // Formulaire de modification
+                <form onSubmit={handleProfileSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="text-lg font-medium text-gray-900 mb-4">Informations personnelles</h4>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Prénom *</label>
+                          <input
+                            type="text"
+                            name="firstName"
+                            value={profileForm.firstName}
+                            onChange={handleProfileChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
+                          <input
+                            type="text"
+                            name="lastName"
+                            value={profileForm.lastName}
+                            onChange={handleProfileChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={profileForm.email}
+                            onChange={handleProfileChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={profileForm.phone}
+                            onChange={handleProfileChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="text-lg font-medium text-gray-900 mb-4">Informations d'entreprise</h4>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Nom de l'entreprise *</label>
+                          <input
+                            type="text"
+                            name="businessInfo.companyName"
+                            value={profileForm.businessInfo.companyName}
+                            onChange={handleProfileChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">SIRET *</label>
+                          <input
+                            type="text"
+                            name="businessInfo.siret"
+                            value={profileForm.businessInfo.siret}
+                            onChange={handleProfileChange}
+                            maxLength="14"
+                            pattern="[0-9]{14}"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Spécialité *</label>
+                          <select
+                            name="businessInfo.profession"
+                            value={profileForm.businessInfo.profession}
+                            onChange={handleProfileChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          >
+                            <option value="automobile">Automobile</option>
+                            <option value="plomberie">Plomberie</option>
+                            <option value="serrurerie">Serrurerie</option>
+                            <option value="electricite">Électricité</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-900 mb-4">Adresse de l'entreprise</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Rue *</label>
+                        <input
+                          type="text"
+                          name="businessInfo.businessAddress.street"
+                          value={profileForm.businessInfo.businessAddress.street}
+                          onChange={handleProfileChange}
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Code postal *</label>
+                          <input
+                            type="text"
+                            name="businessInfo.businessAddress.zipCode"
+                            value={profileForm.businessInfo.businessAddress.zipCode}
+                            onChange={handleProfileChange}
+                            maxLength="5"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Ville *</label>
+                          <input
+                            type="text"
+                            name="businessInfo.businessAddress.city"
+                            value={profileForm.businessInfo.businessAddress.city}
+                            onChange={handleProfileChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Description de votre activité *</label>
+                    <textarea
+                      name="businessInfo.description"
+                      value={profileForm.businessInfo.description}
+                      onChange={handleProfileChange}
+                      rows={4}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Décrivez votre expertise et vos services..."
+                    />
+                  </div>
+
+                  <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingProfile(false)
+                        setProfileForm({
+                          firstName: user?.firstName || '',
+                          lastName: user?.lastName || '',
+                          email: user?.email || '',
+                          phone: user?.phone || '',
+                          businessInfo: {
+                            companyName: user?.businessInfo?.companyName || '',
+                            siret: user?.businessInfo?.siret || '',
+                            businessAddress: {
+                              street: user?.businessInfo?.businessAddress?.street || '',
+                              city: user?.businessInfo?.businessAddress?.city || '',
+                              zipCode: user?.businessInfo?.businessAddress?.zipCode || '',
+                              country: user?.businessInfo?.businessAddress?.country || 'France'
+                            },
+                            profession: user?.businessInfo?.profession || 'automobile',
+                            description: user?.businessInfo?.description || ''
+                          }
+                        })
+                      }}
+                      className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50"
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      {loading ? 'Enregistrement...' : 'Enregistrer'}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         )}
