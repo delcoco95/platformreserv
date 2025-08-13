@@ -40,10 +40,12 @@ router.post('/register', [
     // Vérifier les erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      const validationErrors = errors.array();
+      const firstError = validationErrors[0];
       return res.status(400).json({
         success: false,
-        message: 'Données invalides',
-        errors: errors.array()
+        message: firstError.msg || 'Données invalides',
+        errors: validationErrors
       });
     }
 
