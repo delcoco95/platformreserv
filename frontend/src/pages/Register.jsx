@@ -260,14 +260,14 @@ const Register = () => {
               <>
                 <div>
                   <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
-                    Nom de l'entreprise
+                    Nom de l'entreprise *
                   </label>
                   <div className="mt-1 relative">
                     <input
                       id="companyName"
                       name="businessInfo.companyName"
                       type="text"
-                      required
+                      required={formData.userType === 'professionnel'}
                       value={formData.businessInfo.companyName}
                       onChange={handleChange}
                       className="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
