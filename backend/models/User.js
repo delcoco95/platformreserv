@@ -70,7 +70,19 @@ const userSchema = new mongoose.Schema({
       enum: ['automobile', 'plomberie', 'serrurerie', 'electricite']
     },
     description: String,
-    images: [String] // URLs des images
+    images: [String], // URLs des images
+    schedule: {
+      type: Object,
+      default: {
+        monday: { isWorking: true, start: '08:00', end: '18:00' },
+        tuesday: { isWorking: true, start: '08:00', end: '18:00' },
+        wednesday: { isWorking: true, start: '08:00', end: '18:00' },
+        thursday: { isWorking: true, start: '08:00', end: '18:00' },
+        friday: { isWorking: true, start: '08:00', end: '18:00' },
+        saturday: { isWorking: false, start: '08:00', end: '18:00' },
+        sunday: { isWorking: false, start: '08:00', end: '18:00' }
+      }
+    }
   },
   
   // Statut
