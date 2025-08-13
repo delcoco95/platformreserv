@@ -297,7 +297,7 @@ const Register = () => {
 
                 <div>
                   <label htmlFor="siret" className="block text-sm font-medium text-gray-700">
-                    Numéro SIRET
+                    Numéro SIRET *
                   </label>
                   <div className="mt-1 relative">
                     <input
@@ -308,6 +308,7 @@ const Register = () => {
                       pattern="[0-9]{14}"
                       value={formData.businessInfo.siret}
                       onChange={handleChange}
+                      required={formData.userType === 'professionnel'}
                       className="appearance-none block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       placeholder="12345678901234"
                     />
