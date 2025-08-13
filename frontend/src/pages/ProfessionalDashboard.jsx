@@ -372,23 +372,69 @@ const ProfessionalDashboard = () => {
               </div>
             </div>
 
-            {/* Réservations récentes */}
-            <div className="bg-white rounded-lg shadow">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-900">Réservations récentes</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Réservations récentes */}
+              <div className="bg-white rounded-lg shadow">
+                <div className="px-6 py-4 border-b border-gray-200">
+                  <h2 className="text-lg font-medium text-gray-900">Réservations récentes</h2>
+                </div>
+                <div className="p-6">
+                  {bookings.length > 0 ? (
+                    bookings.slice(0, 3).map((booking) => (
+                      <div key={booking._id} className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0">
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {booking.clientId?.firstName} {booking.clientId?.lastName}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {booking.serviceId?.name} - {new Date(booking.appointmentDate).toLocaleDateString('fr-FR')}
+                          </p>
+                        </div>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(booking.status)}`}>
+                          {getStatusText(booking.status)}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-center py-8">Aucune réservation</p>
+                  )}
+                </div>
               </div>
-              <div className="p-6">
-                {bookings.slice(0, 3).map((booking) => (
-                  <div key={booking.id} className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0">
-                    <div>
-                      <p className="font-medium text-gray-900">{booking.clientName}</p>
-                      <p className="text-sm text-gray-600">{booking.service} - {booking.date} à {booking.time}</p>
-                    </div>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(booking.status)}`}>
-                      {getStatusText(booking.status)}
-                    </span>
-                  </div>
-                ))}
+
+              {/* Planning de la semaine */}
+              <div className="bg-white rounded-lg shadow">
+                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                  <h2 className="text-lg font-medium text-gray-900">Mon planning</h2>
+                  <button
+                    onClick={() => setEditingSchedule(true)}
+                    className="text-blue-600 hover:text-blue-700 text-sm flex items-center"
+                  >
+                    <Edit3 className="h-4 w-4 mr-1" />
+                    Modifier
+                  </button>
+                </div>
+                <div className="p-6">
+                  {Object.entries(schedule).map(([day, hours]) => {
+                    const dayNames = {
+                      monday: 'Lundi',
+                      tuesday: 'Mardi',
+                      wednesday: 'Mercredi',
+                      thursday: 'Jeudi',
+                      friday: 'Vendredi',
+                      saturday: 'Samedi',
+                      sunday: 'Dimanche'
+                    }
+
+                    return (
+                      <div key={day} className="flex items-center justify-between py-2">
+                        <span className="text-sm font-medium text-gray-700">{dayNames[day]}</span>
+                        <span className="text-sm text-gray-600">
+                          {hours.isWorking ? `${hours.start} - ${hours.end}` : 'Fermé'}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             </div>
           </div>
