@@ -265,6 +265,21 @@ const ProfessionalDashboard = () => {
     }
   }
 
+  const handleDeleteService = async (serviceId) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce service ?')) {
+      try {
+        setLoading(true)
+        await serviceService.deleteService(serviceId)
+        loadProfessionalData()
+      } catch (error) {
+        console.error('Erreur suppression service:', error)
+        alert('Erreur lors de la suppression du service')
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800'
