@@ -37,10 +37,49 @@ const Register = () => {
     { value: 'electricite', label: 'Électricité' }
   ]
 
+  const validateForm = () => {
+    const errors = []
+
+    // Validation des champs communs
+    if (!formData.firstName.trim()) errors.push('Le prénom est obligatoire')
+    if (!formData.lastName.trim()) errors.push('Le nom est obligatoire')
+    if (!formData.email.trim()) errors.push('L\'email est obligatoire')
+    if (!formData.password || formData.password.length < 6) errors.push('Le mot de passe doit contenir au moins 6 caractères')
+
+    // Validation spécifique pour les professionnels
+    if (formData.userType === 'professionnel') {
+      if (!formData.businessInfo.companyName.trim()) errors.push('Le nom de l\'entreprise est obligatoire')
+      if (!formData.businessInfo.siret.trim()) errors.push('Le numéro SIRET est obligatoire')
+      if (formData.businessInfo.siret.trim() && !/^\d{14}$/.test(formData.businessInfo.siret.trim())) {
+        errors.push('Le SIRET doit contenir exactement 14 chiffres')
+      }
+      if (!formData.businessInfo.businessAddress.street.trim()) errors.push('L\'adresse de l\'entreprise est obligatoire')
+      if (!formData.businessInfo.businessAddress.city.trim()) errors.push('La ville de l\'entreprise est obligatoire')
+      if (!formData.businessInfo.businessAddress.zipCode.trim()) errors.push('Le code postal de l\'entreprise est obligatoire')
+      if (formData.businessInfo.businessAddress.zipCode.trim() && !/^\d{5}$/.test(formData.businessInfo.businessAddress.zipCode.trim())) {
+        errors.push('Le code postal doit contenir exactement 5 chiffres')
+      }
+      if (!formData.businessInfo.description.trim()) errors.push('La description de votre activité est obligatoire')
+      if (formData.businessInfo.description.trim() && formData.businessInfo.description.trim().length < 10) {
+        errors.push('La description doit contenir au moins 10 caractères')
+      }
+    }
+
+    return errors
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
+
+    // Validation côté client
+    const validationErrors = validateForm()
+    if (validationErrors.length > 0) {
+      setError(validationErrors[0])
+      setLoading(false)
+      return
+    }
 
     try {
       const result = await register(formData)
