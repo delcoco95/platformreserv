@@ -136,12 +136,120 @@ const ProfessionalDashboard = () => {
     setShowServiceForm(false)
   }
 
-  const handleBookingAction = (bookingId, action) => {
-    setBookings(bookings.map(booking => 
-      booking.id === bookingId 
-        ? { ...booking, status: action }
-        : booking
-    ))
+  const handleBookingAction = async (bookingId, action) => {
+    try {
+      await bookingService.updateBookingStatus(bookingId, action)
+      // Recharger les données
+      loadProfessionalData()
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour:', error)
+      alert('Erreur lors de la mise à jour du statut')
+    }
+  }
+
+  // Gestion du planning
+  const handleScheduleChange = (day, field, value) => {
+    setSchedule({
+      ...schedule,
+      [day]: {
+        ...schedule[day],
+        [field]: value
+      }
+    })
+  }
+
+  const saveSchedule = async () => {
+    try {
+      setLoading(true)
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/users/schedule`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ schedule })
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        alert('Planning sauvegardé avec succès')
+        setEditingSchedule(false)
+      } else {
+        alert(data.message || 'Erreur lors de la sauvegarde')
+      }
+    } catch (error) {
+      console.error('Erreur sauvegarde planning:', error)
+      alert('Erreur lors de la sauvegarde du planning')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Gestion du profil professionnel
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/users/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(profileForm)
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        alert('Profil mis à jour avec succès')
+        setEditingProfile(false)
+        window.location.reload()
+      } else {
+        alert(data.message || 'Erreur lors de la mise à jour')
+      }
+    } catch (error) {
+      console.error('Erreur mise à jour profil:', error)
+      alert('Erreur lors de la mise à jour du profil')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleProfileChange = (e) => {
+    const { name, value } = e.target
+
+    if (name.startsWith('businessInfo.businessAddress.')) {
+      const field = name.split('.')[2]
+      setProfileForm({
+        ...profileForm,
+        businessInfo: {
+          ...profileForm.businessInfo,
+          businessAddress: {
+            ...profileForm.businessInfo.businessAddress,
+            [field]: value
+          }
+        }
+      })
+    } else if (name.startsWith('businessInfo.')) {
+      const field = name.split('.')[1]
+      setProfileForm({
+        ...profileForm,
+        businessInfo: {
+          ...profileForm.businessInfo,
+          [field]: value
+        }
+      })
+    } else {
+      setProfileForm({
+        ...profileForm,
+        [name]: value
+      })
+    }
   }
 
   const getStatusColor = (status) => {
