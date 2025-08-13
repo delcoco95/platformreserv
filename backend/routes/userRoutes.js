@@ -33,7 +33,7 @@ router.put('/profile', auth, async (req, res) => {
   try {
     const allowedUpdates = ['firstName', 'lastName', 'phone', 'address', 'businessInfo'];
     const updates = {};
-    
+
     // Filtrer les champs autorisés
     Object.keys(req.body).forEach(key => {
       if (allowedUpdates.includes(key)) {
@@ -61,6 +61,54 @@ router.put('/profile', auth, async (req, res) => {
     });
   } catch (error) {
     console.error('Erreur mise à jour profil:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur serveur'
+    });
+  }
+});
+
+// Mettre à jour le planning (professionnels uniquement)
+router.put('/schedule', auth, async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est un professionnel
+    if (req.user.userType !== 'professionnel') {
+      return res.status(403).json({
+        success: false,
+        message: 'Seuls les professionnels peuvent définir un planning'
+      });
+    }
+
+    const { schedule } = req.body;
+
+    // Validation basique du planning
+    if (!schedule || typeof schedule !== 'object') {
+      return res.status(400).json({
+        success: false,
+        message: 'Planning invalide'
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { 'businessInfo.schedule': schedule },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Utilisateur non trouvé'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Planning mis à jour avec succès',
+      schedule: user.businessInfo.schedule
+    });
+  } catch (error) {
+    console.error('Erreur mise à jour planning:', error);
     res.status(500).json({
       success: false,
       message: 'Erreur serveur'
