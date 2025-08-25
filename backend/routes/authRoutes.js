@@ -1,142 +1,130 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 
 const router = express.Router();
 
-// Générer un token JWT
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: '7d'
-  });
-};
+// Helpers
+function sendValidationError(res, message, details) {
+  return res.status(400).json({ success: false, message, details });
+}
 
-// Route d'inscription
-router.post('/register', [
-  body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 6 }),
-  body('firstName').trim().isLength({ min: 2 }),
-  body('lastName').trim().isLength({ min: 2 }),
-  body('userType').isIn(['client', 'professionnel'])
-], async (req, res) => {
+function signToken(user) {
+  const payload = { id: user._id, userType: user.userType };
+  return jwt.sign(payload, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
+}
+
+/**
+ * POST /api/auth/register
+ * Inscription client OU professionnel (via userType)
+ * - Tous champs obligatoires
+ * - SIRET valide (Luhn) pour professionnel
+ */
+router.post('/register', async (req, res) => {
   try {
-    // Vérifier les erreurs de validation
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Données invalides',
-        errors: errors.array()
-      });
-    }
-
-    const { email, password, firstName, lastName, userType, businessInfo } = req.body;
-
-    // Vérifier si l'utilisateur existe déjà
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'Un compte avec cet email existe déjà'
-      });
-    }
-
-    // Créer le nouvel utilisateur
-    const userData = {
+    const {
+      userType,
       email,
       password,
       firstName,
       lastName,
-      userType
-    };
+      phone,
+      address, // { street, city, zipCode, country }
+      // champs pro optionnels si client
+      businessInfo, // { companyName, siret }
+      businessAddress, // { street, city, zipCode, country }
+      profession,
+      description,
+      images,
+    } = req.body;
 
-    // Ajouter les infos business si professionnel
-    if (userType === 'professionnel' && businessInfo) {
-      userData.businessInfo = businessInfo;
+    // Vérifs minimales côté route (en plus des validations Mongoose)
+    if (!userType || !['client', 'professionnel'].includes(userType))
+      return sendValidationError(res, 'Le type de compte est obligatoire (client ou professionnel).');
+
+    if (!email || !password || !firstName || !lastName || !phone)
+      return sendValidationError(res, 'Tous les champs personnels sont obligatoires (email, mot de passe, prénom, nom, téléphone).');
+
+    if (!address || !address.street || !address.city || !address.zipCode || !address.country)
+      return sendValidationError(res, 'Adresse incomplète : rue, ville, code postal et pays sont obligatoires.');
+
+    if (userType === 'professionnel') {
+      if (!businessInfo || !businessInfo.companyName || !businessInfo.siret) {
+        return sendValidationError(res, 'Pour un compte professionnel, “companyName” et “siret” sont obligatoires.');
+      }
+      if (!businessAddress || !businessAddress.street || !businessAddress.city || !businessAddress.zipCode || !businessAddress.country) {
+        return sendValidationError(res, 'Adresse professionnelle incomplète : rue, ville, code postal et pays sont obligatoires.');
+      }
+      if (!profession) {
+        return sendValidationError(res, 'La profession est obligatoire pour un compte professionnel.');
+      }
     }
 
-    const user = new User(userData);
+    // Unicité email
+    const existing = await User.findOne({ email });
+    if (existing) return sendValidationError(res, 'Un compte existe déjà avec cet email.');
+
+    // Création
+    const user = new User({
+      userType,
+      email,
+      password,
+      firstName,
+      lastName,
+      phone,
+      address,
+      businessInfo: userType === 'professionnel' ? businessInfo : undefined,
+      businessAddress: userType === 'professionnel' ? businessAddress : undefined,
+      profession: userType === 'professionnel' ? profession : undefined,
+      description,
+      images,
+      isVerified: false,
+      isActive: true,
+    });
+
+    await user.validate(); // remonte des messages précis si erreur schéma
     await user.save();
 
-    // Générer le token
-    const token = generateToken(user._id);
-
+    const token = signToken(user);
     res.status(201).json({
       success: true,
-      message: 'Compte créé avec succès',
+      message: 'Compte créé avec succès.',
       token,
-      user: user.getPublicProfile()
+      user: user.getPublicProfile(),
     });
-
-  } catch (error) {
-    console.error('Erreur inscription:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Erreur serveur lors de l\'inscription'
-    });
+  } catch (err) {
+    // Erreurs de validation mongoose
+    if (err?.name === 'ValidationError') {
+      const details = Object.keys(err.errors).map((k) => ({
+        path: k,
+        message: err.errors[k].message,
+      }));
+      return sendValidationError(res, 'Erreur de validation', details);
+    }
+    console.error('Erreur /register:', err);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 });
 
-// Route de connexion
-router.post('/login', [
-  body('email').isEmail().normalizeEmail(),
-  body('password').exists()
-], async (req, res) => {
+/**
+ * POST /api/auth/login
+ */
+router.post('/login', async (req, res) => {
   try {
-    // Vérifier les erreurs de validation
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email ou mot de passe invalide'
-      });
-    }
+    const { email, password: candidate } = req.body;
+    if (!email || !candidate) return sendValidationError(res, 'Email et mot de passe sont obligatoires.');
 
-    const { email, password } = req.body;
-
-    // Trouver l'utilisateur
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email ou mot de passe incorrect'
-      });
-    }
+    if (!user) return sendValidationError(res, 'Identifiants invalides.');
 
-    // Vérifier le mot de passe
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email ou mot de passe incorrect'
-      });
-    }
+    const ok = await user.comparePassword(candidate);
+    if (!ok) return sendValidationError(res, 'Identifiants invalides.');
 
-    // Vérifier si le compte est actif
-    if (!user.isActive) {
-      return res.status(400).json({
-        success: false,
-        message: 'Compte désactivé'
-      });
-    }
-
-    // Générer le token
-    const token = generateToken(user._id);
-
-    res.json({
-      success: true,
-      message: 'Connexion réussie',
-      token,
-      user: user.getPublicProfile()
-    });
-
-  } catch (error) {
-    console.error('Erreur connexion:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Erreur serveur lors de la connexion'
-    });
+    const token = signToken(user);
+    res.json({ success: true, token, user: user.getPublicProfile() });
+  } catch (err) {
+    console.error('Erreur /login:', err);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 });
 
