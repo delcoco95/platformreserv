@@ -1,99 +1,62 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-import { apiCall } from '../services/api'
+// frontend/src/contexts/AuthContext.jsx
+import React, { createContext, useContext, useState, useMemo } from "react";
+import { register as apiRegister, login as apiLogin } from "../services/api";
 
-const AuthContext = createContext()
+const AuthContext = createContext(null);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-  return context
-}
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      // Vérifier si le token est valide
-      checkAuthStatus()
-    } else {
-      setLoading(false)
-    }
-  }, [])
-
-  const checkAuthStatus = async () => {
+  const register = async (formValues) => {
+    setError("");
+    setLoading(true);
     try {
-      const response = await apiCall('/api/users/profile')
-      if (response.success) {
-        setUser(response.user)
-      } else {
-        localStorage.removeItem('token')
-      }
-    } catch (error) {
-      localStorage.removeItem('token')
+      // Construit le payload au bon format dans api.js
+      const data = await apiRegister(formValues);
+
+      // L’API renvoie { success, message, token, user }
+      if (data?.token) setToken(data.token);
+      if (data?.user) setUser(data.user);
+
+      return { ok: true, data };
+    } catch (e) {
+      setError(e.message);
+      return { ok: false, error: e.message };
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const login = async (email, password) => {
+  const login = async (credentials) => {
+    setError("");
+    setLoading(true);
     try {
-      const response = await apiCall('/api/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password })
-      })
-
-      if (response.success) {
-        localStorage.setItem('token', response.token)
-        setUser(response.user)
-        return { success: true }
-      } else {
-        return { success: false, message: response.message }
-      }
-    } catch (error) {
-      return { success: false, message: 'Erreur de connexion' }
+      const data = await apiLogin(credentials);
+      if (data?.token) setToken(data.token);
+      if (data?.user) setUser(data.user);
+      return { ok: true, data };
+    } catch (e) {
+      setError(e.message);
+      return { ok: false, error: e.message };
+    } finally {
+      setLoading(false);
     }
-  }
-
-  const register = async (userData) => {
-    try {
-      const response = await apiCall('/api/auth/register', {
-        method: 'POST',
-        body: JSON.stringify(userData)
-      })
-
-      if (response.success) {
-        localStorage.setItem('token', response.token)
-        setUser(response.user)
-        return { success: true }
-      } else {
-        return { success: false, message: response.message }
-      }
-    } catch (error) {
-      return { success: false, message: 'Erreur d\'inscription' }
-    }
-  }
+  };
 
   const logout = () => {
-    localStorage.removeItem('token')
-    setUser(null)
-  }
+    setUser(null);
+    setToken(null);
+  };
 
-  const value = {
-    user,
-    login,
-    register,
-    logout,
-    loading
-  }
+  const value = useMemo(
+    () => ({ user, token, loading, error, register, login, logout }),
+    [user, token, loading, error]
+  );
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+
+export const useAuth = () => useContext(AuthContext);

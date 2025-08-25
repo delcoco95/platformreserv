@@ -1,10 +1,13 @@
 {
   "compilerOptions": {
     "checkJs": true,
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": { "@/*": ["src/*"] }
   },
-  "include": ["src/**/*", "vite.config.js", "index.html"],
+  "include": ["src/**/*", "vite.config.*", "vite-env.d.ts", "index.html"],
   "exclude": ["node_modules", "dist"]
 }
