@@ -54,13 +54,7 @@ const businessInfoSub = new mongoose.Schema(
         message: 'Le numéro SIRET est invalide (doit contenir 14 chiffres valides — contrôle Luhn).',
       },
     },
-<<<<<<< HEAD
-    businessAddress: {
-      street: String,
-      city: String,
-      zipCode: String,
-      country: { type: String, default: 'France' }
-    },
+    businessAddress: businessAddressSub,
     profession: {
       type: String,
       enum: ['automobile', 'plomberie', 'serrurerie', 'electricite']
@@ -79,89 +73,111 @@ const businessInfoSub = new mongoose.Schema(
         sunday: { isWorking: false, start: '08:00', end: '18:00' }
       }
     }
-=======
->>>>>>> refs/remotes/origin/main
   },
   { _id: false }
 );
 
-const userSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
-    // Base
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, required: true, minlength: 6 },
-    userType: { type: String, required: true, enum: ['client', 'professionnel'] },
-
-    // Profil personnel
-    firstName: { type: String, required: true, trim: true },
-    lastName: { type: String, required: true, trim: true },
-    phone: { type: String, required: true, trim: true },
-
-    // Localisation (client/pro)
-    address: {
-      type: addressSub,
-      required: true,
-      validate: {
-        validator: function (addr) {
-          if (!addr) return false;
-          return !!(addr.street && addr.city && addr.zipCode && addr.country);
-        },
-        message: 'Adresse incomplète : rue, ville, code postal et pays sont obligatoires.',
+    email: {
+      type: String,
+      required: [true, 'Email requis'],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, 'Format email invalide'],
+    },
+    password: {
+      type: String,
+      required: [true, 'Mot de passe requis'],
+      minlength: [6, 'Le mot de passe doit contenir au moins 6 caractères'],
+    },
+    firstName: {
+      type: String,
+      required: [true, 'Prénom requis'],
+      trim: true,
+      minlength: [2, 'Le prénom doit contenir au moins 2 caractères'],
+    },
+    lastName: {
+      type: String,
+      required: [true, 'Nom requis'],
+      trim: true,
+      minlength: [2, 'Le nom doit contenir au moins 2 caractères'],
+    },
+    phone: {
+      type: String,
+      trim: true,
+      match: [/^(?:\+33|0)[1-9](?:[0-9]{8})$/, 'Numéro de téléphone français invalide'],
+    },
+    userType: {
+      type: String,
+      required: [true, 'Type d\'utilisateur requis'],
+      enum: {
+        values: ['client', 'professionnel'],
+        message: 'Le type d\'utilisateur doit être "client" ou "professionnel"',
       },
     },
-
-    // Spécifique professionnel
-    businessInfo: { type: businessInfoSub },
-    businessAddress: { type: businessAddressSub },
-    profession: { type: String, enum: ['automobile', 'plomberie', 'serrurerie', 'electricite'] },
-    description: { type: String, trim: true },
-    images: [String],
-
-    // Statut
+    address: addressSub,
+    businessInfo: businessInfoSub,
+    profilePicture: { type: String },
     isActive: { type: Boolean, default: true },
     isVerified: { type: Boolean, default: false },
+    lastLogin: { type: Date },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true, transform: (doc, ret) => { delete ret.password; return ret; } },
+    toObject: { virtuals: true, transform: (doc, ret) => { delete ret.password; return ret; } },
+  }
 );
 
-/**
- * Contraintes conditionnelles :
- * - Pour "professionnel" : companyName, siret (Luhn valide), businessAddress complet, profession obligatoires.
- * - Pour "client" : businessInfo/bizAddress non obligatoires.
- */
-userSchema.pre('validate', function (next) {
+// Validation conditionnelle pour les professionnels
+UserSchema.pre('validate', function (next) {
   if (this.userType === 'professionnel') {
-    const bi = this.businessInfo || {};
-    const ba = this.businessAddress || {};
-    if (!bi.companyName) this.invalidate('businessInfo.companyName', 'Le nom d’entreprise est obligatoire.');
-    if (!bi.siret) this.invalidate('businessInfo.siret', 'Le numéro SIRET est obligatoire.');
-    if (bi.siret && !isValidSiretLuhn(bi.siret)) {
-      this.invalidate('businessInfo.siret', 'Le numéro SIRET est invalide (contrôle Luhn).');
+    // SIRET obligatoire pour les professionnels
+    if (!this.businessInfo?.siret) {
+      this.invalidate('businessInfo.siret', 'Le numéro SIRET est obligatoire pour les professionnels');
     }
-    if (!ba.street || !ba.city || !ba.zipCode || !ba.country) {
-      this.invalidate('businessAddress', 'L’adresse professionnelle est obligatoire et complète.');
+    // Nom de société requis
+    if (!this.businessInfo?.companyName) {
+      this.invalidate('businessInfo.companyName', 'Le nom de société est obligatoire pour les professionnels');
     }
-    if (!this.profession) this.invalidate('profession', 'La profession est obligatoire pour un compte professionnel.');
+    // Profession requise
+    if (!this.businessInfo?.profession) {
+      this.invalidate('businessInfo.profession', 'La profession est obligatoire pour les professionnels');
+    }
   }
   next();
 });
 
-// Hash du mot de passe
-userSchema.pre('save', async function (next) {
+// Middleware pour hashage automatique du mot de passe
+UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 12);
-  next();
+
+  try {
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
-// Méthodes
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+// Méthode pour comparer les mots de passe
+UserSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
-userSchema.methods.getPublicProfile = function () {
-  const userObject = this.toObject();
-  delete userObject.password;
-  return userObject;
-};
+// Virtual pour le nom complet
+UserSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
 
-module.exports = mongoose.model('User', userSchema);
+// Index pour optimiser les recherches
+UserSchema.index({ email: 1 });
+UserSchema.index({ userType: 1 });
+UserSchema.index({ 'businessInfo.profession': 1 });
+
+module.exports = mongoose.model('User', UserSchema);
