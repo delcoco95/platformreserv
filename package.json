@@ -4,15 +4,15 @@
   "description": "BookAuto - Plateforme de réservation automobile",
   "scripts": {
     "dev": "concurrently \"npm run dev:db\" \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:db": "docker-compose up -d mongodb",
+    "dev:db": "docker compose up -d mongodb",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "start": "npm run start:db && npm run start:backend",
-    "start:db": "docker-compose up -d mongodb",
+    "start:db": "docker compose up -d mongodb",
     "start:backend": "cd backend && npm start",
     "build:frontend": "cd frontend && npm run build",
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
-    "clean": "docker-compose down -v",
+    "clean": "docker compose down -v",
     "setup": "npm run install:all && npm run dev:db"
   },
   "devDependencies": {
