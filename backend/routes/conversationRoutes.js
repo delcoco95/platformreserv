@@ -3,19 +3,19 @@ const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
-// Routes temporaires (à implémenter)
+// Get user conversations
 router.get("/", auth, (req, res) => {
-  res.json({
-    success: true,
-    data: [],
-    message: "Route des conversations en cours de développement"
+  res.status(501).json({
+    success: false,
+    message: "Conversations feature not implemented yet"
   });
 });
 
+// Create new conversation
 router.post("/", auth, (req, res) => {
-  res.json({
-    success: true,
-    message: "Création de conversation en cours de développement"
+  res.status(501).json({
+    success: false,
+    message: "Conversation creation not implemented yet"
   });
 });
 

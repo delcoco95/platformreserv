@@ -3,19 +3,19 @@ const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
-// Routes temporaires (à implémenter)
+// Get reviews for a professional
 router.get("/professional/:professionalId", (req, res) => {
-  res.json({
-    success: true,
-    data: [],
-    message: "Route des avis en cours de développement"
+  res.status(501).json({
+    success: false,
+    message: "Reviews feature not implemented yet"
   });
 });
 
+// Create new review
 router.post("/", auth, (req, res) => {
-  res.json({
-    success: true,
-    message: "Création d'avis en cours de développement"
+  res.status(501).json({
+    success: false,
+    message: "Review creation not implemented yet"
   });
 });
 

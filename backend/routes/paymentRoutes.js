@@ -3,27 +3,27 @@ const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
-// Routes temporaires (à implémenter)
+// Create payment intent
 router.post("/create-intent", auth, (req, res) => {
-  res.json({
-    success: true,
-    data: { clientSecret: "pi_test_1234567890" },
-    message: "Paiement Stripe en cours de développement"
+  res.status(501).json({
+    success: false,
+    message: "Payment integration not implemented yet"
   });
 });
 
+// Confirm payment
 router.post("/confirm", auth, (req, res) => {
-  res.json({
-    success: true,
-    message: "Confirmation de paiement en cours de développement"
+  res.status(501).json({
+    success: false,
+    message: "Payment confirmation not implemented yet"
   });
 });
 
+// Get transaction history
 router.get("/transactions", auth, (req, res) => {
-  res.json({
-    success: true,
-    data: [],
-    message: "Historique des transactions en cours de développement"
+  res.status(501).json({
+    success: false,
+    message: "Transaction history not implemented yet"
   });
 });
 
