@@ -72,11 +72,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-// MongoDB connection with retry logic
+// MongoDB connection with retry logic (non-blocking)
 async function connectWithRetry() {
-  const { MONGO_URI, PORT = 5000 } = process.env;
-  
-  while (true) {
+  const { MONGO_URI } = process.env;
+
+  let attempts = 0;
+  const maxAttempts = 5; // Limite les tentatives pour éviter les boucles infinies
+
+  while (attempts < maxAttempts) {
     try {
       await mongoose.connect(MONGO_URI, {
         serverSelectionTimeoutMS: 5000,
@@ -84,21 +87,30 @@ async function connectWithRetry() {
       console.log('✅ MongoDB connecté');
       break;
     } catch (err) {
-      console.error('❌ Connexion MongoDB échouée, nouvelle tentative dans 2s…', err.message);
-      await new Promise(res => setTimeout(res, 2000));
+      attempts++;
+      console.error(`❌ Connexion MongoDB échouée (tentative ${attempts}/${maxAttempts}):`, err.message);
+
+      if (attempts < maxAttempts) {
+        console.log('⏳ Nouvelle tentative dans 2s...');
+        await new Promise(res => setTimeout(res, 2000));
+      } else {
+        console.log('⚠️ MongoDB indisponible - Le serveur continuera sans base de données');
+      }
     }
   }
 }
 
-// Start server
-(async () => {
-  await connectWithRetry();
-  
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`✅ Backend démarré sur http://localhost:${PORT}`);
-    console.log(`🌍 Environnement: ${process.env.NODE_ENV || 'development'}`);
+// Start server immediately and connect to MongoDB in background
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`✅ Backend démarré sur http://localhost:${PORT}`);
+  console.log(`🌍 Environnement: ${process.env.NODE_ENV || 'development'}`);
+
+  // Try to connect to MongoDB in background
+  connectWithRetry().catch(err => {
+    console.error('❌ Erreur lors de la connexion MongoDB:', err.message);
   });
-})();
+});
 
 module.exports = app;
