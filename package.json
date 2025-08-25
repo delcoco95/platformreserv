@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "BookAuto - Plateforme de réservation automobile",
   "scripts": {
-    "dev": "concurrently \"npm run dev:db\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:db": "docker compose up -d mongodb",
-    "dev:backend": "cd backend && npm run dev",
-    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && nodemon server.js",
+    "dev:frontend": "cd frontend && vite --port 3000",
+    "dev": "npm run dev:db && npm run dev:backend",
     "start": "npm run start:db && npm run start:backend",
     "start:db": "docker compose up -d mongodb",
     "start:backend": "cd backend && npm start",
