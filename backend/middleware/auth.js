@@ -18,7 +18,7 @@ const auth = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Récupérer l'utilisateur
-    const user = await User.findById(decoded.id).select('-password');
+    const user = await User.findById(decoded.userId).select('-password');
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -35,7 +35,7 @@ const auth = async (req, res, next) => {
     }
 
     // Ajouter l'utilisateur à la requête
-    req.user = user;
+    req.user = { userId: decoded.userId, ...user.toObject() };
     next();
 
   } catch (error) {
